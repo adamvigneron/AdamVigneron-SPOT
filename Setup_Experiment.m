@@ -11,10 +11,10 @@ function [] = Setup_Experiment()
     if isempty(expName)==1
         fprintf("No name entered...\n");
     else
-        copyfile([cd '\Template_Files\'],...
-        [cd '\Projects\' expName{1,1}]);
+        copyfile([cd filesep 'Template_Files' filesep],...
+        [cd filesep 'Projects' filesep expName{1,1}]);
     
-        cd([cd '\Projects\' expName{1,1}]);
+        cd([cd filesep 'Projects' filesep expName{1,1}]);
     
         movefile('Template_v4_00_2023a_Jetson.slx',[expName{1,1} '.slx']);
     end
