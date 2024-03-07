@@ -74,3 +74,52 @@ Gamma6_wr = 0.02;
 
 % Set the PWM frequency
 PWMFreq = 5; %[Hz]
+
+%% Iterative Learning Control
+
+% "Iterative Learning Control of Spacecraft Proximity Operations Based on Confidence Level"
+% Steve Ulrich and Kirk Hovell
+% AIAA GNC 2017
+% https://arc.aiaa.org/doi/10.2514/6.2017-1046 
+
+% This script simulates the numerical example of Section III.C
+
+% select a value for beta
+% 0 - feed-forward blocked
+% 1 - feed-forward applied
+% (fractional values also possible)
+beta = 0.5;
+
+
+%% Define feed-forward signal
+
+try 
+    load('Saved Data/SimulationData_2024_3_7_16_51_16_809/dataPacket_SIM.mat');
+    myTime = dataClass.Time_s;
+    myData = dataClass.CustomUserData51;
+
+    fprintf('Run_Initializer.m:\n');
+    fprintf('  feed-forward signal loaded from datafile\n\n');
+
+catch ME
+    if (strcmp(ME.identifier,'MATLAB:load:couldNotReadFile'))
+        myTime = 0:baseRate:tsim;
+        myData = 0*myTime;
+
+        fprintf('Run_Initializer.m:\n');
+        fprintf('  feed-forward signal set to zero\n\n')
+
+    else
+        rethrow(ME)
+    end
+end
+
+RED_Fx_Fwd_N = timeseries(myData,myTime);
+
+% currently, the reference is hardcoded as a sinusoid
+% x = aRef * cos( wRef * t ) + xLength/2
+aRef = 0.85;
+x0   = init_states_RED(1);
+
+xLength = 2 * ( x0 - aRef );
+
