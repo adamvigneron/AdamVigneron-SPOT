@@ -116,10 +116,34 @@ end
 
 RED_Fx_Fwd_N = timeseries(myData,myTime);
 
-% currently, the reference is hardcoded as a sinusoid
-% x = aRef * cos( wRef * t ) + xLength/2
-aRef = 0.85;
-x0   = init_states_RED(1);
 
-xLength = 2 * ( x0 - aRef );
+%% Initialize the reference signal
+
+% codegen - predeclare parameter struct
+nPhase    = 7;
+nSubphase = 4;
+nCoord    = 12;
+
+structRefGen.fun = 0;
+structRefGen.k1  = 0;
+structRefGen.k2  = 0;
+structRefGen.k3  = 0;
+structRefGen.k4  = 0;
+
+paramRefGen = repmat(structRefGen,nPhase,nSubphase,nCoord);
+
+% specify the phase, subphase, and coordinate of interest
+phase      = 3;  % will be combined with subphase in an enumeration
+subphase   = 4;
+coordinate = 1;  % xRed; will be converted to an enumeration
+
+% fun = k1 * cos( k2 * t + k3 ) + k4
+paramRefGen(phase,subphase,coordinate).fun = 1;  % cosine; will be converted to an enumeration
+paramRefGen(phase,subphase,coordinate).k1  = 0.85;
+paramRefGen(phase,subphase,coordinate).k2  = 0.03490659;
+paramRefGen(phase,subphase,coordinate).k3  = 0;
+paramRefGen(phase,subphase,coordinate).k4  = xLength / 2;
+
+% we update the definition of k4 to ensure a bumpless transfer
+paramRefGen(phase,subphase,coordinate).k4  = init_states_RED(1) - paramRefGen(phase,subphase,coordinate).k1;
 
