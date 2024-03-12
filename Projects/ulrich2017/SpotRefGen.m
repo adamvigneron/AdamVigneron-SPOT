@@ -1,22 +1,25 @@
-function ref = SpotRefGen(t, phaseSubCoord, paramRefGen)
+function ref = SpotRefGen(t, phase, coord, paramRefGen)
 
-    phase      = phaseSubCoord(1);
-    subphase   = phaseSubCoord(2);
-    coordinate = phaseSubCoord(3);
-
-    myFun = paramRefGen(phase,subphase,coordinate).fun;
+    myFun = paramRefGen(phase,coord).fun;
  
     switch myFun
-        case 1  % cosine; will be replaced with an enumeration
-            k1 = paramRefGen(phase,subphase,coordinate).k1;
-            k2 = paramRefGen(phase,subphase,coordinate).k2;
-            k3 = paramRefGen(phase,subphase,coordinate).k3;
-            k4 = paramRefGen(phase,subphase,coordinate).k4;
+
+        case SpotRef.constant
+            k1 = paramRefGen(phase,coord).k1;
+
+            ref = k1;
+
+        case SpotRef.cosine
+            k1 = paramRefGen(phase,coord).k1;
+            k2 = paramRefGen(phase,coord).k2;
+            k3 = paramRefGen(phase,coord).k3;
+            k4 = paramRefGen(phase,coord).k4;
 
             ref = k1 * cos( k2 * t + k3) + k4;
 
         otherwise
-            error('SpotRefGen.m:\n  specified reference function "%s" not defined (phase %d subphase %d coordinate %d).', myFun, phase, subphase, coordinate)
+
+            error('SpotRefGen.m:\n  function SpotRef(%d).fun not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
 
     end % switch myFun
 

@@ -94,7 +94,7 @@ beta = 0.5;
 %% Define feed-forward signal
 
 try 
-    load('Saved Data/SimulationData_2024_3_7_16_51_16_809/dataPacket_SIM.mat');
+    load('Saved Data/SimulationData_2024_3_12_14_59_42_1783/dataPacket_SIM.mat');
     myTime = dataClass.Time_s;
     myData = dataClass.CustomUserData51;
 
@@ -107,7 +107,7 @@ catch ME
         myData = 0*myTime;
 
         fprintf('Run_Initializer.m:\n');
-        fprintf('  feed-forward signal set to zero\n\n')
+        fprintf('  feed-forward datafile not found; feed-forward signal set to zero\n\n')
 
     else
         rethrow(ME)
@@ -119,31 +119,30 @@ RED_Fx_Fwd_N = timeseries(myData,myTime);
 
 %% Initialize the reference signal
 
-% codegen - predeclare parameter struct
-nPhase    = 7;
-nSubphase = 4;
-nCoord    = 12;
+% predeclare for code generation
+numPhase = length(meta.class.fromName('SpotPhase').EnumerationMemberList);
+numCoord = length(meta.class.fromName('SpotCoord').EnumerationMemberList);
 
-structRefGen.fun = 0;
+structRefGen.fun = SpotRef.constant;
 structRefGen.k1  = 0;
 structRefGen.k2  = 0;
 structRefGen.k3  = 0;
 structRefGen.k4  = 0;
 
-paramRefGen = repmat(structRefGen,nPhase,nSubphase,nCoord);
+paramRefGen = repmat(structRefGen,numPhase,numCoord);
 
-% specify the phase, subphase, and coordinate of interest
-phase      = 3;  % will be combined with subphase in an enumeration
-subphase   = 4;
-coordinate = 1;  % xRed; will be converted to an enumeration
+% specify the phase and coordinate of interest
+phase = SpotPhase.Phase3_4;
+coord = SpotCoord.xRed;  
+
+paramRefGen(phase,coord).fun = SpotRef.cosine;  
 
 % fun = k1 * cos( k2 * t + k3 ) + k4
-paramRefGen(phase,subphase,coordinate).fun = 1;  % cosine; will be converted to an enumeration
-paramRefGen(phase,subphase,coordinate).k1  = 0.85;
-paramRefGen(phase,subphase,coordinate).k2  = 0.03490659;
-paramRefGen(phase,subphase,coordinate).k3  = 0;
-paramRefGen(phase,subphase,coordinate).k4  = xLength / 2;
+paramRefGen(phase,coord).k1  = 0.85;
+paramRefGen(phase,coord).k2  = 0.03490659;
+paramRefGen(phase,coord).k3  = 0;
+paramRefGen(phase,coord).k4  = xLength / 2;
 
-% we update the definition of k4 to ensure a bumpless transfer
-paramRefGen(phase,subphase,coordinate).k4  = init_states_RED(1) - paramRefGen(phase,subphase,coordinate).k1;
+% we can update the definition of k4 to ensure a bumpless transfer
+paramRefGen(phase,coord).k4  = init_states_RED(1) - paramRefGen(phase,coord).k1;
 
