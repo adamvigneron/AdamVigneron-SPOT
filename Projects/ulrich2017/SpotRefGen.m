@@ -5,17 +5,71 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
     switch myFun
 
         case SpotRef.constant
-            k1 = paramRefGen(phase,coord).k1;
+            k1 = paramRefGen(phase,coord).k1;  % constant reference
 
             ref = k1;
 
         case SpotRef.cosine
-            k1 = paramRefGen(phase,coord).k1;
-            k2 = paramRefGen(phase,coord).k2;
-            k3 = paramRefGen(phase,coord).k3;
-            k4 = paramRefGen(phase,coord).k4;
+            k1 = paramRefGen(phase,coord).k1;  % amplitude
+            k2 = paramRefGen(phase,coord).k2;  % frequency
+            k3 = paramRefGen(phase,coord).k3;  % phase
+            k4 = paramRefGen(phase,coord).k4;  % offset
 
-            ref = k1 * cos( k2 * t + k3) + k4;
+            ref = k1 * cos( k2 * t + k3 ) + k4;
+
+        case SpotRef.sine
+            k1 = paramRefGen(phase,coord).k1;  % amplitude
+            k2 = paramRefGen(phase,coord).k2;  % frequency
+            k3 = paramRefGen(phase,coord).k3;  % phase
+            k4 = paramRefGen(phase,coord).k4;  % offset
+
+            ref = k1 * sin( k2 * t + k3 ) + k4;
+
+        case SpotRef.sineSpinup
+            k1 = paramRefGen(phase,coord).k1;  % amplitude
+            k2 = paramRefGen(phase,coord).k2;  % frequency
+            k3 = paramRefGen(phase,coord).k3;  % phase
+            k4 = paramRefGen(phase,coord).k4;  % offset
+            k5 = paramRefGen(phase,coord).k5;  % spin-up time
+
+            % define a few convenience variables
+            omgSpin = k2;
+            tSpin   = k5;
+
+            % calculate total angle elapsed
+            if t < tSpin
+                % we're in spin-up
+                alpha = 0.5 * omgSpin/tSpin * t^2;
+            else
+                % we're already spun-up
+                alpha = 0.5 * omgSpin*tSpin + omgSpin * (t-tSpin);
+            end
+
+            % total angle elapsed replaces the omega*t term
+            ref   = k1 * sin( alpha + k3 ) + k4;
+
+        case SpotRef.cosineSpinup
+            k1 = paramRefGen(phase,coord).k1;  % amplitude
+            k2 = paramRefGen(phase,coord).k2;  % frequency
+            k3 = paramRefGen(phase,coord).k3;  % phase
+            k4 = paramRefGen(phase,coord).k4;  % offset
+            k5 = paramRefGen(phase,coord).k5;  % spin-up time
+
+            % define a few convenience variables
+            omgSpin = k2;
+            tSpin   = k5;
+
+            % calculate total angle elapsed
+            if t < tSpin
+                % we're in spin-up
+                alpha = 0.5 * omgSpin/tSpin * t^2;
+            else
+                % we're already spun-up
+                alpha = 0.5 * omgSpin*tSpin + omgSpin * (t-tSpin);
+            end
+
+            % total angle elapsed replaces the omega*t term
+            ref = k1 * cos( alpha + k3 ) + k4;
 
         otherwise
 
