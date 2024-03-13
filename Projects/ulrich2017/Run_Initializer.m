@@ -34,13 +34,13 @@ initSpotRefGen;
 % 0 - feed-forward blocked
 % 1 - feed-forward applied
 % (decimal values also possible)
-beta = 0.5;
+beta = 0.25;
 
 
 %% Define feed-forward signal
 
 try 
-    load('Saved Data/SimulationData_2024_3_13_10_27_18_9607c/dataPacket_SIM.mat');
+    load('Saved Data/SimulationData_2024_3_13_13_43_11_7144/dataPacket_SIM.mat');
     myTime = dataClass.Time_s;
     myDataX = dataClass.CustomUserData51;
     myDataY = dataClass.CustomUserData52;

@@ -5,7 +5,21 @@ includeSpinup = 1;
 
 %% additional calculations
 
-spinupTime = 100;
+% as an initial conservative design, reserve half of the authority 
+% and split the remaining half between spin-up and centripetal
+
+alloc = 0.5;
+
+traAuth = min(F_red_X_nominal,F_red_Y_nominal) / mRED;
+accAvail = alloc * traAuth;
+
+rRef   = 0.85;
+omgRef = 0.03490659;
+
+accCent = omgRef^2 * rRef;
+accSpin = accAvail - accCent;
+
+spinupTime = omgRef * rRef / accSpin;
 
 
 %% predeclare for code generation
@@ -34,13 +48,10 @@ else
 end
 
 % ref = k1 * cos( k2 * t + k3 ) + k4
-paramRefGen(phase,coord).k1  = 0.85;
-paramRefGen(phase,coord).k2  = 0.03490659;
+paramRefGen(phase,coord).k1  = rRef;
+paramRefGen(phase,coord).k2  = omgRef;
 paramRefGen(phase,coord).k3  = 0;
-paramRefGen(phase,coord).k4  = xLength / 2;
-
-% we can update the definition of k4 to ensure a bumpless transfer
-paramRefGen(phase,coord).k4  = init_states_RED(1) - paramRefGen(phase,coord).k1;
+paramRefGen(phase,coord).k4  = init_states_RED(1) - rRef;
 
 
 %% SpotPhase.Phase3_4 - SpotCoord.yRed
@@ -56,11 +67,8 @@ else
 end
 
 % ref = k1 * sin( k2 * t + k3) + k4;
-paramRefGen(phase,coord).k1  = 0.85;
-paramRefGen(phase,coord).k2  = 0.03490659;
+paramRefGen(phase,coord).k1  = rRef;
+paramRefGen(phase,coord).k2  = omgRef;
 paramRefGen(phase,coord).k3  = 0;
-paramRefGen(phase,coord).k4  = yLength / 2;
-
-% we can update the definition of k4 to ensure a bumpless transfer
 paramRefGen(phase,coord).k4  = init_states_RED(2);
 
