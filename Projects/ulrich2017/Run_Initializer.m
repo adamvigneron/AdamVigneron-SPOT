@@ -40,10 +40,10 @@ beta = 0.25;
 %% Define feed-forward signal
 
 try 
-    load('Saved Data/SimulationData_2024_3_13_13_43_11_7144/dataPacket_SIM.mat');
+    load('Saved Data/SimulationData_2024_3_14_13_39_19_4889/dataPacket_SIM.mat');
     myTime = dataClass.Time_s;
-    myDataX = dataClass.CustomUserData51;
-    myDataY = dataClass.CustomUserData52;
+    myDataX = dataClass.RED_Fx_N;
+    myDataY = dataClass.RED_Fy_N;
 
     fprintf('Run_Initializer.m:\n');
     fprintf('  feed-forward signal loaded from datafile\n\n');
@@ -56,6 +56,14 @@ catch ME
 
         fprintf('Run_Initializer.m:\n');
         fprintf('  feed-forward datafile not found; feed-forward signal set to zero\n\n')
+
+    elseif (strcmp(ME.identifier,'MATLAB:nonExistentField'))
+        myTime = 0:baseRate:tsim;
+        myDataX = 0*myTime;
+        myDataY = 0*myTime;
+
+        fprintf('Run_Initializer.m:\n');
+        fprintf(['  ' ME.message(1:(end-1)) ' within feed-forward datafile; feed-forward signal set to zero\n\n'])
 
     else
         rethrow(ME)
