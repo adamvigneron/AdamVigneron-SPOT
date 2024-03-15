@@ -8,7 +8,7 @@ includeSpinup = 1;
 % as an initial conservative design, reserve half of the authority 
 % and split the remaining half between spin-up and centripetal
 
-alloc = 0.5;
+alloc = 0.1;
 
 traAuth = min(F_red_X_nominal,F_red_Y_nominal) / mRED;
 accAvail = alloc * traAuth;

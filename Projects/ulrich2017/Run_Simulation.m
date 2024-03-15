@@ -21,7 +21,7 @@ myApp.public_BLACKCheckBoxValueChanged([]);
 myApp.public_StartSimulationButtonPushed([]);
 
 % save the simulation data
-myEvent.value = 'suppressWaitfor';
+myEvent.Value = 'suppressWaitfor';
 myApp.public_SaveSimulationDataButtonPushed(myEvent);
 
 % close the simulink model; close the figure (and app); clear the workspace
