@@ -1,10 +1,14 @@
-classdef SpotRef < Simulink.IntEnumType
+classdef SpotKey < Simulink.IntEnumType
     enumeration
-        constant(1)
-        cosine(2)
-        sine(3)
-        cosineSpinup(4)
-        sineSpinup(5)
+        refConstant(101)
+        refCosine(102)
+        refSine(103)
+        refCosineSpinup(104)
+        refSineSpinup(105)
+%        
+        ctrlNone(201)
+        ctrlPd(202)
+        ctrlPdFwd(203)
     end
 end
 

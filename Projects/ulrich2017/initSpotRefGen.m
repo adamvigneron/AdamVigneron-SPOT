@@ -26,7 +26,7 @@ spinupTime = omgRef * rRef / accSpin;
 numPhase = length(meta.class.fromName('SpotPhase').EnumerationMemberList);
 numCoord = length(meta.class.fromName('SpotCoord').EnumerationMemberList);
 
-structRefGen.fun = SpotRef.constant;
+structRefGen.fun = SpotKey.refConstant;
 structRefGen.k1  = 0;
 structRefGen.k2  = 0;
 structRefGen.k3  = 0;
@@ -41,10 +41,10 @@ phase = SpotPhase.Phase3_4;
 coord = SpotCoord.xRed;
 
 if includeSpinup
-    paramRefGen(phase,coord).fun = SpotRef.cosineSpinup;
+    paramRefGen(phase,coord).fun = SpotKey.refCosineSpinup;
     paramRefGen(phase,coord).k5  = spinupTime;
 else
-    paramRefGen(phase,coord).fun = SpotRef.cosine;
+    paramRefGen(phase,coord).fun = SpotKey.refCosine;
 end
 
 % ref = k1 * cos( k2 * t + k3 ) + k4
@@ -60,10 +60,10 @@ phase = SpotPhase.Phase3_4;
 coord = SpotCoord.yRed;
 
 if includeSpinup
-    paramRefGen(phase,coord).fun = SpotRef.sineSpinup;
+    paramRefGen(phase,coord).fun = SpotKey.refSineSpinup;
     paramRefGen(phase,coord).k5  = spinupTime;
 else
-    paramRefGen(phase,coord).fun = SpotRef.sine;
+    paramRefGen(phase,coord).fun = SpotKey.refSine;
 end
 
 % ref = k1 * sin( k2 * t + k3) + k4;

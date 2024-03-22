@@ -4,12 +4,12 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
  
     switch myFun
 
-        case SpotRef.constant
+        case SpotKey.refConstant
             k1 = paramRefGen(phase,coord).k1;  % constant reference
 
             ref = k1;
 
-        case SpotRef.cosine
+        case SpotKey.refCosine
             k1 = paramRefGen(phase,coord).k1;  % amplitude
             k2 = paramRefGen(phase,coord).k2;  % frequency
             k3 = paramRefGen(phase,coord).k3;  % phase
@@ -17,7 +17,7 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
 
             ref = k1 * cos( k2 * t + k3 ) + k4;
 
-        case SpotRef.sine
+        case SpotKey.refSine
             k1 = paramRefGen(phase,coord).k1;  % amplitude
             k2 = paramRefGen(phase,coord).k2;  % frequency
             k3 = paramRefGen(phase,coord).k3;  % phase
@@ -25,7 +25,7 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
 
             ref = k1 * sin( k2 * t + k3 ) + k4;
 
-        case SpotRef.sineSpinup
+        case SpotKey.refSineSpinup
             k1 = paramRefGen(phase,coord).k1;  % amplitude
             k2 = paramRefGen(phase,coord).k2;  % frequency
             k3 = paramRefGen(phase,coord).k3;  % phase
@@ -48,7 +48,7 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
             % total angle elapsed replaces the omega*t term
             ref   = k1 * sin( alpha + k3 ) + k4;
 
-        case SpotRef.cosineSpinup
+        case SpotKey.refCosineSpinup
             k1 = paramRefGen(phase,coord).k1;  % amplitude
             k2 = paramRefGen(phase,coord).k2;  % frequency
             k3 = paramRefGen(phase,coord).k3;  % phase
@@ -72,8 +72,7 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
             ref = k1 * cos( alpha + k3 ) + k4;
 
         otherwise
-
-            error('SpotRefGen.m:\n  function SpotRef(%d).fun not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
+            error('SpotRefGen.m:\n  function SpotKey(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
 
     end % switch myFun
 

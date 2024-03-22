@@ -20,3 +20,6 @@ initSpotArmCtrlParam;
 % initialize the GNC unit handling reference generation
 initSpotRefGen;
 
+% initialize the GNC unit handling control
+initSpotController;
+

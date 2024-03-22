@@ -70,6 +70,13 @@ for iSim = 1:length(betaVec)
 
     beta = betaVec(iSim);
     
+    paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).k4 = beta;
+
+    if exist('dataClass','var')
+        % overwrite the appropriate feed-foward signal
+        feedForward.Data(:,SpotCoord.xRed) = dataClass.RED_Fx_N;
+    end
+    
     myEvent.Value = 'suppressHardwareWarning';
     myApp.public_StartSimulationButtonPushed(myEvent);
 
