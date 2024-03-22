@@ -5,20 +5,23 @@ includeSpinup = 1;
 
 %% additional calculations
 
-% as an initial conservative design, reserve half of the authority 
-% and split the remaining half between spin-up and centripetal
+% as an initial conservative design, reserve 90% of the authority 
+% and split the remaining 10% between spin-up and centripetal
 
-alloc = 0.1;
-
-traAuth = min(F_red_X_nominal,F_red_Y_nominal) / mRED;
+% determine translational authority allocated for spin-up and centripetal
+alloc    = 0.1;
+traAuth  = min(F_red_X_nominal,F_red_Y_nominal) / mRED;
 accAvail = alloc * traAuth;
 
-rRef   = 0.85;
-omgRef = 0.03490659;
+% reference orbit 
+rRef   = 0.85;  % radius, metres
+omgRef = 0.03490659;  % angular frequency, rad/s
 
+% calculate the centripetal and spin-up accelerations
 accCent = omgRef^2 * rRef;
 accSpin = accAvail - accCent;
 
+% finally, calculate the total spin-up time
 spinupTime = omgRef * rRef / accSpin;
 
 

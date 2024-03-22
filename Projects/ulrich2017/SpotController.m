@@ -14,11 +14,13 @@ function [F,diag] = SpotController(e, phase, coord, feedFwd, paramCtrl)
 
 
     %% initialization of diagnostic output
+
     numPhase = size(paramCtrl,1); %#ok<NASGU>
     numCoord = size(paramCtrl,2);
     numDiag  = 3;
 
     diag = zeros(numDiag,numCoord);
+
 
     %% select a control method
 
@@ -41,8 +43,12 @@ function [F,diag] = SpotController(e, phase, coord, feedFwd, paramCtrl)
                 eDelta = eDeltaOld;
             end
 
+            % F = Kp*e + Kd*(de/dt)
             F = k1*e + k2*eDelta/k3;
-
+            
+            diag(1,coord) = k1*e;
+            diag(2,coord) = k2*eDelta/k3;
+            
             eOld      = e;
             eDeltaOld = eDelta;
 
@@ -58,6 +64,7 @@ function [F,diag] = SpotController(e, phase, coord, feedFwd, paramCtrl)
                 eDelta = eDeltaOld;
             end
 
+            % F = Kp*e + Kd*(de/dt) + beta*uOld
             F = k1*e + k2*eDelta/k3 + k4*feedFwd(coord);
 
             diag(1,coord) = k1*e;

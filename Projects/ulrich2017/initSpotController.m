@@ -1,9 +1,6 @@
 %% predeclare for code generation
-spotPhases = {meta.class.fromName('SpotPhase').EnumerationMemberList.Name};
-spotCoords = {meta.class.fromName('SpotCoord').EnumerationMemberList.Name};
-
-numPhase = length(spotPhases);
-numCoord = length(spotCoords);
+numPhase = length(meta.class.fromName('SpotPhase').EnumerationMemberList);
+numCoord = length(meta.class.fromName('SpotCoord').EnumerationMemberList);
 
 structCtrl.fun = SpotKey.ctrlNone;
 structCtrl.k1  = 0;
@@ -31,7 +28,7 @@ paramCtrl(phase,coord).fun = SpotKey.ctrlPdFwd;
 paramCtrl(phase,coord).k1  = Kp_xr;
 paramCtrl(phase,coord).k2  = Kd_xr;
 paramCtrl(phase,coord).k3  = baseRate;
-paramCtrl(phase,coord).k4  = 0;  % initial beta value
+% paramCtrl(phase,coord).k4 will be overwritten with beta values at runtime
 
 
 %% SpotPhase.Phase3_4 - SpotCoord.yRed
@@ -43,5 +40,5 @@ paramCtrl(phase,coord).fun = SpotKey.ctrlPdFwd;
 paramCtrl(phase,coord).k1  = Kp_yr;
 paramCtrl(phase,coord).k2  = Kd_yr;
 paramCtrl(phase,coord).k3  = baseRate;
-paramCtrl(phase,coord).k4  = 0;  % initial beta value
+% paramCtrl(phase,coord).k4 will be overwritten with beta values at runtime
 

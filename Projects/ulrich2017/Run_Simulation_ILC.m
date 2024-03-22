@@ -43,12 +43,6 @@ phase3 = (myTime > Phase2_End) & (myTime < Phase3_End);
 nSim = length(betaVec);
 nPts = length(myTime);
 
-myDataX = zeros(1,nPts);
-myDataY = zeros(1,nPts);
-
-RED_Fx_Fwd_N = timeseries(myDataX,myTime);
-RED_Fy_Fwd_N = timeseries(myDataY,myTime);
-
 xRef = zeros(nSim,nPts);
 yRef = zeros(nSim,nPts);
 xCmd = zeros(nSim,nPts);
@@ -66,15 +60,14 @@ yCmd_u0 = zeros(nSim,nPts);
 
 %% SIMULATE
 
-for iSim = 1:length(betaVec)
+for iSim = 1:nSim
 
-    beta = betaVec(iSim);
+    paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).k4 = betaVec(iSim); %#ok<SAGROW>
+    paramCtrl(SpotPhase.Phase3_4,SpotCoord.yRed).k4 = betaVec(iSim); %#ok<SAGROW>
     
-    paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).k4 = beta;
-
     if exist('dataClass','var')
-        % overwrite the appropriate feed-foward signal
         feedForward.Data(:,SpotCoord.xRed) = dataClass.RED_Fx_N;
+        feedForward.Data(:,SpotCoord.yRed) = dataClass.RED_Fy_N;
     end
     
     myEvent.Value = 'suppressHardwareWarning';
@@ -98,9 +91,6 @@ for iSim = 1:length(betaVec)
     posErr2D = mean( vecnorm( [ xRef(iSim,phase3) - xTra(iSim,phase3); ...
                                 yRef(iSim,phase3) - yTra(iSim,phase3)] ) );
     disp( ['Iteration ' num2str(iSim,'%02i') ': posErr2D = ' num2str(posErr2D) ] );
-
-    RED_Fx_Fwd_N = timeseries(dataClass.RED_Fx_N,myTime);
-    RED_Fy_Fwd_N = timeseries(dataClass.RED_Fy_N,myTime);
 
 end
 
