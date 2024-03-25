@@ -42,3 +42,15 @@ paramCtrl(phase,coord).k2  = Kd_yr;
 paramCtrl(phase,coord).k3  = baseRate;
 % paramCtrl(phase,coord).k4 will be overwritten with beta values at runtime
 
+
+%% SpotPhase.Phase3_4 - SpotCoord.thetaRed
+
+phase = SpotPhase.Phase3_4;
+coord = SpotCoord.thetaRed;
+
+paramCtrl(phase,coord).fun = SpotKey.ctrlPdFwd;
+paramCtrl(phase,coord).k1  = Kp_tr;
+paramCtrl(phase,coord).k2  = Kd_tr;
+paramCtrl(phase,coord).k3  = baseRate;
+% paramCtrl(phase,coord).k4 will be overwritten with beta values at runtime
+

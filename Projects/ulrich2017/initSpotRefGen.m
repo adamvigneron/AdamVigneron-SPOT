@@ -75,3 +75,14 @@ paramRefGen(phase,coord).k2  = omgRef;
 paramRefGen(phase,coord).k3  = 0;
 paramRefGen(phase,coord).k4  = init_states_RED(2);
 
+
+%% SpotPhase.Phase3_4 - SpotCoord.thetaRed
+
+phase = SpotPhase.Phase3_4;
+coord = SpotCoord.thetaRed;
+
+paramRefGen(phase,coord).fun = SpotKey.refPolyWrap;
+
+% ref = wrapToPi( k1 + k2 * t );
+paramRefGen(phase,coord).k1  = pi;
+paramRefGen(phase,coord).k2  = omgRef;

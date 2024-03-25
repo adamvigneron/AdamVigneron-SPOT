@@ -44,11 +44,14 @@ nSim = length(betaVec);
 nPts = length(myTime);
 
 xRef = zeros(nSim,nPts);
-yRef = zeros(nSim,nPts);
 xCmd = zeros(nSim,nPts);
-yCmd = zeros(nSim,nPts);
 xTra = zeros(nSim,nPts);
+yRef = zeros(nSim,nPts);
+yCmd = zeros(nSim,nPts);
 yTra = zeros(nSim,nPts);
+tRef = zeros(nSim,nPts);
+tCmd = zeros(nSim,nPts);
+tRot = zeros(nSim,nPts);
 
 xCmd_Kp = zeros(nSim,nPts);
 xCmd_Kd = zeros(nSim,nPts);
@@ -56,29 +59,37 @@ xCmd_u0 = zeros(nSim,nPts);
 yCmd_Kp = zeros(nSim,nPts);
 yCmd_Kd = zeros(nSim,nPts);
 yCmd_u0 = zeros(nSim,nPts);
+tCmd_Kp = zeros(nSim,nPts);
+tCmd_Kd = zeros(nSim,nPts);
+tCmd_u0 = zeros(nSim,nPts);
 
 
 %% SIMULATE
 
 for iSim = 1:nSim
 
-    paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).k4 = betaVec(iSim); %#ok<SAGROW>
-    paramCtrl(SpotPhase.Phase3_4,SpotCoord.yRed).k4 = betaVec(iSim); %#ok<SAGROW>
+    paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).k4     = betaVec(iSim); %#ok<SAGROW>
+    paramCtrl(SpotPhase.Phase3_4,SpotCoord.yRed).k4     = betaVec(iSim); %#ok<SAGROW>
+    paramCtrl(SpotPhase.Phase3_4,SpotCoord.thetaRed).k4 = betaVec(iSim); %#ok<SAGROW>
     
     if exist('dataClass','var')
-        feedForward.Data(:,SpotCoord.xRed) = dataClass.RED_Fx_N;
-        feedForward.Data(:,SpotCoord.yRed) = dataClass.RED_Fy_N;
+        feedForward.Data(:,SpotCoord.xRed)     = dataClass.RED_Fx_N;
+        feedForward.Data(:,SpotCoord.yRed)     = dataClass.RED_Fy_N;
+        feedForward.Data(:,SpotCoord.thetaRed) = dataClass.RED_Tz_Nm;
     end
     
     myEvent.Value = 'suppressHardwareWarning';
     myApp.public_StartSimulationButtonPushed(myEvent);
 
     xRef(iSim,:) = dataClass.RED_REFx_m;
-    yRef(iSim,:) = dataClass.RED_REFy_m;
     xCmd(iSim,:) = dataClass.RED_Fx_N;
-    yCmd(iSim,:) = dataClass.RED_Fy_N;
     xTra(iSim,:) = dataClass.RED_Px_m;
+    yRef(iSim,:) = dataClass.RED_REFy_m;
+    yCmd(iSim,:) = dataClass.RED_Fy_N;
     yTra(iSim,:) = dataClass.RED_Py_m;
+    tRef(iSim,:) = dataClass.RED_REFz_rad;
+    tCmd(iSim,:) = dataClass.RED_Tz_Nm;
+    tRot(iSim,:) = dataClass.RED_Rz_rad;
 
     xCmd_Kp(iSim,:) = dataClass.RED_Fx_Kp_N;
     xCmd_Kd(iSim,:) = dataClass.RED_Fx_Kd_N;
@@ -87,6 +98,10 @@ for iSim = 1:nSim
     yCmd_Kp(iSim,:) = dataClass.RED_Fy_Kp_N;
     yCmd_Kd(iSim,:) = dataClass.RED_Fy_Kd_N;
     yCmd_u0(iSim,:) = dataClass.RED_Fy_u0_N;
+
+    tCmd_Kp(iSim,:) = dataClass.RED_Tz_Kp_Nm;
+    tCmd_Kd(iSim,:) = dataClass.RED_Tz_Kd_Nm;
+    tCmd_u0(iSim,:) = dataClass.RED_Tz_u0_Nm;
 
     posErr2D = mean( vecnorm( [ xRef(iSim,phase3) - xTra(iSim,phase3); ...
                                 yRef(iSim,phase3) - yTra(iSim,phase3)] ) );
@@ -98,7 +113,7 @@ end
 %% PLOT
 
 % trajectory
-fig1 = figure('Name','trajectory');
+figure('Name','trajectory');
 plot( xRef(1,phase3), yRef(1,phase3), 'k--', 'LineWidth', 2 );
 hold on;
 plot( xTra(:,phase3)', yTra(:,phase3)' )
@@ -108,8 +123,19 @@ ylabel('y, m');
 legend('reference');
 grid on;
 
+% rotation
+figure('Name','rotation');
+plot( myTime(phase3), wrapToPi(tRef(1,phase3)), 'k--', 'LineWidth', 2 );
+hold on;
+plot( myTime(phase3), wrapToPi(tRot(:,phase3))')
+title('rotation');
+xlabel('theta, rad');
+ylabel('time, s');
+legend('reference');
+grid on;
+
 % x-axis control signal figure
-fig2 = figure('Name','x-control');
+figure('Name','x-control');
 plot(myTime(phase3),xCmd(:,phase3));
 title('control')
 xlabel('time, s');
@@ -117,15 +143,23 @@ ylabel('f_{x,cmd}, N');
 grid on;
 
 % y-axis control signal figure
-fig3 = figure('Name','y-control');
+figure('Name','y-control');
 plot(myTime(phase3),yCmd(:,phase3));
 title('control')
 xlabel('time, s');
 ylabel('f_{y,cmd}, N');
 grid on;
 
+% theta-axis control signal figure
+figure('Name','theta-control');
+plot(myTime(phase3),tCmd(:,phase3));
+title('control')
+xlabel('time, s');
+ylabel('t_{z,cmd}, Nm');
+grid on;
+
 % detail of x-control
-fig4 = figure('Name','x-detail');
+figure('Name','x-detail');
 subplot(1,3,1);
 plot(myTime(phase3),xCmd_u0(:,phase3));
 title('learning')
@@ -144,7 +178,7 @@ xlabel('time, s');
 grid on;
 
 % detail of y-control
-fig5 = figure('Name','y-detail');
+figure('Name','y-detail');
 subplot(1,3,1);
 plot(myTime(phase3),yCmd_u0(:,phase3));
 title('learning')
@@ -158,6 +192,25 @@ xlabel('time, s')
 grid on;
 subplot(1,3,3);
 plot(myTime(phase3),yCmd_Kd(:,phase3));
+title('derivative')
+xlabel('time, s');
+grid on;
+
+% detail of theta-control
+figure('Name','theta-detail');
+subplot(1,3,1);
+plot(myTime(phase3),tCmd_u0(:,phase3));
+title('learning')
+xlabel('time, s')
+ylabel('t_z, Nm');
+grid on;
+subplot(1,3,2);
+plot(myTime(phase3),tCmd_Kp(:,phase3));
+title('proportional')
+xlabel('time, s')
+grid on;
+subplot(1,3,3);
+plot(myTime(phase3),tCmd_Kd(:,phase3));
 title('derivative')
 xlabel('time, s');
 grid on;

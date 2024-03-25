@@ -71,6 +71,12 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
             % total angle elapsed replaces the omega*t term
             ref = k1 * sin( alpha + k3 ) + k4;
 
+        case SpotKey.refPolyWrap
+            k1 = paramRefGen(phase,coord).k1;  % initial angle
+            k2 = paramRefGen(phase,coord).k2;  % initial rate
+
+            ref = wrapToPi( k1 + k2 * t );
+
         otherwise
             error('SpotRefGen.m:\n  function SpotKey(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
 

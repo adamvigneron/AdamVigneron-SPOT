@@ -5,6 +5,7 @@ classdef SpotKey < Simulink.IntEnumType
         refSine(103)
         refCosineSpinup(104)
         refSineSpinup(105)
+        refPolyWrap(106)
 %        
         ctrlNone(201)
         ctrlPd(202)
