@@ -10,6 +10,10 @@ classdef SpotKey < Simulink.IntEnumType
         ctrlNone(201)
         ctrlPd(202)
         ctrlPdFwd(203)
+%
+        errMinus(301)
+        errMinusWrap(302)
+        errHough(303)
     end
 end
 

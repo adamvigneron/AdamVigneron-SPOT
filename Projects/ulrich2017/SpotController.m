@@ -75,7 +75,7 @@ function [F,diag] = SpotController(e, phase, coord, feedFwd, paramCtrl)
             eDeltaOld = eDelta;
 
         otherwise
-            error('SpotCtrl.m:\n  function SpotKey(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
+            error('SpotController.m:\n  function SpotKey(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
 
     end % switch myFun
 
