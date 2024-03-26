@@ -29,7 +29,7 @@ spinupTime = omgRef * rRef / accSpin;
 numPhase = length(meta.class.fromName('SpotPhase').EnumerationMemberList);
 numCoord = length(meta.class.fromName('SpotCoord').EnumerationMemberList);
 
-structRefGen.fun = SpotKey.refConstant;
+structRefGen.fun = SpotGnc.refConstant;
 structRefGen.k1  = 0;
 structRefGen.k2  = 0;
 structRefGen.k3  = 0;
@@ -44,10 +44,10 @@ phase = SpotPhase.Phase3_4;
 coord = SpotCoord.xRed;
 
 if includeSpinup
-    paramRefGen(phase,coord).fun = SpotKey.refCosineSpinup;
+    paramRefGen(phase,coord).fun = SpotGnc.refCosineSpinup;
     paramRefGen(phase,coord).k5  = spinupTime;
 else
-    paramRefGen(phase,coord).fun = SpotKey.refCosine;
+    paramRefGen(phase,coord).fun = SpotGnc.refCosine;
 end
 
 % ref = k1 * cos( k2 * t + k3 ) + k4
@@ -63,10 +63,10 @@ phase = SpotPhase.Phase3_4;
 coord = SpotCoord.yRed;
 
 if includeSpinup
-    paramRefGen(phase,coord).fun = SpotKey.refSineSpinup;
+    paramRefGen(phase,coord).fun = SpotGnc.refSineSpinup;
     paramRefGen(phase,coord).k5  = spinupTime;
 else
-    paramRefGen(phase,coord).fun = SpotKey.refSine;
+    paramRefGen(phase,coord).fun = SpotGnc.refSine;
 end
 
 % ref = k1 * sin( k2 * t + k3) + k4;
@@ -81,7 +81,7 @@ paramRefGen(phase,coord).k4  = init_states_RED(2);
 phase = SpotPhase.Phase3_4;
 coord = SpotCoord.thetaRed;
 
-paramRefGen(phase,coord).fun = SpotKey.refPolyWrap;
+paramRefGen(phase,coord).fun = SpotGnc.refPolyWrap;
 
 % ref = wrapToPi( k1 + k2 * t );
 paramRefGen(phase,coord).k1  = pi;

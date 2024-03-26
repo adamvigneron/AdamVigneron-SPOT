@@ -28,11 +28,11 @@ function [F,diag] = SpotController(e, phase, coord, feedFwd, paramCtrl)
     
     switch myFun
 
-        case SpotKey.ctrlNone
+        case SpotGnc.ctrlNone
 
             F = 0;
 
-        case SpotKey.ctrlPd
+        case SpotGnc.ctrlPd
             k1 = paramCtrl(phase,coord).k1;  % Kp
             k2 = paramCtrl(phase,coord).k2;  % Kd
             k3 = paramCtrl(phase,coord).k3;  % baseRate
@@ -52,7 +52,7 @@ function [F,diag] = SpotController(e, phase, coord, feedFwd, paramCtrl)
             eOld      = e;
             eDeltaOld = eDelta;
 
-        case SpotKey.ctrlPdFwd
+        case SpotGnc.ctrlPdFwd
             k1 = paramCtrl(phase,coord).k1;  % Kp
             k2 = paramCtrl(phase,coord).k2;  % Kd
             k3 = paramCtrl(phase,coord).k3;  % baseRate
@@ -75,7 +75,7 @@ function [F,diag] = SpotController(e, phase, coord, feedFwd, paramCtrl)
             eDeltaOld = eDelta;
 
         otherwise
-            error('SpotController.m:\n  function SpotKey(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
+            error('SpotController.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
 
     end % switch myFun
 

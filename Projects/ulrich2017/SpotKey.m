@@ -1,4 +1,4 @@
-classdef SpotKey < Simulink.IntEnumType
+classdef SpotGnc < Simulink.IntEnumType
     enumeration
         refConstant(101)
         refCosine(102)

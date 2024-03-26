@@ -4,12 +4,12 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
  
     switch myFun
 
-        case SpotKey.refConstant
+        case SpotGnc.refConstant
             k1 = paramRefGen(phase,coord).k1;  % constant reference
 
             ref = k1;
 
-        case SpotKey.refCosine
+        case SpotGnc.refCosine
             k1 = paramRefGen(phase,coord).k1;  % amplitude
             k2 = paramRefGen(phase,coord).k2;  % frequency
             k3 = paramRefGen(phase,coord).k3;  % phase
@@ -17,7 +17,7 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
 
             ref = k1 * cos( k2 * t + k3 ) + k4;
 
-        case SpotKey.refSine
+        case SpotGnc.refSine
             k1 = paramRefGen(phase,coord).k1;  % amplitude
             k2 = paramRefGen(phase,coord).k2;  % frequency
             k3 = paramRefGen(phase,coord).k3;  % phase
@@ -25,7 +25,7 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
 
             ref = k1 * sin( k2 * t + k3 ) + k4;
 
-        case SpotKey.refCosineSpinup
+        case SpotGnc.refCosineSpinup
             k1 = paramRefGen(phase,coord).k1;  % amplitude
             k2 = paramRefGen(phase,coord).k2;  % frequency
             k3 = paramRefGen(phase,coord).k3;  % phase
@@ -48,7 +48,7 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
             % total angle elapsed replaces the omega*t term
             ref = k1 * cos( alpha + k3 ) + k4;
 
-        case SpotKey.refSineSpinup
+        case SpotGnc.refSineSpinup
             k1 = paramRefGen(phase,coord).k1;  % amplitude
             k2 = paramRefGen(phase,coord).k2;  % frequency
             k3 = paramRefGen(phase,coord).k3;  % phase
@@ -71,14 +71,14 @@ function ref = SpotRefGen(t, phase, coord, paramRefGen)
             % total angle elapsed replaces the omega*t term
             ref = k1 * sin( alpha + k3 ) + k4;
 
-        case SpotKey.refPolyWrap
+        case SpotGnc.refPolyWrap
             k1 = paramRefGen(phase,coord).k1;  % initial angle
             k2 = paramRefGen(phase,coord).k2;  % initial rate
 
             ref = wrapToPi( k1 + k2 * t );
 
         otherwise
-            error('SpotRefGen.m:\n  function SpotKey(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
+            error('SpotRefGen.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
 
     end % switch myFun
 

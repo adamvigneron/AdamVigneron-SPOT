@@ -2,7 +2,7 @@
 numPhase = length(meta.class.fromName('SpotPhase').EnumerationMemberList);
 numCoord = length(meta.class.fromName('SpotCoord').EnumerationMemberList);
 
-structCtrlErr.fun = SpotKey.errMinus;
+structCtrlErr.fun = SpotGnc.errMinus;
 
 paramCtrlErr = repmat(structCtrlErr,numPhase,numCoord);
 
@@ -22,5 +22,5 @@ paramCtrlErr = repmat(structCtrlErr,numPhase,numCoord);
 phase = SpotPhase.Phase3_4;
 coord = SpotCoord.thetaRed;
 
-paramCtrlErr(phase,coord).fun = SpotKey.errMinusWrap;
+paramCtrlErr(phase,coord).fun = SpotGnc.errMinusWrap;
 

@@ -4,11 +4,11 @@ function err = SpotCtrlErr(ref, act, phase, coord, paramCtrlErr)
     
     switch myFun
 
-        case SpotKey.errMinus
+        case SpotGnc.errMinus
 
             err = ref - act;
 
-        case SpotKey.errMinusWrap
+        case SpotGnc.errMinusWrap
 
             errWrap = wrapToPi(ref) - wrapToPi(act);
 
@@ -19,7 +19,7 @@ function err = SpotCtrlErr(ref, act, phase, coord, paramCtrlErr)
             end
 
 
-        case SpotKey.errHough
+        case SpotGnc.errHough
     
             xRef = [cos(ref) sin(ref); -sin(ref) cos(ref)]*[1;0];
             yRef = [cos(ref) sin(ref); -sin(ref) cos(ref)]*[0;1];
@@ -30,7 +30,7 @@ function err = SpotCtrlErr(ref, act, phase, coord, paramCtrlErr)
             err  = -sign(yRef'*errX) * norm(errX);
     
         otherwise
-            error('SpotCtrlErr.m:\n  function SpotKey(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
+            error('SpotCtrlErr.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
 
     end % switch myFun
 
