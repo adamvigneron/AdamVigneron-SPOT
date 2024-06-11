@@ -74,6 +74,9 @@ function [F,diag] = SpotController(e, phase, coord, feedFwd, paramCtrl)
             eOld      = e;
             eDeltaOld = eDelta;
 
+         case SpotGnc.ctrlFwd
+            F = feedFwd(coord);
+
         otherwise
             error('SpotController.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
 

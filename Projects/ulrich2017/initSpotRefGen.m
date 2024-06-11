@@ -1,6 +1,6 @@
 %% configuration switches
 
-includeSpinup = 1;
+includeSpinup = 0;
 
 
 %% additional calculations

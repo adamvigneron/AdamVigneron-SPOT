@@ -26,3 +26,5 @@ initSpotCtrlErr;
 % initialize the GNC unit handling control
 initSpotController;
 
+% initialize environmental parameters
+initSpotEnv;
