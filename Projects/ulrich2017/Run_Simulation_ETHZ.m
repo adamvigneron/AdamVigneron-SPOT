@@ -173,21 +173,78 @@ myApp.public_StartSimulationButtonPushed([]);
 uVec2 = dataClass.RED_Fx_Sat_N(idxPh3_ILC) / mRED;
 yVec2 = dataClass.RED_Px_m(idxPh3_ILC);
 
+uFbk2 = (dataClass.RED_Fx_Kp_N(idxPh3_ILC) + dataClass.RED_Fx_Kd_N(idxPh3_ILC) ) / mRED;
+uFwd2 =  dataClass.RED_Fx_u0_N(idxPh3_ILC) / mRED;
 
-%% SAVE
+%% SIMULATION 3: FURTHER IMPROVEMENTS?
 
-% save the simulation data
-myEvent.Value = 'suppressWaitfor';
-myApp.public_SaveSimulationDataButtonPushed(myEvent);
+% repeat the command update
+uTilde = uVec2 - uVec0;
+yTilde = yVec2 - yVec0;
+
+dHat = G\yTilde - F*uTilde - G\H*uTilde;
+uNew = -F\dHat;
+
+fNew = interp1(tVec, mRED*uNew, feedForward.Time(idxPh3), 'previous', 'extrap');
+feedForward.Data(idxPh3,SpotCoord.xRed) = fNew;
+
+% start the simulation
+myEvent.Value = 'suppressHardwareWarning';
+myApp.public_StartSimulationButtonPushed([]);
+
+% extract the relevant data
+uVec3 = dataClass.RED_Fx_Sat_N(idxPh3_ILC) / mRED;
+yVec3 = dataClass.RED_Px_m(idxPh3_ILC);
 
 
-%% SHUTDOWN
+%% PLOT
 
-% close the simulink model; close the figure (and app); clear the workspace
-bdclose;
-close(myFig);
-clear;
+% output signal
+figure('name','RED_Px_m (value)')
+plot(tVec,[yVec0 yVec1 yVec2 yVec3]);
+legend('nominal','1: feedback', '2: feedback + feedfwd', ...
+       '3: further improvement', 'Location', 'BestOutside');
+xlabel('Time\_s');
+ylabel('RED\_Px\_m');
+title('output signal');
 
-% reset figure style
-reset(groot);
+% output error
+figure('name','RED_Px_m (error)')
+plot(tVec,[yVec0-rVec yVec1-rVec yVec2-rVec yVec3-rVec]);
+legend('nominal','1: feedback', '2: feedback + feedfwd', ...
+       '3: further improvement', 'Location', 'BestOutside');
+xlabel('Time\_s');
+ylabel('RED\_Px\_m');
+title('output error');
+
+% control signal
+figure('name','RED_Fx_Sat_N')
+plot(tVec,mRED * [uVec0 uVec1 uVec2 uFbk2 uFwd2 uVec3]);
+hold on;
+plot(disturbFT.Time(idxPh3,SpotCoord.xRed),-1 * disturbFT.Data(idxPh3,SpotCoord.xRed),'k--')
+legend('nominal','1: feedback', '2: feedback + feedfwd', ...
+       '2: feedback', '2: feedfwd', '3: further improvement', ...
+       [char(8211) '1 \times disturbance'], 'Location', 'BestOutside');
+xlabel('Time\_s');
+ylabel('RED\_Fx\_Sat\_N');
+title('control signal');
+ylim([-0.2 0.1]);
+
+
+% %% SAVE
+% 
+% % save the simulation data
+% myEvent.Value = 'suppressWaitfor';
+% myApp.public_SaveSimulationDataButtonPushed(myEvent);
+% 
+% 
+% %% SHUTDOWN
+% 
+% % reset figure style
+% reset(groot);
+% 
+% % close the simulink model; close the figure (and app); clear the workspace
+% bdclose;
+% close(myFig);
+% clear;
 

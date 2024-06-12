@@ -1,86 +1,103 @@
-function ref = SpotRefGen(t, phase, coord, paramRefGen)
+function ref = SpotRefGen(phase, t, paramRefGen)
 
-    myFun = paramRefGen(phase,coord).fun;
- 
-    switch myFun
+    %% initialization of output variables
 
-        case SpotGnc.refConstant
-            k1 = paramRefGen(phase,coord).k1;  % constant reference
+    coords   = enumeration('SpotCoord');
+    numCoord = length(coords);
 
-            ref = k1;
+    ref = zeros(numCoord,1);
 
-        case SpotGnc.refCosine
-            k1 = paramRefGen(phase,coord).k1;  % amplitude
-            k2 = paramRefGen(phase,coord).k2;  % frequency
-            k3 = paramRefGen(phase,coord).k3;  % phase
-            k4 = paramRefGen(phase,coord).k4;  % offset
+    
+    %% loop over all coordinates
 
-            ref = k1 * cos( k2 * t + k3 ) + k4;
+    for k = 1:numCoord
+        
+        coord = coords(k);
 
-        case SpotGnc.refSine
-            k1 = paramRefGen(phase,coord).k1;  % amplitude
-            k2 = paramRefGen(phase,coord).k2;  % frequency
-            k3 = paramRefGen(phase,coord).k3;  % phase
-            k4 = paramRefGen(phase,coord).k4;  % offset
+        %% select a reference generation method
+        myFun = paramRefGen(phase,coord).fun;
+     
+        switch myFun
+    
+            case SpotGnc.refConstant
+                k1 = paramRefGen(phase,coord).k1;  % constant reference
+    
+                ref(coord) = k1;
+    
+            case SpotGnc.refCosine
+                k1 = paramRefGen(phase,coord).k1;  % amplitude
+                k2 = paramRefGen(phase,coord).k2;  % frequency
+                k3 = paramRefGen(phase,coord).k3;  % phase
+                k4 = paramRefGen(phase,coord).k4;  % offset
+    
+                ref(coord) = k1 * cos( k2 * t + k3 ) + k4;
+    
+            case SpotGnc.refSine
+                k1 = paramRefGen(phase,coord).k1;  % amplitude
+                k2 = paramRefGen(phase,coord).k2;  % frequency
+                k3 = paramRefGen(phase,coord).k3;  % phase
+                k4 = paramRefGen(phase,coord).k4;  % offset
+    
+                ref(coord) = k1 * sin( k2 * t + k3 ) + k4;
+    
+            case SpotGnc.refCosineSpinup
+                k1 = paramRefGen(phase,coord).k1;  % amplitude
+                k2 = paramRefGen(phase,coord).k2;  % frequency
+                k3 = paramRefGen(phase,coord).k3;  % phase
+                k4 = paramRefGen(phase,coord).k4;  % offset
+                k5 = paramRefGen(phase,coord).k5;  % spin-up time
+    
+                % define a few convenience variables
+                omgSpin = k2;
+                tSpin   = k5;
+    
+                % calculate total angle elapsed
+                if t < tSpin
+                    % we're in spin-up
+                    alpha = 0.5 * omgSpin/tSpin * t^2;
+                else
+                    % we're already spun-up
+                    alpha = 0.5 * omgSpin*tSpin + omgSpin * (t-tSpin);
+                end
+    
+                % total angle elapsed replaces the omega*t term
+                ref(coord) = k1 * cos( alpha + k3 ) + k4;
+    
+            case SpotGnc.refSineSpinup
+                k1 = paramRefGen(phase,coord).k1;  % amplitude
+                k2 = paramRefGen(phase,coord).k2;  % frequency
+                k3 = paramRefGen(phase,coord).k3;  % phase
+                k4 = paramRefGen(phase,coord).k4;  % offset
+                k5 = paramRefGen(phase,coord).k5;  % spin-up time
+    
+                % define a few convenience variables
+                omgSpin = k2;
+                tSpin   = k5;
+    
+                % calculate total angle elapsed
+                if t < tSpin
+                    % we're in spin-up
+                    alpha = 0.5 * omgSpin/tSpin * t^2;
+                else
+                    % we're already spun-up
+                    alpha = 0.5 * omgSpin*tSpin + omgSpin * (t-tSpin);
+                end
+    
+                % total angle elapsed replaces the omega*t term
+                ref(coord) = k1 * sin( alpha + k3 ) + k4;
+    
+            case SpotGnc.refPolyWrap
+                k1 = paramRefGen(phase,coord).k1;  % initial angle
+                k2 = paramRefGen(phase,coord).k2;  % initial rate
+    
+                ref(coord) = wrapToPi( k1 + k2 * t );
+    
+            otherwise
+                error('SpotRefGen.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
+    
+        end % switch myFun
 
-            ref = k1 * sin( k2 * t + k3 ) + k4;
-
-        case SpotGnc.refCosineSpinup
-            k1 = paramRefGen(phase,coord).k1;  % amplitude
-            k2 = paramRefGen(phase,coord).k2;  % frequency
-            k3 = paramRefGen(phase,coord).k3;  % phase
-            k4 = paramRefGen(phase,coord).k4;  % offset
-            k5 = paramRefGen(phase,coord).k5;  % spin-up time
-
-            % define a few convenience variables
-            omgSpin = k2;
-            tSpin   = k5;
-
-            % calculate total angle elapsed
-            if t < tSpin
-                % we're in spin-up
-                alpha = 0.5 * omgSpin/tSpin * t^2;
-            else
-                % we're already spun-up
-                alpha = 0.5 * omgSpin*tSpin + omgSpin * (t-tSpin);
-            end
-
-            % total angle elapsed replaces the omega*t term
-            ref = k1 * cos( alpha + k3 ) + k4;
-
-        case SpotGnc.refSineSpinup
-            k1 = paramRefGen(phase,coord).k1;  % amplitude
-            k2 = paramRefGen(phase,coord).k2;  % frequency
-            k3 = paramRefGen(phase,coord).k3;  % phase
-            k4 = paramRefGen(phase,coord).k4;  % offset
-            k5 = paramRefGen(phase,coord).k5;  % spin-up time
-
-            % define a few convenience variables
-            omgSpin = k2;
-            tSpin   = k5;
-
-            % calculate total angle elapsed
-            if t < tSpin
-                % we're in spin-up
-                alpha = 0.5 * omgSpin/tSpin * t^2;
-            else
-                % we're already spun-up
-                alpha = 0.5 * omgSpin*tSpin + omgSpin * (t-tSpin);
-            end
-
-            % total angle elapsed replaces the omega*t term
-            ref = k1 * sin( alpha + k3 ) + k4;
-
-        case SpotGnc.refPolyWrap
-            k1 = paramRefGen(phase,coord).k1;  % initial angle
-            k2 = paramRefGen(phase,coord).k2;  % initial rate
-
-            ref = wrapToPi( k1 + k2 * t );
-
-        otherwise
-            error('SpotRefGen.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
-
-    end % switch myFun
+    end % loop coords
 
 end % function
 
