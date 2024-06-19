@@ -17,6 +17,9 @@ run('GUI_v4_0_Main');
 % initialize control parameters for the manipulator
 initSpotArmCtrlParam;
 
+% initialize the GNC unit handling measurement processing
+initSpotMeasProc;
+
 % initialize the GNC unit handling reference generation
 initSpotRefGen;
 
