@@ -52,6 +52,12 @@ walkFT_xRed_3sig    = 0.02;  % newton, three-sigma
 noiseFT_xRed_3sig   = 0.02;  % newton, three-sigma
 noiseMeas_xRed_3sig = 0.01;  % metre, three-sigma
 
+% estimator performance -- highly dependent on estimator gains!
+noiseEstVel_xRed_3sig = 0.003;  % metre per second, three-sigma
+
+% number of points in feed-forward running average
+nPtsRunAve = 21;
+
 % we run the learning algorithm ten times slower than the model
 sampleFactor = 10;
 learnRate    = sampleFactor * baseRate;  % seconds
@@ -198,10 +204,11 @@ ylabel('RED\_*x\_mpers2');
 title('bias disturbance');
 
 % extract the relevant data
-tVec  = dataClass.Time_s(      idxPh3_ILC );
-rVec  = dataClass.RED_REFx_m(  idxPh3_ILC );
-uVec1 = dataClass.RED_Fx_N(    idxPh3_ILC ) / mRED;
-yVec1 = dataClass.RED_PROCx_m( idxPh3_ILC );
+tVec  = dataClass.Time_s(          idxPh3_ILC );
+rVec  = dataClass.RED_REFx_m(      idxPh3_ILC );
+uVec1 = dataClass.RED_Fx_N(        idxPh3_ILC ) / mRED;
+yVec1 = dataClass.RED_PROCx_m(     idxPh3_ILC );
+vVec1 = dataClass.RED_Vx_Est_mpers(idxPh3_ILC);
 
 
 %% COMMAND UPDATE
@@ -213,6 +220,7 @@ tf_K = pid(Kp_xr,0,Kd_xr,baseRate);
 % closed-loop transfer functions
 tf_UR = feedback(tf_K,tf_G);
 tf_YR = feedback(tf_K*tf_G,1);
+tf_VR = tf_YR * tf('s');
 
 % normalize closed-loop reference
 rVec0 = rVec - drop_states_RED(1);
@@ -220,10 +228,12 @@ rVec0 = rVec - drop_states_RED(1);
 % map closed-loop reference onto control and output
 uVec0 = lsim(tf_UR,rVec0,tVec);
 yVec0 = lsim(tf_YR,rVec0,tVec) + drop_states_RED(1);
+vVec0 = lsim(tf_VR,rVec0,tVec);
 
 % [ETHZ] calculate departure from nominal trajectory
 uTilde1 = uVec1 - uVec0;
 yTilde1 = yVec1 - yVec0;
+vTilde1 = vVec1 - vVec0;
 
 % [ETHZ] calculate modelling error estimate and updated input 
 d0    = G\yTilde1 - F*uTilde1 - G\H*uTilde1;
@@ -233,9 +243,11 @@ uNew0 = -F\d0;
 %% KALMAN FILTER
 
 % convert standard deviations into variances
-walkFT_xRed_var    = ( walkFT_xRed_3sig    / 3 )^2;
-noiseFT_xRed_var   = ( noiseFT_xRed_3sig   / 3 )^2;
-noiseMeas_xRed_var = ( noiseMeas_xRed_3sig / 3 )^2;
+walkFT_xRed_var  = ( walkFT_xRed_3sig  / 3 )^2;
+noiseFT_xRed_var = ( noiseFT_xRed_3sig / 3 )^2;
+
+noiseMeas_xRed_var   = ( noiseMeas_xRed_3sig   / 3 )^2;
+noiseEstVel_xRed_var = ( noiseEstVel_xRed_3sig / 3 )^2;
 
 % P0 - initial model error variance
 % we construct this assuming a disturbance three times the actual
@@ -257,27 +269,38 @@ dHat0 = 0*dHat0;
 % Upsilon - measurement noise covariance
 OmegaVec   = ones( nSteps, 1 ) * walkFT_xRed_var    / mRED^2;
 XiVec      = ones( nSteps, 1 ) * noiseFT_xRed_var   / mRED^2;
-UpsilonVec = ones( nSteps, 1 ) * noiseMeas_xRed_var;
 
 Omega   = F * diag(OmegaVec)   * F';
 Xi      = F * diag(XiVec)      * F';
-Upsilon =     diag(UpsilonVec);
+
+PosMeasVec = ones( nSteps, 1 ) * noiseMeas_xRed_var;
+VelEstVec  = ones( nSteps, 1)  * noiseEstVel_xRed_3sig;
+
+UpsilonVec = zeros( xDim*nSteps, 1 );
+UpsilonVec(1:xDim:end) = PosMeasVec;
+UpsilonVec(2:xDim:end) = VelEstVec;
+Upsilon = diag(UpsilonVec);
+
+yMeasEst = zeros( xDim*nSteps, 1 );
+yMeasEst(1:xDim:end) = yTilde1;
+yMeasEst(2:xDim:end) = vTilde1;
 
 % M - stochastic variable covariance
-M = G*Xi*G' + Upsilon;
+M = Xi + Upsilon;
 
 % I - identity matrix
 I = eye( xDim*nSteps );
 
 % kalman filter equations
 P1_0  = P0_0 + Omega;
-Theta = G*P1_0*G' + M;
-K     = P1_0 * G' / Theta;
-P1_1  = (I - K*G) * P1_0;
-d1    = dHat0 + K * ( yTilde1 - G*dHat0 - ( G*F + H ) * uTilde1 );
+Theta = P1_0 + M;
+K     = P1_0 / Theta;
+P1_1  = (I - K) * P1_0;
+d1    = dHat0 + K * ( yMeasEst - dHat0 - F * uTilde1 );
 
 % minimization problem (2-norm)
-uNew1 = quadprog( F'*F, d1'*F );
+uNew1_raw = quadprog( F'*F, d1'*F );
+uNew1     = movmean(uNew1_raw,nPtsRunAve);
 
 
 %% KALMAN PERFORMANCE
@@ -345,25 +368,33 @@ myEvent.Value = 'suppressHardwareWarning';
 myApp.public_StartSimulationButtonPushed([]);
 
 % extract the relevant data
-uVec2 = dataClass.RED_Fx_N(    idxPh3_ILC ) / mRED;
-yVec2 = dataClass.RED_PROCx_m( idxPh3_ILC );
+uVec2 = dataClass.RED_Fx_N(         idxPh3_ILC ) / mRED;
+yVec2 = dataClass.RED_PROCx_m(      idxPh3_ILC );
+vVec2 = dataClass.RED_Vx_Est_mpers( idxPh3_ILC );
 
 uFbk2 = (dataClass.RED_Fx_Kp_N(idxPh3_ILC) + dataClass.RED_Fx_Kd_N(idxPh3_ILC) ) / mRED;
 uFwd2 =  dataClass.RED_Fx_u0_N(idxPh3_ILC) / mRED;
+
 
 %% SIMULATION 3: FURTHER IMPROVEMENTS?
 
 % repeat the command update
 uTilde2 = uVec2 - uVec0;
 yTilde2 = yVec2 - yVec0;
+vTilde2 = vVec2 - vVec0;
 
 if flag_kalman
+    yMeasEst(1:xDim:end) = yTilde2;
+    yMeasEst(2:xDim:end) = vTilde2;
+
     P2_1  = P1_1 + Omega;
-    Theta = G*P2_1*G' + M;
-    K     = P2_1 * G' / Theta;
-    P2_2  = (I - K*G) * P2_1;
-    d2    = d1 + K * ( yTilde2 - G*d1 - ( G*F + H ) * uTilde2 );
-    uNew2 = quadprog( F'*F, d2'*F );
+    Theta = P2_1 + M;
+    K     = P2_1 / Theta;
+    P2_2  = (I - K) * P2_1;
+    d2    = d1 + K * ( yMeasEst - d1 - F * uTilde2 );
+
+    uNew2_raw = quadprog( F'*F, d2'*F );
+    uNew2     = movmean(uNew2_raw,nPtsRunAve);
 else
     d2 = G\yTilde2 - F*uTilde2 - G\H*uTilde2;
     uNew2 = -F\d2;
