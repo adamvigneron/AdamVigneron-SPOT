@@ -20,6 +20,9 @@ initSpotArmCtrlParam;
 % initialize the GNC unit handling measurement processing
 initSpotMeasProc;
 
+% initialize the GNC unit handling state estimation
+initSpotEstimator;
+
 % initialize the GNC unit handling reference generation
 initSpotRefGen;
 

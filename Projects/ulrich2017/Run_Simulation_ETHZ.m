@@ -47,10 +47,10 @@ flag_noiseFT   = 1;
 flag_noiseMeas = 1;
 
 % noise and disturbance values
-disturbFT_xRed      = 0.1;     % newton, absolute
-walkFT_xRed_3sig    = 0.01;    % newton, three-sigma
-noiseFT_xRed_3sig   = 0.01;    % newton, three-sigma
-noiseMeas_xRed_3sig = 0.0001;  % metre, three-sigma
+disturbFT_xRed      = 0.1;   % newton, absolute
+walkFT_xRed_3sig    = 0.02;  % newton, three-sigma
+noiseFT_xRed_3sig   = 0.02;  % newton, three-sigma
+noiseMeas_xRed_3sig = 0.01;  % metre, three-sigma
 
 % we run the learning algorithm ten times slower than the model
 sampleFactor = 10;
@@ -175,11 +175,33 @@ xlabel('Time\_s');
 ylabel('RED\_*x\_N');
 title('control signal');
 
+% sanity check: velocity estimator
+figure('name','Velocity Estimator (run 1)')
+plot(dataClass.Time_s(idxPh3), ...
+     dataClass.RED_Vx_Est_mpers(idxPh3), ... 
+     dataClass.Time_s(idxPh3), ...
+     dataClass.RED_Vx_mpers(idxPh3));
+legend('RED\_Vx\_Est\_mpers', 'RED\_Vx\_mpers', 'Location', 'BestOutside');
+xlabel('Time\_s');
+ylabel('RED\_*x\_mpers');
+title('output rate');
+
+% sanity check: bias estimator
+figure('name','Bias Estimator (run 1)')
+plot(dataClass.Time_s(idxPh3), ...
+     dataClass.RED_BIASx_Est_mpers2(idxPh3), ... 
+     disturbFT.Time(idxPh3,SpotCoord.xRed), ...
+     disturbFT.Data(idxPh3,SpotCoord.xRed) / mRED);
+legend('RED\_BIASx\_Est\_mpers2', 'disturbFT', 'Location', 'BestOutside');
+xlabel('Time\_s');
+ylabel('RED\_*x\_mpers2');
+title('bias disturbance');
+
 % extract the relevant data
 tVec  = dataClass.Time_s(      idxPh3_ILC );
 rVec  = dataClass.RED_REFx_m(  idxPh3_ILC );
 uVec1 = dataClass.RED_Fx_N(    idxPh3_ILC ) / mRED;
-yVec1 = dataClass.RED_PROCx_m ( idxPh3_ILC );
+yVec1 = dataClass.RED_PROCx_m( idxPh3_ILC );
 
 
 %% COMMAND UPDATE
@@ -257,7 +279,10 @@ d1    = dHat0 + K * ( yTilde1 - G*dHat0 - ( G*F + H ) * uTilde1 );
 % minimization problem (2-norm)
 uNew1 = quadprog( F'*F, d1'*F );
 
-% break out data for kalman filter performance
+
+%% KALMAN PERFORMANCE
+
+% break out data 
 diagP  = diag(P1_1);
 sigPos = sqrt(diagP(1:2:end));
 d0Pos  =         d0(1:2:end);
@@ -305,7 +330,7 @@ end
 feedForward_xRed = interp1(tVec, mRED*uNew, feedForward.Time(idxPh3), 'previous', 'extrap');
 
 % update the feed-forward signal
-paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).fun = SpotGnc.ctrlPdFwd;
+paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).fun = SpotGnc.ctrlPdFwd_vel;
 paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).k4  = 1;
 feedForward.Data(     idxPh3,SpotCoord.xRed)     = feedForward_xRed;
 

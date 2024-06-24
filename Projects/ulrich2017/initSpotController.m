@@ -24,7 +24,7 @@ feedForward = timeseries(myData,myTime);
 phase = SpotPhase.Phase3_4;
 coord = SpotCoord.xRed;
 
-paramCtrl(phase,coord).fun = SpotGnc.ctrlPdFwd;
+paramCtrl(phase,coord).fun = SpotGnc.ctrlPdFwd_vel;
 paramCtrl(phase,coord).k1  = Kp_xr;
 paramCtrl(phase,coord).k2  = Kd_xr;
 paramCtrl(phase,coord).k3  = baseRate;

@@ -1,11 +1,12 @@
-function err = SpotCtrlErr(phase, est, ref, paramCtrlErr)
+function [err,err_vel] = SpotCtrlErr(phase, ref, ref_vel, est, est_vel, paramCtrlErr)
 
     %% initialization of output variables
     
     coords   = enumeration('SpotCoord');
     numCoord = length(coords);
 
-    err = zeros(numCoord,1);
+    err     = zeros(numCoord,1);
+    err_vel = zeros(numCoord,1);
     
     
     %% loop over all coordinates
@@ -21,7 +22,9 @@ function err = SpotCtrlErr(phase, est, ref, paramCtrlErr)
     
             case SpotGnc.errMinus
     
-                err(coord) = ref(coord) - est(coord);
+                err(coord)     = ref(coord)     - est(coord);
+
+                err_vel(coord) = ref_vel(coord) - est_vel(coord);
     
             case SpotGnc.errMinusWrap
     
@@ -32,6 +35,8 @@ function err = SpotCtrlErr(phase, est, ref, paramCtrlErr)
                 else
                     err(coord) = errWrap - sign(errWrap)*2*pi;
                 end
+
+                err_vel(coord) = ref_vel(coord) - est_vel(coord);
     
     
             case SpotGnc.errHough
@@ -46,6 +51,8 @@ function err = SpotCtrlErr(phase, est, ref, paramCtrlErr)
         
                 errX = xRef - xAct;
                 err(coord)  = -sign(yRef'*errX) * norm(errX);
+
+                err_vel(coord) = ref_vel(coord) - est_vel(coord);
         
             otherwise
                 error('SpotCtrlErr.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))

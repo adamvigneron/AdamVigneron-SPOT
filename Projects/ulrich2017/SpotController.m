@@ -1,4 +1,4 @@
-function [F,debug] = SpotController(phase, err, feedFwd, paramCtrl)
+function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
 
     %% initialization of output and persistent variables
 
@@ -57,6 +57,16 @@ function [F,debug] = SpotController(phase, err, feedFwd, paramCtrl)
                 errOld(coord) = err(coord);
                 errDeltaOld(coord) = eDelta;
     
+            case SpotGnc.ctrlPd_vel
+                k1 = paramCtrl(phase,coord).k1;  % Kp
+                k2 = paramCtrl(phase,coord).k2;  % Kd
+    
+                % F = Kp*e + Kd*(de/dt)
+                F(coord) = k1*err(coord) + k2*err_vel(coord);
+                
+                debug(1,coord) = k1*err(coord);
+                debug(2,coord) = k2*err_vel(coord);
+    
             case SpotGnc.ctrlPdFwd
                 k1 = paramCtrl(phase,coord).k1;  % Kp
                 k2 = paramCtrl(phase,coord).k2;  % Kd
@@ -78,6 +88,19 @@ function [F,debug] = SpotController(phase, err, feedFwd, paramCtrl)
     
                 errOld(coord) = err(coord);
                 errDeltaOld(coord) = eDelta;
+    
+            case SpotGnc.ctrlPdFwd_vel
+                k1 = paramCtrl(phase,coord).k1;  % Kp
+                k2 = paramCtrl(phase,coord).k2;  % Kd
+                k4 = paramCtrl(phase,coord).k4;  % beta
+    
+                % F = Kp*e + Kd*(de/dt) + beta*uOld
+                F(coord) = k1*err(coord) + k2*err_vel(coord) + k4*feedFwd(coord);
+    
+                debug(1,coord) = k1*err(coord);
+                debug(2,coord) = k2*err_vel(coord);
+                debug(3,coord) = k4*feedFwd(coord);
+    
     
             otherwise
                 error('SpotController.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
