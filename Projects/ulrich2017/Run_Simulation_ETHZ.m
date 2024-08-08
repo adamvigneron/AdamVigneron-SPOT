@@ -315,7 +315,7 @@ d0Vel  =         d0(2:2:end);
 d1Vel  =         d1(2:2:end);
 
 % first element
-figure('Name', 'Kalman (I)');
+figure('Name', 'Kalman I (run 1)');
 plot(tVec, d0Pos, tVec, d1Pos, tVec, d1Pos+sigPos, 'm--', tVec, d1Pos-sigPos, 'm--');
 legend('raw estimate','filter estimate','filter uncertainty','Location','BestOutside');
 xlabel('Time\_s');
@@ -323,7 +323,7 @@ ylabel('1st element');
 title('kalman performance');
 
 % second element
-figure('Name', 'Kalman (II)');
+figure('Name', 'Kalman II (run 1)');
 plot(tVec, d0Vel, tVec, d1Vel, tVec, d1Vel+sigVel, 'm--', tVec, d1Vel-sigVel, 'm--');
 legend('raw estimate','filter estimate','filter uncertainty','Location','BestOutside');
 xlabel('Time\_s');
@@ -331,7 +331,7 @@ ylabel('2nd element');
 title('kalman performance');
 
 % new command
-figure('Name', 'Kalman (III)');
+figure('Name', 'Kalman III (run 1)');
 plot(tVec, uNew0, tVec, uNew1);
 legend('raw estimate','filter estimate','Location','BestOutside');
 xlabel('Time\_s');
@@ -383,24 +383,28 @@ uTilde2 = uVec2 - uVec0;
 yTilde2 = yVec2 - yVec0;
 vTilde2 = vVec2 - vVec0;
 
+d0_2 = G\yTilde2 - F*uTilde2 - G\H*uTilde2;
+uNew0_2 = -F\d0_2;
+
+yMeasEst(1:xDim:end) = yTilde2;
+yMeasEst(2:xDim:end) = vTilde2;
+
+P2_1  = P1_1 + Omega;
+Theta = P2_1 + M;
+K     = P2_1 / Theta;
+P2_2  = (I - K) * P2_1;
+d2    = d1 + K * ( yMeasEst - d1 - F * uTilde2 );
+
+uNew2_raw = quadprog( F'*F, d2'*F );
+uNew2     = movmean(uNew2_raw,nPtsRunAve);
+
 if flag_kalman
-    yMeasEst(1:xDim:end) = yTilde2;
-    yMeasEst(2:xDim:end) = vTilde2;
-
-    P2_1  = P1_1 + Omega;
-    Theta = P2_1 + M;
-    K     = P2_1 / Theta;
-    P2_2  = (I - K) * P2_1;
-    d2    = d1 + K * ( yMeasEst - d1 - F * uTilde2 );
-
-    uNew2_raw = quadprog( F'*F, d2'*F );
-    uNew2     = movmean(uNew2_raw,nPtsRunAve);
+    uNew = uNew2;
 else
-    d2 = G\yTilde2 - F*uTilde2 - G\H*uTilde2;
-    uNew2 = -F\d2;
+    uNew = uNew0_2;
 end
 
-feedForward_xRed = interp1(tVec, mRED*uNew2, feedForward.Time(idxPh3), 'previous', 'extrap');
+feedForward_xRed = interp1(tVec, mRED*uNew, feedForward.Time(idxPh3), 'previous', 'extrap');
 feedForward.Data(idxPh3,SpotCoord.xRed) = feedForward_xRed;
 
 % apply a random walk to the disturbance
@@ -451,6 +455,42 @@ xlabel('Time\_s');
 ylabel('RED\_Fx\_N');
 title('control signal');
 ylim([-0.2 0.1]);
+
+
+%% KALMAN PERFORMANCE
+
+% break out data 
+diagP  = diag(P2_2);
+sigPos = sqrt(diagP(1:2:end));
+d0Pos  =       d0_2(1:2:end);
+d2Pos  =         d2(1:2:end);
+sigVel = sqrt(diagP(2:2:end));
+d0Vel  =       d0_2(2:2:end);
+d2Vel  =         d2(2:2:end);
+
+% first element
+figure('Name', 'Kalman I (run 2)');
+plot(tVec, d0Pos, tVec, d2Pos, tVec, d2Pos+sigPos, 'm--', tVec, d2Pos-sigPos, 'm--');
+legend('raw estimate','filter estimate','filter uncertainty','Location','BestOutside');
+xlabel('Time\_s');
+ylabel('1st element');
+title('kalman performance');
+
+% second element
+figure('Name', 'Kalman II (run 2)');
+plot(tVec, d0Vel, tVec, d2Vel, tVec, d2Vel+sigVel, 'm--', tVec, d2Vel-sigVel, 'm--');
+legend('raw estimate','filter estimate','filter uncertainty','Location','BestOutside');
+xlabel('Time\_s');
+ylabel('2nd element');
+title('kalman performance');
+
+% new command
+figure('Name', 'Kalman III (run 2)');
+plot(tVec, uNew0, tVec, uNew2);
+legend('raw estimate','filter estimate','Location','BestOutside');
+xlabel('Time\_s');
+ylabel('disturbance compensation');
+title('kalman performance');
 
 
 % %% SAVE

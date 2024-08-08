@@ -1,4 +1,4 @@
-function [c,ww] = smooth(varargin)
+function [c,slope,ww] = smoothSlope(varargin)
 %SMOOTH  Smooth data.
 %   Z = SMOOTH(Y) smooths data Y using a 5-point moving average.
 %
@@ -119,6 +119,9 @@ if nargin >= 2+is_x+is_span
     method = varargin{2+is_x+is_span};
 end
 
+% smoothSlope: assign a default value to our added 'slope' output
+slope = 0*y;
+
 t = length(y);
 if t == 0
     c = y;
@@ -176,7 +179,8 @@ switch method
             robust = 1;
             method = method(2:end);
         end
-        c(ok) = lowess(x(ok),y(ok),span, method,robust,iter);
+        % smoothSlope: include the 'slope' output in the call to <lowess>
+        [c(ok),slope(ok)] = lowess(x(ok),y(ok),span, method,robust,iter);
     case 'sgolay'
         if nargin >= 3+is_x+is_span
             degree = varargin{3+is_x+is_span};
@@ -256,7 +260,8 @@ else
     end
 end
 %--------------------------------------------------------------------
-function c = lowess(x,y, span, method, robust, iter)
+% smoothSlope: include the 'slope' output in the returns for <lowess>
+function [c,slope] = lowess(x,y, span, method, robust, iter)
 % LOWESS  Smooth data using Lowess or Loess method.
 %
 % The difference between LOWESS and LOESS is that LOWESS uses a
@@ -276,6 +281,7 @@ n = length(y);
 span = floor(span);
 span = min(span,n);
 c = y;
+slope = 0*y;  % smoothSlope: assign a default value to our added 'slope' output
 if span == 1
     return;
 end
@@ -289,6 +295,10 @@ diffx = diff(x);
 
 % For problems where x is uniform, there's a faster way
 isuniform = uniformx(diffx,x,y);
+
+% smoothSlope: we don't want to use the faster way!
+isuniform = false;
+
 if isuniform
     % For uniform data, an even span actually covers an odd number of
     % points.  For example, the four closest points to 5 in the
@@ -391,6 +401,7 @@ else
             b = v\y1;
         end
         c(i) = b(1);
+        slope(i) = b(2);  % smoothSlope: save the slope of the linear fit
     end
 end
 
