@@ -20,7 +20,7 @@
 % Linear State Space Systems. McGraw-Hill.
 
 
-%% SETUP
+%% SIMULATION OR EXPERIMENT
 
 % change default figure style
 set(groot,'DefaultFigureWindowStyle','docked');
@@ -32,6 +32,12 @@ set(groot,'defaultAxesYGrid','on');
 % run the SPOT intialization script
 Run_Initializer;
 
+% set the main switch, suppressing relevant warning
+isExperiment = 0;  %#ok<*UNRCH>
+
+
+%% SETUP
+
 % get a handle for the open app via its containing figure
 myFig = findall(groot,'Name','SPOT 4.0 GUI');
 myApp = myFig.RunningAppInstance;
@@ -40,18 +46,34 @@ myApp = myFig.RunningAppInstance;
 myApp.AvailableDiagramsDropDown.Value = myApp.AvailableDiagramsDropDown.Items{2};
 myApp.public_AvailableDiagramsDropDownValueChanged([]);  % [] is an empty event
 
-% activate all three platforms
-myApp.REDCheckBox.Value = 1;
-myApp.BLUECheckBox.Value = 1;
-myApp.BLACKCheckBox.Value = 1;
+if isExperiment
+    % activate only RED
+    myApp.REDCheckBox.Value = 1; 
+    myApp.BLUECheckBox.Value = 0;
+    myApp.BLACKCheckBox.Value = 0;
+else
+    % activate all three platforms
+    myApp.REDCheckBox.Value = 1;
+    myApp.BLUECheckBox.Value = 1;
+    myApp.BLACKCheckBox.Value = 1;
+end
+
 myApp.public_REDCheckBoxValueChanged([]);
 myApp.public_BLUECheckBoxValueChanged([]);
 myApp.public_BLACKCheckBoxValueChanged([]);
+
+if isExperiment
+    % merge Phase 1 into Phase 2 (not reflected in GUI)
+    Phase2_Duration = Phase2_Duration + Phase1_Duration - 1;
+    Phase1_Duration = 1;
+    Phase1_End      = Phase0_End + 1;
+end
 
 
 %% CONFIGURATION
 
 % choose ILC method
+% 0 - none
 % 1 - arimoto
 % 2 - ulrich
 % 3 - schoellig
@@ -75,8 +97,8 @@ idxPh2_End = round(Phase2_End / baseRate) + 2;
 idxPh3_End = round(Phase3_End / baseRate) + 2;
 idxPh3     = idxPh2_End:idxPh3_End;
 
-% we run the learning algorithm ten times slower than the model
-sampleFactor = 10;
+% we run the learning algorithm two times slower than the model
+sampleFactor = 2;
 learnRate    = sampleFactor * baseRate;  % seconds
 
 
@@ -106,7 +128,7 @@ if flag_noiseFT
     noiseFT.var(SpotCoord.xRed) = ( noiseFT_xRed_3sig / 3 )^2; 
 end
 
-if flag_noiseMeas
+if ( flag_noiseMeas ) && ( ~isExperiment )
     noiseMeas.var(SpotCoord.xRed) = ( noiseMeas_xRed_3sig / 3 )^2;  
 end
 
@@ -142,16 +164,48 @@ GCell = repmat({Cd},1,nSteps);
 G     = blkdiag(GCell{:});
 
 
-%% SIMULATION 1: WITHOUT COMPENSATION
+%% ROUND 1: WITHOUT COMPENSATION
 
 % we apply a disturbance in Phase3 on xRed
-if flag_distFT
-    disturbFT.Data(idxPh3,SpotCoord.xRed) = disturbFT_xRed;  
+if ( flag_distFT ) && ( ~isExperiment )
+    disturbFT.Data(idxPh3,SpotCoord.xRed) = disturbFT_xRed;
 end
 
-% start the simulation
-myEvent.Value = 'suppressHardwareWarning';
-myApp.public_StartSimulationButtonPushed([]);
+if isExperiment
+    % give the user a chance to react
+    disp('Connect! PhaseSpace! Rebuild! Run! Save!');
+    pause;
+    disp('Run the experiment!');
+    pause;
+    disp('Save the data!');
+    pause;
+
+    % create a copy of the experimental data for the simulation plots
+    dataClass = dataClass_rt;
+
+    % as PhaseSpace is running at half the baseRate, we divide Vx by 2
+    dataClass.RED_Vx_mpers(idxPh3) = dataClass.RED_Vx_mpers(idxPh3) / 2;
+
+    % break out the CustomUserData
+    dataClass.RED_REFx_m           = dataClass.CustomUserData48;
+    dataClass.RED_PROCx_m          = dataClass.CustomUserData50;
+
+    dataClass.RED_Vx_Est_mpers     = dataClass.CustomUserData52;
+
+    dataClass.RED_Fx_N             = dataClass.CustomUserData54;
+    dataClass.RED_Fx_Kp_N          = dataClass.CustomUserData55;
+    dataClass.RED_Fx_Kd_N          = dataClass.CustomUserData56;
+    dataClass.RED_Fx_u0_N          = dataClass.CustomUserData57;
+    dataClass.RED_Fx_Real_N        = dataClass.CustomUserData58;
+    dataClass.RED_BIASx_Est_mpers2 = dataClass.CustomUserData59;
+
+    dataClass.Time_s               = dataClass.CustomUserData61;
+
+else
+    % start the simulation
+    myEvent.Value = 'suppressHardwareWarning';
+    myApp.public_StartSimulationButtonPushed([]);
+end
 
 % sanity check: measurement error
 figure('name','Output Signal (run 1)')
@@ -211,7 +265,7 @@ vVec1 = dataClass.RED_Vx_Est_mpers(idxPh3 );
 
 % nominal plant and controller model
 tf_G = ss(A,B,C,D);
-tf_K = pid( Kp_xr, 0, Kd_xr, (Kd_xr/Kp_xr)/20 );
+tf_K = pid( Kp_xr/mRED, 0, Kd_xr/mRED, (Kd_xr/Kp_xr)/20 );
 % per [5], the smallest recommended time constant for a derivative filter;
 % the time constant of 0.13 s corresponds to a frequency of 7.7 rad/s,
 % our reference has a frequency of 0.035 rad/s, well below this value!
@@ -225,7 +279,14 @@ tf_YR = feedback(tf_K*tf_G,1);
 tf_VR = tf_YR * tf('s');
 
 % normalize closed-loop reference
-rVec0 = rVec - init_states_RED(1);
+if isExperiment  % as experimental rVec gets time signal from PhaseSpace,
+                 % we need to avoid the step-like behaviour 
+    k1 = paramRefGen(SpotPhase.Phase3_4,SpotCoord.xRed).k1;
+    k2 = paramRefGen(SpotPhase.Phase3_4,SpotCoord.xRed).k2;
+    rVec0 = k1 * cos( k2 * (tVec - tVec(1)) ) - k1;
+else
+    rVec0 = rVec - init_states_RED(1);
+end
 
 % map closed-loop reference onto control and output
 uVec0 = lsim(tf_UR,rVec0,tVec);
@@ -256,7 +317,7 @@ title('output rate smoothing');
 % sanity check: acceleration estimate
 figure('name','Acceleration Estimate (run 1)')
 plot(dataClass.Time_s(idxPh3), ...
-     (dataClass.RED_Fx_Real_N(idxPh3) + disturbFT_xRed)/mRED, ... 
+     dataClass.RED_Fx_Real_N(idxPh3)/mRED, ... 
      tVec, aVec1);
 legend('real acceleration', 'estimated acceleration', ...
        'Location', 'BestOutside');
@@ -273,7 +334,16 @@ rVec_ETHZ  = dataClass.RED_REFx_m(  idxPh3_ETHZ );
 uVec1_ETHZ = dataClass.RED_Fx_N(    idxPh3_ETHZ ) / mRED;
 yVec1_ETHZ = dataClass.RED_PROCx_m( idxPh3_ETHZ );
 
-rVec0_ETHZ = rVec_ETHZ - init_states_RED(1);
+% normalize closed-loop reference
+if isExperiment  % as experimental rVec gets time signal from PhaseSpace,
+                 % we need to avoid the step-like behaviour 
+    k1 = paramRefGen(SpotPhase.Phase3_4,SpotCoord.xRed).k1;
+    k2 = paramRefGen(SpotPhase.Phase3_4,SpotCoord.xRed).k2;
+    rVec0_ETHZ = k1 * cos( k2 * (tVec_ETHZ - tVec_ETHZ(1)) ) - k1;
+else
+    rVec0_ETHZ = rVec_ETHZ - init_states_RED(1);
+end
+
 uVec0_ETHZ = lsim(tf_UR,rVec0_ETHZ,tVec_ETHZ);
 yVec0_ETHZ = lsim(tf_YR,rVec0_ETHZ,tVec_ETHZ) + init_states_RED(1);
 
@@ -290,19 +360,21 @@ uNew_observer  = -1 * dataClass.RED_BIASx_Est_mpers2(idxPh3);
 
 % ilc signals
 figure('name','feedForward_xRed')
-plot(tVec, uVec0 - disturbFT_xRed/mRED, '--', ...
+plot(tVec, uVec0, '--', ...
      tVec, [ uNew_arimoto uNew_ulrich uNew_schoellig uNew_observer ] );
 legend('model', 'arimoto', 'ulrich', 'schoellig', 'observer', ...
        'Location', 'BestOutside');
 xlabel('Time\_s');
-ylabel('RED\_Fx\_u0\_m');
+ylabel('RED\_Fx\_u0\_mpers2');
 title('feed forward signals');
 
 
-%% SIMULATION 2: WITH COMPENSATION
+%% COMMAND UPDATE - SELECTION
 
 % choose compensation method
 switch ilcMethod
+    case 0
+        uNew = 0 * tVec;
     case 1
         uNew = uNew_arimoto;
     case 2
@@ -324,15 +396,44 @@ paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).fun = SpotGnc.ctrlPdFwd_vel;
 paramCtrl(SpotPhase.Phase3_4,SpotCoord.xRed).k4  = 1;
 feedForward.Data(     idxPh3,SpotCoord.xRed)     = feedForward_xRed;
 
+
+%% ROUND 2: WITH COMPENSATION
+
 % apply a random walk to the (initially uniform) disturbance
-if flag_walkFT
+if ( flag_walkFT ) && ( ~isExperiment ) 
     disturbFT.Data(idxPh3,SpotCoord.xRed) = disturbFT.Data(idxPh3,SpotCoord.xRed) + ...
         (walkFT_xRed_3sig / 3) * randn( length(idxPh3), 1 );
 end
 
-% start the simulation
-myEvent.Value = 'suppressHardwareWarning';
-myApp.public_StartSimulationButtonPushed([]);
+if isExperiment
+    % give the user a chance to react
+    disp('Rebuild the code!');
+    pause;
+    disp('Run the experiment!');
+    pause;
+    disp('Save the data!');
+    pause;
+
+    % create a copy of the experimental data for the simulation plots
+    dataClass = dataClass_rt;
+    
+    dataClass.RED_REFx_m       = dataClass.CustomUserData48;
+    dataClass.RED_PROCx_m      = dataClass.CustomUserData50;
+
+    dataClass.RED_Vx_Est_mpers = dataClass.CustomUserData52;
+
+    dataClass.RED_Fx_N         = dataClass.CustomUserData54;
+    dataClass.RED_Fx_Kp_N      = dataClass.CustomUserData55;
+    dataClass.RED_Fx_Kd_N      = dataClass.CustomUserData56;
+    dataClass.RED_Fx_u0_N      = dataClass.CustomUserData57;
+    dataClass.RED_Fx_Real_N    = dataClass.CustomUserData58;
+    dataClass.RED_BIASx_Est    = dataClass.CustomUserData59;
+
+else
+    % start the simulation
+    myEvent.Value = 'suppressHardwareWarning';
+    myApp.public_StartSimulationButtonPushed([]);
+end
 
 % extract the relevant data
 uVec2 = dataClass.RED_Fx_N(         idxPh3 ) / mRED;

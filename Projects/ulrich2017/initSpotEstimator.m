@@ -16,7 +16,7 @@ phase = SpotPhase.Phase3_4;
 coord = SpotCoord.xRed;
 
 paramEst(phase,coord).fun = SpotGnc.estVelBias;
-paramEst(phase,coord).k1  = baseRate;
+paramEst(phase,coord).k1  = 2 * baseRate;  % measurement frequency
 paramEst(phase,coord).k2  = 1;  % L1
 paramEst(phase,coord).k3  = 1;  % L2
 

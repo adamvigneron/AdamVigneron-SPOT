@@ -27,7 +27,7 @@ coord = SpotCoord.xRed;
 paramCtrl(phase,coord).fun = SpotGnc.ctrlPdFwd_vel;
 paramCtrl(phase,coord).k1  = Kp_xr;
 paramCtrl(phase,coord).k2  = Kd_xr;
-paramCtrl(phase,coord).k3  = baseRate;
+paramCtrl(phase,coord).k3  = 2 * baseRate;  % measurement frequency
 % paramCtrl(phase,coord).k4 will be overwritten with beta values at runtime
 
 
@@ -39,7 +39,7 @@ coord = SpotCoord.yRed;
 paramCtrl(phase,coord).fun = SpotGnc.ctrlPdFwd;
 paramCtrl(phase,coord).k1  = Kp_yr;
 paramCtrl(phase,coord).k2  = Kd_yr;
-paramCtrl(phase,coord).k3  = baseRate;
+paramCtrl(phase,coord).k3  = 2 * baseRate;  % measurement frequency
 % paramCtrl(phase,coord).k4 will be overwritten with beta values at runtime
 
 
@@ -51,6 +51,6 @@ coord = SpotCoord.thetaRed;
 paramCtrl(phase,coord).fun = SpotGnc.ctrlPdFwd;
 paramCtrl(phase,coord).k1  = Kp_tr;
 paramCtrl(phase,coord).k2  = Kd_tr;
-paramCtrl(phase,coord).k3  = baseRate;
+paramCtrl(phase,coord).k3  = 2 * baseRate;  % measurement frequency
 % paramCtrl(phase,coord).k4 will be overwritten with beta values at runtime
 

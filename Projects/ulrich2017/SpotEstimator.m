@@ -13,10 +13,12 @@ function [est,est_vel,est_bias] = SpotEstimator(phase, proc, cmd, paramEst)
     
     % persistent variables - definition
     persistent estState;
+    persistent prevEst;
 
     % persistent variables - initialization
     if isempty(estState)
         estState = zeros(maxEstState,numCoord);
+        prevEst  = zeros(3,numCoord);
     end
 
 
@@ -66,13 +68,28 @@ function [est,est_vel,est_bias] = SpotEstimator(phase, proc, cmd, paramEst)
                     estState(:,coord) = -1 * [L1; L2] * proc(coord);
                 end
 
-                % run the observer in discrete time
-                rHat              = Cd * estState(:,coord) + Dd * [cmd(coord); proc(coord)];
-                estState(:,coord) = Ad * estState(:,coord) + Bd * [cmd(coord); proc(coord)];
+                % if the measurement hasn't changed, don't run the observer
+                if proc(coord) == prevEst(1,coord)
+                    
+                    est_vel(coord)  = prevEst(2,coord);
+                    est_bias(coord) = prevEst(3,coord);
+                
+                else
 
-                % map the discrete-time output onto the function output
-                est_vel(coord)  = rHat(1);
-                est_bias(coord) = rHat(2);
+                    % run the observer in discrete time
+                    rHat              = Cd * estState(:,coord) + Dd * [cmd(coord); proc(coord)];
+                    estState(:,coord) = Ad * estState(:,coord) + Bd * [cmd(coord); proc(coord)];
+
+                    % map the discrete-time output onto the function output
+                    est_vel(coord)  = rHat(1);
+                    est_bias(coord) = rHat(2);
+
+                    % save the observer output for next time
+                    prevEst(1,coord) = proc(coord);
+                    prevEst(2,coord) = est_vel(coord);
+                    prevEst(3,coord) = est_bias(coord);
+
+                end
                 
             otherwise
                 error('SpotEstimator.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))

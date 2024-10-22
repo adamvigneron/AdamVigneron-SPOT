@@ -1,6 +1,6 @@
 slprj/
 .DS_Store
 Saved\ Data/
-ulrich2017.elf
-ulrich2017.slxc
-ulrich2017_ert_rtw/
+*.elf
+*.slxc
+*_ert_rtw/
