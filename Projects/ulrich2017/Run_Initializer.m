@@ -14,8 +14,11 @@ run('GUI_v4_0_Main');
 
 %% Place any custom variables or overwriting variables in this section
 
-% initialize control parameters for the manipulator
-initSpotArmCtrlParam;
+% initialize default parameters for SPOT
+initSpotDefaultParam;
+
+% initialize the GNC unit handling phase management
+initSpotPhaseMgmt;
 
 % initialize the GNC unit handling measurement processing
 initSpotMeasProc;
@@ -32,5 +35,9 @@ initSpotCtrlErr;
 % initialize the GNC unit handling control
 initSpotController;
 
+% initialize the GNC unit handling status flags
+initSpotFlag;
+
 % initialize environmental parameters
 initSpotEnv;
+

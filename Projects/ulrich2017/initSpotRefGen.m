@@ -12,47 +12,187 @@ structRefGen.k5  = 0;
 paramRefGen = repmat(structRefGen,numPhase,numCoord);
 
 
+%% convenience variables
+
+allPhases = enumeration('SpotPhase');
+allPhases = allPhases(:).';  % converts to a row vector
+
+phases3_1to3_4 = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
+                  SpotPhase.Phase3_3, SpotPhase.Phase3_4];
+
+
 %% reference orbit
 
 rRef   = 0.85;  % radius, metres
 omgRef = 0.03490659;  % angular frequency, rad/s
 
+% we define a phase offset corresponding to the orbit start time
+startPhase = omgRef * Phase2_End;
 
-%% SpotPhase.Phase3_4 - SpotCoord.xRed
 
-phase = SpotPhase.Phase3_4;
+%% SpotPhase.Phase2 - Platforms
+
+phase = SpotPhase.Phase2;
+
+% paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
+
+paramRefGen(phase,SpotCoord.xRed    ).k1 = init_states_RED(1);
+paramRefGen(phase,SpotCoord.yRed    ).k1 = init_states_RED(2);
+paramRefGen(phase,SpotCoord.thetaRed).k1 = init_states_RED(3);
+
+paramRefGen(phase,SpotCoord.xBlack    ).k1 = init_states_BLACK(1);
+paramRefGen(phase,SpotCoord.yBlack    ).k1 = init_states_BLACK(2);
+paramRefGen(phase,SpotCoord.thetaBlack).k1 = init_states_BLACK(3);
+
+paramRefGen(phase,SpotCoord.xBlue    ).k1 = init_states_BLUE(1);
+paramRefGen(phase,SpotCoord.yBlue    ).k1 = init_states_BLUE(2);
+paramRefGen(phase,SpotCoord.thetaBlue).k1 = init_states_BLUE(3);
+
+
+%% SpotPhase.Phase3 - SpotCoord.xRed
+
 coord = SpotCoord.xRed;
 
-paramRefGen(phase,coord).fun = SpotGnc.refCosine;
+for phase = phases3_1to3_4
 
-% ref = k1 * cos( k2 * t + k3 ) + k4
-paramRefGen(phase,coord).k1  = rRef;
-paramRefGen(phase,coord).k2  = omgRef;
-paramRefGen(phase,coord).k3  = 0;
-paramRefGen(phase,coord).k4  = init_states_RED(1) - rRef;
+    paramRefGen(phase,coord).fun = SpotGnc.refCosine;
+
+    % ref = k1 * cos( k2 * t + k3 ) + k4
+    paramRefGen(phase,coord).k1  = rRef;
+    paramRefGen(phase,coord).k2  = omgRef;
+    paramRefGen(phase,coord).k3  = -1 * startPhase;
+    paramRefGen(phase,coord).k4  = 0.5 * xLength;
+
+end
 
 
-%% SpotPhase.Phase3_4 - SpotCoord.yRed
+%% SpotPhase.Phase3 - SpotCoord.yRed
 
-phase = SpotPhase.Phase3_4;
 coord = SpotCoord.yRed;
 
-paramRefGen(phase,coord).fun = SpotGnc.refSine;
+for phase = phases3_1to3_4
 
-% ref = k1 * sin( k2 * t + k3) + k4;
-paramRefGen(phase,coord).k1  = rRef;
-paramRefGen(phase,coord).k2  = omgRef;
-paramRefGen(phase,coord).k3  = 0;
-paramRefGen(phase,coord).k4  = init_states_RED(2);
+    paramRefGen(phase,coord).fun = SpotGnc.refSine;
+
+    % ref = k1 * sin( k2 * t + k3) + k4;
+    paramRefGen(phase,coord).k1  = rRef;
+    paramRefGen(phase,coord).k2  = omgRef;
+    paramRefGen(phase,coord).k3  = -1 * startPhase;
+    paramRefGen(phase,coord).k4  = 0.5 * yLength;
+
+end
 
 
-%% SpotPhase.Phase3_4 - SpotCoord.thetaRed
+%% SpotPhase.Phase3 - SpotCoord.thetaRed
 
-phase = SpotPhase.Phase3_4;
 coord = SpotCoord.thetaRed;
 
-paramRefGen(phase,coord).fun = SpotGnc.refPolyWrap;
+for phase = phases3_1to3_4
+    
+    paramRefGen(phase,coord).fun = SpotGnc.refPolyWrap;
 
-% ref = wrapToPi( k1 + k2 * t );
-paramRefGen(phase,coord).k1  = pi;
-paramRefGen(phase,coord).k2  = omgRef;
+    % ref = wrapToPi( k1 + k2 * t );
+    paramRefGen(phase,coord).k1  = pi - startPhase;
+    paramRefGen(phase,coord).k2  = omgRef;
+
+end
+
+
+%% SpotPhase.Phase3 - SpotCoord.xBlack | SpotCoord.yBlack | spotCoord.thetaBlack
+
+for phase = phases3_1to3_4
+
+    % paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
+    paramRefGen(phase,SpotCoord.xBlack).k1 = 0.5 * xLength;
+    paramRefGen(phase,SpotCoord.yBlack).k1 = 0.5 * yLength;
+    
+    % ref = wrapToPi( k1 + k2 * t );
+    paramRefGen(phase,SpotCoord.thetaBlack).fun = SpotGnc.refPolyWrap;
+    paramRefGen(phase,SpotCoord.thetaBlack).k1  = -1 * startPhase;
+    paramRefGen(phase,SpotCoord.thetaBlack).k2  = omgRef;
+
+end
+
+
+%% SpotPhase.Phase3 - SpotCoord.xBlue
+
+coord = SpotCoord.xBlue;
+
+for phase = phases3_1to3_4
+
+    paramRefGen(phase,coord).fun = SpotGnc.refCosine;
+
+    % ref = k1 * cos( k2 * t + k3 ) + k4
+    paramRefGen(phase,coord).k1  = rRef;
+    paramRefGen(phase,coord).k2  = omgRef;
+    paramRefGen(phase,coord).k3  = pi - startPhase;
+    paramRefGen(phase,coord).k4  = 0.5 * xLength;
+
+end
+
+
+%% SpotPhase.Phase3 - SpotCoord.yBlue
+
+coord = SpotCoord.yBlue;
+
+for phase = phases3_1to3_4
+
+    paramRefGen(phase,coord).fun = SpotGnc.refSine;
+
+    % ref = k1 * sin( k2 * t + k3) + k4;
+    paramRefGen(phase,coord).k1  = rRef;
+    paramRefGen(phase,coord).k2  = omgRef;
+    paramRefGen(phase,coord).k3  = pi - startPhase;
+    paramRefGen(phase,coord).k4  = 0.5 * yLength;
+
+end
+
+
+%% SpotPhase.Phase3 - SpotCoord.thetaBlue
+
+coord = SpotCoord.thetaBlue;
+
+for phase = phases3_1to3_4
+
+    paramRefGen(phase,coord).fun = SpotGnc.refPolyWrap;
+
+    % ref = wrapToPi( k1 + k2 * t );
+    paramRefGen(phase,coord).k1  = -1 * startPhase;
+    paramRefGen(phase,coord).k2  = omgRef;
+
+end
+
+
+%% SpotPhase.Phase4 | SpotPhase.Phase5 - Platforms
+
+% paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
+
+for phase = [SpotPhase.Phase4, SpotPhase.Phase5]
+
+    paramRefGen(phase,SpotCoord.xRed    ).k1 = home_states_RED(1);
+    paramRefGen(phase,SpotCoord.yRed    ).k1 = home_states_RED(2);
+    paramRefGen(phase,SpotCoord.thetaRed).k1 = home_states_RED(3);
+    
+    paramRefGen(phase,SpotCoord.xBlack    ).k1 = home_states_BLACK(1);
+    paramRefGen(phase,SpotCoord.yBlack    ).k1 = home_states_BLACK(2);
+    paramRefGen(phase,SpotCoord.thetaBlack).k1 = home_states_BLACK(3);
+    
+    paramRefGen(phase,SpotCoord.xBlue    ).k1 = home_states_BLUE(1);
+    paramRefGen(phase,SpotCoord.yBlue    ).k1 = home_states_BLUE(2);
+    paramRefGen(phase,SpotCoord.thetaBlue).k1 = home_states_BLUE(3);
+
+end
+
+
+%% SpotCoord.shoulderArm | SpotCoord.elbowArm | SpotCoord.wristArm - default
+
+% paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
+
+for phase = allPhases
+
+    paramRefGen(phase,SpotCoord.shoulderArm).k1 = pi/2;
+    paramRefGen(phase,SpotCoord.elbowArm   ).k1 = pi/2;
+    paramRefGen(phase,SpotCoord.wristArm   ).k1 = 0;
+
+end
+

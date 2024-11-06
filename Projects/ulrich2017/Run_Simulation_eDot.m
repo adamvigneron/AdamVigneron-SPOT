@@ -22,13 +22,6 @@
 
 %% SIMULATION OR EXPERIMENT
 
-% change default figure style
-set(groot,'DefaultFigureWindowStyle','docked');
-set(groot,'DefaultLineLineWidth', 2);
-set(groot,'DefaultAxesFontSize', 18);
-set(groot,'defaultAxesXGrid','on');
-set(groot,'defaultAxesYGrid','on');
-
 % run the SPOT intialization script
 Run_Initializer;
 
@@ -37,6 +30,13 @@ isExperiment = 0;  %#ok<*UNRCH>
 
 
 %% SETUP
+
+% change default figure style
+set(groot,'DefaultFigureWindowStyle','docked');
+set(groot,'DefaultLineLineWidth', 2);
+set(groot,'DefaultAxesFontSize', 18);
+set(groot,'defaultAxesXGrid','on');
+set(groot,'defaultAxesYGrid','on');
 
 % get a handle for the open app via its containing figure
 myFig = findall(groot,'Name','SPOT 4.0 GUI');
@@ -63,10 +63,8 @@ myApp.public_BLUECheckBoxValueChanged([]);
 myApp.public_BLACKCheckBoxValueChanged([]);
 
 if isExperiment
-    % merge Phase 1 into Phase 2 (not reflected in GUI)
-    Phase2_Duration = Phase2_Duration + Phase1_Duration - 1;
-    Phase1_Duration = 1;
-    Phase1_End      = Phase0_End + 1;
+    % shorten Phase1 to 1 second (Phase2 will be extended accordingly)
+    paramPhaseMgmt.Phase1_End = paramPhaseMgmt.Phase0_End + 1;
 end
 
 
@@ -78,7 +76,7 @@ end
 % 2 - ulrich
 % 3 - schoellig
 % 4 - observer
-ilcMethod = 4;
+ilcMethod = 3;
 
 % noise switches
 flag_distFT    = 1;
