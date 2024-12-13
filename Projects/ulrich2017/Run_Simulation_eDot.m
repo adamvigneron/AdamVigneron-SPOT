@@ -47,15 +47,15 @@ myApp.AvailableDiagramsDropDown.Value = myApp.AvailableDiagramsDropDown.Items{2}
 myApp.public_AvailableDiagramsDropDownValueChanged([]);  % [] is an empty event
 
 if isExperiment
-    % activate only RED
+    % activate only RED and BLACK
     myApp.REDCheckBox.Value = 1; 
+    myApp.BLACKCheckBox.Value = 1;
     myApp.BLUECheckBox.Value = 0;
-    myApp.BLACKCheckBox.Value = 0;
 else
     % activate all three platforms
     myApp.REDCheckBox.Value = 1;
-    myApp.BLUECheckBox.Value = 1;
     myApp.BLACKCheckBox.Value = 1;
+    myApp.BLUECheckBox.Value = 1;
 end
 
 myApp.public_REDCheckBoxValueChanged([]);
@@ -85,12 +85,13 @@ flag_noiseFT   = 1;
 flag_noiseMeas = 1;
 
 % noise and disturbance values
-disturbFT_xRed      = 0.1;     % newton, absolute
+disturbFT_xRed      = -0.2;     % newton, absolute
 walkFT_xRed_3sig    = 0.02;    % newton, three-sigma
 noiseFT_xRed_3sig   = 0.02;    % newton, three-sigma
 noiseMeas_xRed_3sig = 0.0001;  % metre, three-sigma
 
 % determine timeseries indices in Phase 3 for the model and the learning
+idxPh1_End = round(Phase1_End / baseRate) + 2;
 idxPh2_End = round(Phase2_End / baseRate) + 2;
 idxPh3_End = round(Phase3_End / baseRate) + 2;
 idxPh3     = idxPh2_End:idxPh3_End;
@@ -166,7 +167,7 @@ G     = blkdiag(GCell{:});
 
 % we apply a disturbance in Phase3 on xRed
 if ( flag_distFT ) && ( ~isExperiment )
-    disturbFT.Data(idxPh3,SpotCoord.xRed) = disturbFT_xRed;
+    disturbFT.Data(idxPh1_End:idxPh3_End,SpotCoord.xRed) = disturbFT_xRed;
 end
 
 if isExperiment
@@ -197,7 +198,7 @@ if isExperiment
     dataClass.RED_Fx_Real_N        = dataClass.CustomUserData58;
     dataClass.RED_BIASx_Est_mpers2 = dataClass.CustomUserData59;
 
-    dataClass.Time_s               = dataClass.CustomUserData61;
+    dataClass.Time_s               = dataClass.CustomUserData63;
 
 else
     % start the simulation
@@ -399,8 +400,8 @@ feedForward.Data(     idxPh3,SpotCoord.xRed)     = feedForward_xRed;
 
 % apply a random walk to the (initially uniform) disturbance
 if ( flag_walkFT ) && ( ~isExperiment ) 
-    disturbFT.Data(idxPh3,SpotCoord.xRed) = disturbFT.Data(idxPh3,SpotCoord.xRed) + ...
-        (walkFT_xRed_3sig / 3) * randn( length(idxPh3), 1 );
+    disturbFT.Data(idxPh1_End:idxPh3_End,SpotCoord.xRed) = disturbFT.Data(idxPh1_End:idxPh3_End,SpotCoord.xRed) + ...
+        (walkFT_xRed_3sig / 3) * randn( length(idxPh1_End:idxPh3_End), 1 );
 end
 
 if isExperiment

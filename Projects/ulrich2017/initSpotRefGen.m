@@ -26,6 +26,9 @@ phases3_1to3_4 = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
 rRef   = 0.85;  % radius, metres
 omgRef = 0.03490659;  % angular frequency, rad/s
 
+% % aas_sfm_2025
+% omgRef = 2 * omgRef;  % doubling to reduce chance of sticking on table
+
 % we define a phase offset corresponding to the orbit start time
 startPhase = omgRef * Phase2_End;
 
@@ -35,6 +38,14 @@ startPhase = omgRef * Phase2_End;
 phase = SpotPhase.Phase2;
 
 % paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
+
+% % aas_sfm_2025
+% % update the drop/initial state of RED and BLACK
+% drop_states_RED(2) = 1.9;
+% init_states_RED(2) = 1.9;
+% init_states_RED(3) = init_states_RED(3) + pi/2;
+% init_states_BLACK(1) = init_states_RED(1) - rRef;
+% init_states_BLACK(2) = 0.9;
 
 paramRefGen(phase,SpotCoord.xRed    ).k1 = init_states_RED(1);
 paramRefGen(phase,SpotCoord.yRed    ).k1 = init_states_RED(2);
@@ -61,7 +72,7 @@ for phase = phases3_1to3_4
     paramRefGen(phase,coord).k1  = rRef;
     paramRefGen(phase,coord).k2  = omgRef;
     paramRefGen(phase,coord).k3  = -1 * startPhase;
-    paramRefGen(phase,coord).k4  = 0.5 * xLength;
+    paramRefGen(phase,coord).k4  = init_states_RED(1) - rRef;
 
 end
 
@@ -78,7 +89,12 @@ for phase = phases3_1to3_4
     paramRefGen(phase,coord).k1  = rRef;
     paramRefGen(phase,coord).k2  = omgRef;
     paramRefGen(phase,coord).k3  = -1 * startPhase;
-    paramRefGen(phase,coord).k4  = 0.5 * yLength;
+    paramRefGen(phase,coord).k4  = init_states_RED(2);
+
+    % % aas_sfm_2025
+    % paramRefGen(phase,coord).k1  = paramRefGen(phase,coord).k1 * 0.2;  % reduce to stay in airflow
+    % paramRefGen(phase,coord).k2  = paramRefGen(phase,coord).k2 * 2;    % double for figure-8
+    % paramRefGen(phase,coord).k3  = paramRefGen(phase,coord).k3 * 2;    % same comment
 
 end
 
@@ -95,6 +111,10 @@ for phase = phases3_1to3_4
     paramRefGen(phase,coord).k1  = pi - startPhase;
     paramRefGen(phase,coord).k2  = omgRef;
 
+    % % aas_sfm_2025
+    % paramRefGen(phase,coord).fun = SpotGnc.refConstant;
+    % paramRefGen(phase,coord).k1 = init_states_RED(3);
+
 end
 
 
@@ -103,8 +123,8 @@ end
 for phase = phases3_1to3_4
 
     % paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
-    paramRefGen(phase,SpotCoord.xBlack).k1 = 0.5 * xLength;
-    paramRefGen(phase,SpotCoord.yBlack).k1 = 0.5 * yLength;
+    paramRefGen(phase,SpotCoord.xBlack).k1 = init_states_BLACK(1);
+    paramRefGen(phase,SpotCoord.yBlack).k1 = init_states_BLACK(2);
     
     % ref = wrapToPi( k1 + k2 * t );
     paramRefGen(phase,SpotCoord.thetaBlack).fun = SpotGnc.refPolyWrap;
