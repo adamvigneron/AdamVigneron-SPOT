@@ -1,0 +1,12 @@
+tracker_id_RED_0_pos_string,159.129636,135.335709,0
+tracker_id_RED_6_pos_string,160.629636,-142.164291,0
+tracker_id_RED_4_pos_string,-116.370364,-140.164291,0
+tracker_id_RED_2_pos_string,-117.370364,137.835709,0
+tracker_id_BLACK_13_pos_string,136.334888,156.205422,0
+tracker_id_BLACK_11_pos_string,136.834888,-121.294578,0
+tracker_id_BLACK_9_pos_string,-140.665112,-120.794578,0
+tracker_id_BLACK_15_pos_string,-140.665112,157.705422,0
+tracker_id_BLUE_8_pos_string,148.480637,153.301003,0
+tracker_id_BLUE_14_pos_string,148.980637,-124.198997,0
+tracker_id_BLUE_12_pos_string,-128.519363,-123.698997,0
+tracker_id_BLUE_10_pos_string,-128.519363,154.801003,0
