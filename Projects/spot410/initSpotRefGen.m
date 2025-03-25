@@ -17,7 +17,6 @@ paramRefGen = repmat(structRefGen,numPhase,numCoord);
 allPhases = enumeration('SpotPhase');
 allPhases = allPhases(:).';  % converts to a row vector
 
-phases0to1     = [SpotPhase.Phase0,   SpotPhase.Phase1];
 phases3_1to3_4 = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
                   SpotPhase.Phase3_3, SpotPhase.Phase3_4];
 
@@ -34,9 +33,9 @@ omgRef = 0.03490659;  % angular frequency, rad/s
 startPhase = omgRef * Phase2_End;
 
 
-%% SpotPhase.Phase0 and SpotPhase.Phase1 - Platforms
+%% SpotPhase.Phase0 through SpotPhase.Phase2 - Platforms
 
-for phase = phases0to1
+for phase = [SpotPhase.Phase0, SpotPhase.Phase1, SpotPhase.Phase2]
 
     % paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
     
@@ -53,33 +52,6 @@ for phase = phases0to1
     paramRefGen(phase,SpotCoord.thetaBlue).k1 = drop_states_BLUE(3);
 
 end
-
-
-%% SpotPhase.Phase2 - Platforms
-
-phase = SpotPhase.Phase2;
-
-% paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
-
-% % aas_sfm_2025
-% % update the drop/initial state of RED and BLACK
-% drop_states_RED(2) = 1.9;
-% init_states_RED(2) = 1.9;
-% init_states_RED(3) = init_states_RED(3) + pi/2;
-% init_states_BLACK(1) = init_states_RED(1) - rRef;
-% init_states_BLACK(2) = 0.9;
-
-paramRefGen(phase,SpotCoord.xRed    ).k1 = init_states_RED(1);
-paramRefGen(phase,SpotCoord.yRed    ).k1 = init_states_RED(2);
-paramRefGen(phase,SpotCoord.thetaRed).k1 = init_states_RED(3);
-
-paramRefGen(phase,SpotCoord.xBlack    ).k1 = init_states_BLACK(1);
-paramRefGen(phase,SpotCoord.yBlack    ).k1 = init_states_BLACK(2);
-paramRefGen(phase,SpotCoord.thetaBlack).k1 = init_states_BLACK(3);
-
-paramRefGen(phase,SpotCoord.xBlue    ).k1 = init_states_BLUE(1);
-paramRefGen(phase,SpotCoord.yBlue    ).k1 = init_states_BLUE(2);
-paramRefGen(phase,SpotCoord.thetaBlue).k1 = init_states_BLUE(3);
 
 
 %% SpotPhase.Phase3 - SpotCoord.xRed
