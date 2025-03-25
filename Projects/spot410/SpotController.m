@@ -8,7 +8,7 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
 
     % output variables
     F     = zeros(numCoord,1);
-    debug = zeros(numDebug,numCoord);
+    debug = zeros(numCoord,numDebug);
     
     % persistent variables - definition
     persistent errOld;
@@ -51,8 +51,8 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 % F = Kp*e + Kd*(de/dt)
                 F(coord) = k1*err(coord) + k2*eDelta/k3;
                 
-                debug(1,coord) = k1*err(coord);
-                debug(2,coord) = k2*eDelta/k3;
+                debug(coord,1) = k1*err(coord);
+                debug(coord,2) = k2*eDelta/k3;
                 
                 errOld(coord) = err(coord);
                 errDeltaOld(coord) = eDelta;
@@ -64,8 +64,8 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 % F = Kp*e + Kd*(de/dt)
                 F(coord) = k1*err(coord) + k2*err_vel(coord);
                 
-                debug(1,coord) = k1*err(coord);
-                debug(2,coord) = k2*err_vel(coord);
+                debug(coord,1) = k1*err(coord);
+                debug(coord,2) = k2*err_vel(coord);
     
             case SpotGnc.ctrlPdFwd
                 k1 = paramCtrl(phase,coord).k1;  % Kp
@@ -82,9 +82,9 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 % F = Kp*e + Kd*(de/dt) + beta*uOld
                 F(coord) = k1*err(coord) + k2*eDelta/k3 + k4*feedFwd(coord);
     
-                debug(1,coord) = k1*err(coord);
-                debug(2,coord) = k2*eDelta/k3;
-                debug(3,coord) = k4*feedFwd(coord);
+                debug(coord,1) = k1*err(coord);
+                debug(coord,2) = k2*eDelta/k3;
+                debug(coord,3) = k4*feedFwd(coord);
     
                 errOld(coord) = err(coord);
                 errDeltaOld(coord) = eDelta;
@@ -97,9 +97,9 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 % F = Kp*e + Kd*(de/dt) + beta*uOld
                 F(coord) = k1*err(coord) + k2*err_vel(coord) + k4*feedFwd(coord);
     
-                debug(1,coord) = k1*err(coord);
-                debug(2,coord) = k2*err_vel(coord);
-                debug(3,coord) = k4*feedFwd(coord);
+                debug(coord,1) = k1*err(coord);
+                debug(coord,2) = k2*err_vel(coord);
+                debug(coord,3) = k4*feedFwd(coord);
     
     
             otherwise

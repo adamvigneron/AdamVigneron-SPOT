@@ -13,13 +13,12 @@ classdef SpotGnc < Simulink.IntEnumType
 %
         errMinus(301)
         errMinusWrap(302)
-        errHough(303)
 %
         estNone(401)
         estVelBias(402)
 %
         procNone(501)
-        procFreeze(502)
+        procAngle(502)
     end
 end
 

@@ -11,7 +11,36 @@ structMeasProc.k4  = 0;
 
 paramMeasProc = repmat(structMeasProc,numPhase,numCoord);
 
-noiseMeas.mean = zeros(numCoord,1);
-noiseMeas.seed = zeros(numCoord,1);
-noiseMeas.var  = zeros(numCoord,1);
+
+%% convenience variables
+
+allPhases = enumeration('SpotPhase');
+allPhases = allPhases(:).';  % converts to a row vector
+
+
+%% SpotCoord.thetaRed - default
+
+coord = SpotCoord.thetaRed;
+
+for phase = allPhases
+    paramMeasProc(phase,coord).fun = SpotGnc.procAngle;
+end
+
+
+%% SpotCoord.thetaBlack - default
+
+coord = SpotCoord.thetaBlack;
+
+for phase = allPhases
+    paramMeasProc(phase,coord).fun = SpotGnc.procAngle;
+end
+
+
+%% SpotCoord.thetaBlue - default
+
+coord = SpotCoord.thetaBlue;
+
+for phase = allPhases
+    paramMeasProc(phase,coord).fun = SpotGnc.procAngle;
+end
 

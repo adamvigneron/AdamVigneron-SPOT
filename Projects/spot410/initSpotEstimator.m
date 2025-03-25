@@ -22,7 +22,7 @@ coord = SpotCoord.xRed;
 
 for phase = allPhases    
     paramEst(phase,coord).fun = SpotGnc.estVelBias;
-    paramEst(phase,coord).k1  = baseRate;  % 2*baseRate in experiment
+    paramEst(phase,coord).k1  = baseRate;
     paramEst(phase,coord).k2  = 1;  % L1
     paramEst(phase,coord).k3  = 1;  % L2
 end
@@ -30,42 +30,98 @@ end
 
 %% SpotCoord.yRed - default
 
-% paramEst.fun is set to estNone by default
+coord = SpotCoord.yRed;
+
+for phase = allPhases    
+    paramEst(phase,coord).fun = SpotGnc.estVelBias;
+    paramEst(phase,coord).k1  = baseRate;
+    paramEst(phase,coord).k2  = 1;  % L1
+    paramEst(phase,coord).k3  = 1;  % L2
+end
 
 
 %% SpotCoord.thetaRed - default
 
-% paramEst.fun is set to estNone by default
+coord = SpotCoord.thetaRed;
+
+for phase = allPhases    
+    paramEst(phase,coord).fun = SpotGnc.estVelBias;
+    paramEst(phase,coord).k1  = baseRate;
+    paramEst(phase,coord).k2  = 1;  % L1
+    paramEst(phase,coord).k3  = 1;  % L2
+end
 
 
 %% SpotCoord.xBlack - default
 
-% paramEst.fun is set to estNone by default
+coord = SpotCoord.xBlack;
+
+for phase = allPhases    
+    paramEst(phase,coord).fun = SpotGnc.estVelBias;
+    paramEst(phase,coord).k1  = baseRate;
+    paramEst(phase,coord).k2  = 1;  % L1
+    paramEst(phase,coord).k3  = 1;  % L2
+end
 
 
 %% SpotCoord.yBlack - default
 
-% paramEst.fun is set to estNone by default
+coord = SpotCoord.yBlack;
+
+for phase = allPhases    
+    paramEst(phase,coord).fun = SpotGnc.estVelBias;
+    paramEst(phase,coord).k1  = baseRate;
+    paramEst(phase,coord).k2  = 1;  % L1
+    paramEst(phase,coord).k3  = 1;  % L2
+end
 
 
 %% SpotCoord.thetaBlack - default
 
-% paramEst.fun is set to estNone by default
+coord = SpotCoord.thetaBlack;
+
+for phase = allPhases    
+    paramEst(phase,coord).fun = SpotGnc.estVelBias;
+    paramEst(phase,coord).k1  = baseRate;
+    paramEst(phase,coord).k2  = 1;  % L1
+    paramEst(phase,coord).k3  = 1;  % L2
+end
 
 
 %% SpotCoord.xBlue - default
 
-% paramEst.fun is set to estNone by default
+coord = SpotCoord.xBlue;
+
+for phase = allPhases    
+    paramEst(phase,coord).fun = SpotGnc.estVelBias;
+    paramEst(phase,coord).k1  = baseRate;
+    paramEst(phase,coord).k2  = 1;  % L1
+    paramEst(phase,coord).k3  = 1;  % L2
+end
 
 
 %% SpotCoord.yBlue - default
 
-% paramEst.fun is set to estNone by default
+coord = SpotCoord.yBlue;
+
+for phase = allPhases    
+    paramEst(phase,coord).fun = SpotGnc.estVelBias;
+    paramEst(phase,coord).k1  = baseRate;
+    paramEst(phase,coord).k2  = 1;  % L1
+    paramEst(phase,coord).k3  = 1;  % L2
+end
 
 
 %% SpotCoord.thetaBlue - default
 
-% paramEst.fun is set to estNone by default
+coord = SpotCoord.thetaBlue;
+
+for phase = allPhases    
+    paramEst(phase,coord).fun = SpotGnc.estVelBias;
+    paramEst(phase,coord).k1  = baseRate;
+    paramEst(phase,coord).k2  = 1;  % L1
+    paramEst(phase,coord).k3  = 1;  % L2
+end
 
 
 %% SpotCoord.shoulderArm - default

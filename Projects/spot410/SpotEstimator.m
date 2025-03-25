@@ -14,11 +14,13 @@ function [est,est_vel,est_bias] = SpotEstimator(phase, proc, cmd, paramEst)
     % persistent variables - definition
     persistent estState;
     persistent prevEst;
+    persistent measDelay;
 
     % persistent variables - initialization
     if isempty(estState)
-        estState = zeros(maxEstState,numCoord);
-        prevEst  = zeros(3,numCoord);
+        estState  = zeros(maxEstState,numCoord);
+        prevEst   = zeros(3,numCoord);
+        measDelay = ones(1,numCoord);
     end
 
 
@@ -56,8 +58,11 @@ function [est,est_vel,est_bias] = SpotEstimator(phase, proc, cmd, paramEst)
                 A = [ -L1,       1; -L2,      0];
                 B = [   1, L2-L1^2;   0, -L1*L2];
 
+                % time since last measurement
+                dt = k1 * measDelay(coord);  % time since last measurement
+
                 % discrete time
-                Ad = expm(A*k1);
+                Ad = expm(A*dt);
                 Bd = A \ (Ad - eye(2)) * B;
                 Cd = [1  0; 0  1];
                 Dd = [0 L1; 0 L2];
@@ -73,6 +78,8 @@ function [est,est_vel,est_bias] = SpotEstimator(phase, proc, cmd, paramEst)
                     
                     est_vel(coord)  = prevEst(2,coord);
                     est_bias(coord) = prevEst(3,coord);
+
+                    measDelay(coord) = measDelay(coord) + 1;
                 
                 else
 
@@ -88,6 +95,8 @@ function [est,est_vel,est_bias] = SpotEstimator(phase, proc, cmd, paramEst)
                     prevEst(1,coord) = proc(coord);
                     prevEst(2,coord) = est_vel(coord);
                     prevEst(3,coord) = est_bias(coord);
+
+                    measDelay(coord) = 1;
 
                 end
                 
