@@ -2,7 +2,7 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
 
     %% initialization of output and persistent variables
 
-    coords   = enumeration('SpotCoord');
+    coords   = enumeration( SpotCoord(1) );
     numCoord = length(coords);
     numDebug = 3;
 

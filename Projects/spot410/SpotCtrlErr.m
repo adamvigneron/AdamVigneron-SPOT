@@ -2,7 +2,7 @@ function [err,err_vel] = SpotCtrlErr(phase, ref, ref_vel, est, est_vel, paramCtr
 
     %% initialization of output and persistent variables
     
-    coords   = enumeration('SpotCoord');
+    coords   = enumeration( SpotCoord(1) );
     numCoord = length(coords);
 
     err     = zeros(numCoord,1);

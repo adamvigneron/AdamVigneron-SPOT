@@ -2,7 +2,7 @@ function [ref,ref_vel] = SpotRefGen(phase, t, paramRefGen)
 
     %% initialization of output variables
 
-    coords   = enumeration('SpotCoord');
+    coords   = enumeration( SpotCoord(1) );
     numCoord = length(coords);
 
     ref     = zeros(numCoord,1);

@@ -2,7 +2,7 @@ function [est,est_vel,est_bias] = SpotEstimator(phase, proc, cmd, paramEst)
 
     %% initialization of output and persistent variables
 
-    coords      = enumeration('SpotCoord');
+    coords      = enumeration( SpotCoord(1) );
     numCoord    = length(coords);
     maxEstState = 2;
 

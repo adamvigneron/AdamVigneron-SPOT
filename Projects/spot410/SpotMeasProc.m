@@ -2,7 +2,7 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
 
     %% initialization of output and persistent variables
     
-    coords   = enumeration('SpotCoord');
+    coords   = enumeration( SpotCoord(1) );
     numCoord = length(coords);
 
     proc = zeros(numCoord,1);
