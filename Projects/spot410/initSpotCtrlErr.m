@@ -71,15 +71,27 @@ end
 
 %% SpotCoord.shoulderArm - default
 
-% paramCtrlErr.fun is set to errMinus by default
+coord = SpotCoord.shoulderArm;
+
+for phase = allPhases
+    paramCtrlErr(phase,coord).fun = SpotGnc.errArmSetpoint;
+end
 
 
 %% SpotCoord.elbowArm - default
 
-% paramCtrlErr.fun is set to errMinus by default
+coord = SpotCoord.elbowArm;
+
+for phase = allPhases
+    paramCtrlErr(phase,coord).fun = SpotGnc.errArmSetpoint;
+end
 
 
 %% SpotCoord.wristArm - default
 
-% paramCtrlErr.fun is set to errMinus by default
+coord = SpotCoord.wristArm;
+
+for phase = allPhases
+    paramCtrlErr(phase,coord).fun = SpotGnc.errArmSetpoint;
+end
 

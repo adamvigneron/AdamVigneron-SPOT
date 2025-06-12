@@ -81,6 +81,12 @@ function [err,err_vel] = SpotCtrlErr(phase, ref, ref_vel, est, est_vel, paramCtr
 
                 end                    
         
+            case SpotGnc.errArmSetpoint
+
+                % pass the reference signal through directly
+                err(coord)     = ref(coord);
+                err_vel(coord) = ref_vel(coord);
+        
             otherwise
                 error('SpotCtrlErr.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
     

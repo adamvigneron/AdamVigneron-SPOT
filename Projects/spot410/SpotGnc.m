@@ -10,9 +10,11 @@ classdef SpotGnc < Simulink.IntEnumType
         ctrlPdFwd(203)
         ctrlPd_vel(204)
         ctrlPdFwd_vel(205)
+        ctrlArmSetpoint(206)
 %
         errMinus(301)
         errMinusWrap(302)
+        errArmSetpoint(303)
 %
         estNone(401)
         estVelBias(402)

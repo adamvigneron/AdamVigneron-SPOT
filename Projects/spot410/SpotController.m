@@ -101,6 +101,10 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 debug(coord,2) = k2*err_vel(coord);
                 debug(coord,3) = k4*feedFwd(coord);
     
+            case SpotGnc.ctrlArmSetpoint
+                F(coord) = err(coord);
+    
+                debug(coord,1) = err(coord);
     
             otherwise
                 error('SpotController.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))

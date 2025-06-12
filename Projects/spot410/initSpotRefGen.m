@@ -33,7 +33,7 @@ omgRef = 0.03490659;  % angular frequency, rad/s
 startPhase = omgRef * Phase2_End;
 
 
-%% SpotPhase.Phase0 through SpotPhase.Phase2 - Platforms
+%% SpotPhase.Phase0 through SpotPhase.Phase2
 
 for phase = [SpotPhase.Phase0, SpotPhase.Phase1, SpotPhase.Phase2]
 
@@ -50,6 +50,10 @@ for phase = [SpotPhase.Phase0, SpotPhase.Phase1, SpotPhase.Phase2]
     paramRefGen(phase,SpotCoord.xBlue    ).k1 = drop_states_BLUE(1);
     paramRefGen(phase,SpotCoord.yBlue    ).k1 = drop_states_BLUE(2);
     paramRefGen(phase,SpotCoord.thetaBlue).k1 = drop_states_BLUE(3);
+
+    paramRefGen(phase,SpotCoord.shoulderArm).k1 = 0;
+    paramRefGen(phase,SpotCoord.elbowArm   ).k1 = 0;
+    paramRefGen(phase,SpotCoord.wristArm   ).k1 = 0;
 
 end
 
@@ -177,7 +181,32 @@ for phase = phases3_1to3_4
 end
 
 
-%% SpotPhase.Phase4 | SpotPhase.Phase5 - Platforms
+%% SpotPhase.Phase3 - SpotCoord.shoulderArm | spotCoord.elbowArm | spotCoord.wristArm
+
+for coord = [ SpotCoord.shoulderArm SpotCoord.elbowArm SpotCoord.wristArm ]
+
+    for phase = phases3_1to3_4
+    
+        paramRefGen(phase,coord).fun = SpotGnc.refSine;
+    
+        % ref = k1 * sin( k2 * t + k3) + k4;
+        paramRefGen(phase,coord).k1  = pi/2;
+        paramRefGen(phase,coord).k2  = 2*pi/20;
+        paramRefGen(phase,coord).k3  = 2*pi/20 * Phase2_End * -1;
+        paramRefGen(phase,coord).k4  = 0;
+    
+    end
+
+end
+
+coord = SpotCoord.wristArm;
+
+for phase = phases3_1to3_4
+    paramRefGen(phase,coord).k1 = -1 * paramRefGen(phase,coord).k1;
+end
+
+
+%% SpotPhase.Phase4 | SpotPhase.Phase5
 
 % paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
 
@@ -195,17 +224,8 @@ for phase = [SpotPhase.Phase4, SpotPhase.Phase5]
     paramRefGen(phase,SpotCoord.yBlue    ).k1 = home_states_BLUE(2);
     paramRefGen(phase,SpotCoord.thetaBlue).k1 = home_states_BLUE(3);
 
-end
-
-
-%% SpotCoord.shoulderArm | SpotCoord.elbowArm | SpotCoord.wristArm - default
-
-% paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
-
-for phase = allPhases
-
-    paramRefGen(phase,SpotCoord.shoulderArm).k1 = pi/2;
-    paramRefGen(phase,SpotCoord.elbowArm   ).k1 = pi/2;
+    paramRefGen(phase,SpotCoord.shoulderArm).k1 = 0;
+    paramRefGen(phase,SpotCoord.elbowArm   ).k1 = 0;
     paramRefGen(phase,SpotCoord.wristArm   ).k1 = 0;
 
 end

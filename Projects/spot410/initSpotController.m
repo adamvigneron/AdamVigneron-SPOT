@@ -139,15 +139,27 @@ end
 
 %% SpotCoord.shoulderArm - default
 
-% for now, this stays at SpotGnc.ctrlNone
+coord = SpotCoord.shoulderArm;
+
+for phase = phases2to5
+    paramCtrl(phase,coord).fun = SpotGnc.ctrlArmSetpoint;
+end
 
 
 %% SpotCoord.elbowArm - default
 
-% for now, this stays at SpotGnc.ctrlNone
+coord = SpotCoord.elbowArm;
+
+for phase = phases2to5
+    paramCtrl(phase,coord).fun = SpotGnc.ctrlArmSetpoint;
+end
 
 
 %% SpotCoord.wristArm - default
 
-% for now, this stays at SpotGnc.ctrlNone
+coord = SpotCoord.wristArm;
+
+for phase = phases2to5
+    paramCtrl(phase,coord).fun = SpotGnc.ctrlArmSetpoint;
+end
 
