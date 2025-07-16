@@ -2,47 +2,47 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
 
     %% initialization of output and persistent variables
     
-    coords   = enumeration( SpotCoord(1) );
-    numCoord = length(coords);
+    sensors   = enumeration( SpotSensor(1) );
+    numSensor = length(sensors);
 
-    proc = zeros(numCoord,1);
+    proc = zeros(numSensor,1);
 
     persistent prevProc;
 
     if isempty(prevProc)
-        prevProc = zeros(numCoord,1);
+        prevProc = zeros(numSensor,1);
     end
     
     
-    %% loop over all coordinates
+    %% loop over all measurements
 
-    for k = 1:numCoord
+    for k = 1:numSensor
         
-        coord = coords(k);
+        sensor = sensors(k);
 
         %% select a measurement processing method
-        myFun = paramMeasProc(phase,coord).fun;
+        myFun = paramMeasProc(phase,sensor).fun;
         
         switch myFun
     
             case SpotGnc.procNone
 
-                proc(coord) = meas(coord);
+                proc(sensor) = meas(sensor);
 
             case SpotGnc.procAngle
 
-                measDelta = wrapToPi( meas(coord) - prevProc(coord) );
+                measDelta = wrapToPi( meas(sensor) - prevProc(sensor) );
 
-                proc(coord) = prevProc(coord) + measDelta;
+                proc(sensor) = prevProc(sensor) + measDelta;
 
-                prevProc(coord) = proc(coord);
+                prevProc(sensor) = proc(sensor);
 
             otherwise
-                error('SpotMeasProc.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
+                error('SpotMeasProc.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotSensor(%d).\n\n', int32(myFun), int32(phase), int32(sensor))
     
         end % switch myFun
 
-    end % loop coords
+    end % loop sensors
 
 end % function
 
