@@ -1,14 +1,22 @@
-% collect all times of SpotPhase transition into a single object
+%% predeclare for code generation
+numPhase = length(meta.class.fromName('SpotPhase').EnumerationMemberList);
 
-paramPhaseMgmt.Phase0_End = Phase0_End;
-paramPhaseMgmt.Phase1_End = Phase1_End;
-paramPhaseMgmt.Phase2_End = Phase2_End;
+structPhaseMgmt.phaseEnd = 0;
 
-paramPhaseMgmt.Phase3_SubPhase1_End = Phase3_SubPhase1_End;
-paramPhaseMgmt.Phase3_SubPhase2_End = Phase3_SubPhase2_End;
-paramPhaseMgmt.Phase3_SubPhase3_End = Phase3_SubPhase3_End;
-paramPhaseMgmt.Phase3_SubPhase4_End = Phase3_SubPhase4_End;
+paramPhaseMgmt = repmat(structPhaseMgmt,numPhase);
 
-paramPhaseMgmt.Phase4_End = Phase4_End;
-paramPhaseMgmt.Phase5_End = Phase5_End;
+
+%% use phase durations to define phase ends 
+
+paramPhaseMgmt(SpotPhase.Phase0).phaseEnd =  5 ;
+paramPhaseMgmt(SpotPhase.Phase1).phaseEnd =  5 + paramPhaseMgmt(SpotPhase.Phase0).phaseEnd;
+paramPhaseMgmt(SpotPhase.Phase2).phaseEnd = 20 + paramPhaseMgmt(SpotPhase.Phase1).phaseEnd;
+
+paramPhaseMgmt(SpotPhase.Phase3_1).phaseEnd = 120 + paramPhaseMgmt(SpotPhase.Phase2).phaseEnd;
+paramPhaseMgmt(SpotPhase.Phase3_2).phaseEnd = 120 + paramPhaseMgmt(SpotPhase.Phase3_1).phaseEnd;
+paramPhaseMgmt(SpotPhase.Phase3_3).phaseEnd = 120 + paramPhaseMgmt(SpotPhase.Phase3_2).phaseEnd;
+paramPhaseMgmt(SpotPhase.Phase3_4).phaseEnd = 120 + paramPhaseMgmt(SpotPhase.Phase3_3).phaseEnd;
+
+paramPhaseMgmt(SpotPhase.Phase4).phaseEnd = 5 + paramPhaseMgmt(SpotPhase.Phase3_4).phaseEnd;
+paramPhaseMgmt(SpotPhase.Phase5).phaseEnd = 5 + paramPhaseMgmt(SpotPhase.Phase4).phaseEnd;
 

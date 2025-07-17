@@ -54,13 +54,16 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
     
             case SpotGnc.estNone
                 % position estimate is the processed measurement
-                % velocity estimate remains at zero
+                % velocity estimate is the measured rate
                 % bias estimate remains at zero
 
                 sensor = paramEst(phase,coord).sensor;
                 est(coord) = proc(sensor);
-    
 
+                rateSensor = paramEst(phase,coord).rateSensor;
+                est_vel(coord) = proc(rateSensor);
+
+                
             case SpotGnc.estVelBias
                 % position estimate is the processed measurement
                 % velocity and bias estimate use reduced-order observer 
@@ -208,6 +211,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
 
                 end % if changed meas
                 
+
             otherwise
                 error('SpotEstimator.m:\n  function SpotGnc.estEkf3dof not defined for SpotCoord(%d).\n\n', int32(coord))
     

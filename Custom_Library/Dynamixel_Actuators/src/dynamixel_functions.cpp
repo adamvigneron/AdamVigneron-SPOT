@@ -92,37 +92,41 @@ void initialize_dynamixel()
     if (CONTROL_MODE == 1 && run_once_flag == 1) { // Set up motors for position control
         
         initialize_dynamixel();
+
+        // DRIVE_MODE = 0 corresponds to a velocity profile with CCW positive
+        // VELOCITY_PROILE = 20 in units of 1.374 deg/sec (0 is infinite)
+        // PROFILE_ACCELERATION = 0 in units of 21.4577 deg/sec2 (0 is infinite)
         
         dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 1, ADDR_MX_OPERATING_MODE, 3, &dxl_error);
-        dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 1, ADDR_MX_DRIVE_MODE, 4, &dxl_error); // Velocity_profile yields the time required to reach goal position
+        dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 1, ADDR_MX_DRIVE_MODE, 0, &dxl_error); // Velocity_profile yields the time required to reach goal position
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 1, ADDR_MX_POSITION_P_GAIN, POSITION_P_GAIN, &dxl_error);
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 1, ADDR_MX_POSITION_I_GAIN, POSITION_I_GAIN, &dxl_error);
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 1, ADDR_MX_POSITION_D_GAIN, POSITION_D_GAIN, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 1, ADDR_MX_MAX_POSITION, MAX_POSITION, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 1, ADDR_MX_MIN_POSITION, MIN_POSITION, &dxl_error);
-        dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 1, ADDR_MX_VELOCITY_PROFILE, MOVE_TIME, &dxl_error);
+        dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 1, ADDR_MX_VELOCITY_PROFILE, 20, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 1, ADDR_MX_PROFILE_ACCELERATION, 0, &dxl_error);
         dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 1, ADDR_MX_TORQUE_ENABLE, 1, &dxl_error);
         
         dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 2, ADDR_MX_OPERATING_MODE, 3, &dxl_error);
-        dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 2, ADDR_MX_DRIVE_MODE, 4, &dxl_error); // Velocity_profile yields the time required to reach goal position
+        dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 2, ADDR_MX_DRIVE_MODE, 0, &dxl_error); // Velocity_profile yields the time required to reach goal position
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 2, ADDR_MX_POSITION_P_GAIN, POSITION_P_GAIN, &dxl_error);
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 2, ADDR_MX_POSITION_I_GAIN, POSITION_I_GAIN, &dxl_error);
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 2, ADDR_MX_POSITION_D_GAIN, POSITION_D_GAIN, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 2, ADDR_MX_MAX_POSITION, MAX_POSITION, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 2, ADDR_MX_MIN_POSITION, MIN_POSITION, &dxl_error);
-        dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 2, ADDR_MX_VELOCITY_PROFILE, MOVE_TIME, &dxl_error);
+        dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 2, ADDR_MX_VELOCITY_PROFILE, 20, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 2, ADDR_MX_PROFILE_ACCELERATION, 0, &dxl_error);
         dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 2, ADDR_MX_TORQUE_ENABLE, 1, &dxl_error);
         
         dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 3, ADDR_MX_OPERATING_MODE, 3, &dxl_error);
-        dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 3, ADDR_MX_DRIVE_MODE, 4, &dxl_error); // Velocity_profile yields the time required to reach goal position
+        dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 3, ADDR_MX_DRIVE_MODE, 0, &dxl_error); // Velocity_profile yields the time required to reach goal position
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 3, ADDR_MX_POSITION_P_GAIN, POSITION_P_GAIN, &dxl_error); // Manually set to 800 for the combined experiment!!!
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 3, ADDR_MX_POSITION_I_GAIN, POSITION_I_GAIN, &dxl_error);
         dxl_comm_result   = packetHandler->write2ByteTxRx(portHandler, 3, ADDR_MX_POSITION_D_GAIN, POSITION_D_GAIN, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 3, ADDR_MX_MAX_POSITION, MAX_POSITION, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 3, ADDR_MX_MIN_POSITION, MIN_POSITION, &dxl_error);
-        dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 3, ADDR_MX_VELOCITY_PROFILE, MOVE_TIME, &dxl_error);
+        dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 3, ADDR_MX_VELOCITY_PROFILE, 20, &dxl_error);
         dxl_comm_result   = packetHandler->write4ByteTxRx(portHandler, 3, ADDR_MX_PROFILE_ACCELERATION, 0, &dxl_error);
         dxl_comm_result   = packetHandler->write1ByteTxRx(portHandler, 3, ADDR_MX_TORQUE_ENABLE, 1, &dxl_error);
         

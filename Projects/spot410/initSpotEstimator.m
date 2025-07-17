@@ -15,15 +15,16 @@ allCoords = enumeration('SpotCoord');
 allCoords = allCoords(:).';  % converts to a row vector
 
 
-%% by default, every coordinate uses its PhaseSpace measurement
+%% by default, every coordinate uses its Phasespace/Encoder measurement and rate
 
 for phase = allPhases
     for coord = allCoords
-        paramEst(phase,coord).fun    = SpotGnc.estNone;
-        paramEst(phase,coord).sensor = SpotSensor(coord.real);
-        paramEst(phase,coord).k1     = 0;
-        paramEst(phase,coord).k2     = 0;
-        paramEst(phase,coord).k3     = 0;
+        paramEst(phase,coord).fun        = SpotGnc.estNone;
+        paramEst(phase,coord).sensor     = SpotSensor(coord.real);
+        paramEst(phase,coord).rateSensor = SpotSensor(numCoord + coord.real);
+        paramEst(phase,coord).k1         = 0;
+        paramEst(phase,coord).k2         = 0;
+        paramEst(phase,coord).k3         = 0;
     end
 end
 
@@ -168,5 +169,4 @@ for coord = [SpotCoord.xRed SpotCoord.yRed SpotCoord.thetaRed]
     paramEst(phase,coord).fun = SpotGnc.estEkf3dof;
     paramEst(phase,coord).k1  = baseRate;
 end
-
 
