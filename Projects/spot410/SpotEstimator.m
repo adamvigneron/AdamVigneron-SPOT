@@ -131,10 +131,14 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                 % for now, run the filter in open loop
 
                 % position estimate is the processed measurement
-                % velocity estimate remains at zero
+                % velocity estimate is the measured rate
                 % bias estimate remains at zero
+
                 sensor = paramEst(phase,coord).sensor;
                 est(coord) = proc(sensor);
+
+                rateSensor = paramEst(phase,coord).rateSensor;
+                est_vel(coord) = proc(rateSensor);
 
                 % if the measurement hasn't changed, don't run the filter
                 if est(coord) == prevEst(1,coord)
