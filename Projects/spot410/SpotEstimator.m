@@ -209,7 +209,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
 
                         otherwise
 
-                            error('SpotEstimator.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
+                            error('SpotEstimator.m:\n  function SpotGnc.estEkf3dof not defined for SpotCoord(%d).\n\n', int32(coord))
 
                     end % switch coord
 
@@ -217,7 +217,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                 
 
             otherwise
-                error('SpotEstimator.m:\n  function SpotGnc.estEkf3dof not defined for SpotCoord(%d).\n\n', int32(coord))
+                error('SpotEstimator.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))
     
         end % switch myFun
 

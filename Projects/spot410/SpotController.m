@@ -3,11 +3,11 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
     %% initialization of output and persistent variables
 
     coords   = enumeration( SpotCoord(1) );
-    phases   = enumeration( SpotPhase(1) );
+    % phases   = enumeration( SpotPhase(1) );
     numCoord = length(coords);
-    numPhase = length(phases);
+    % numPhase = length(phases);
     numDebug = 3;
-    numStore = 2400;
+    % numStore = 2400;
 
     % output variables
     F     = zeros(numCoord,1);
@@ -16,21 +16,21 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
     % persistent variables - definition
     persistent errOld;
     persistent errDeltaOld;
-    persistent cmdStore;
-    persistent errStore;
-    persistent fwdStore;
-    persistent idxRW;
-    persistent initFlag;
+    % persistent cmdStore;
+    % persistent errStore;
+    % persistent fwdStore;
+    % persistent idxRW;
+    % persistent initFlag;
 
     % persistent variables - initialization
     if isempty(errOld)
         errOld = err;
         errDeltaOld = zeros(numCoord,1);
-        cmdStore = zeros(numStore,3);
-        errStore = zeros(numStore,3);
-        fwdStore = zeros(numStore,3);
-        idxRW    = zeros(numCoord,1);
-        initFlag = zeros(numPhase,numCoord);
+        % cmdStore = zeros(numStore,3);
+        % errStore = zeros(numStore,3);
+        % fwdStore = zeros(numStore,3);
+        % idxRW    =  ones(numCoord,1);
+        % initFlag = zeros(numPhase,numCoord);
     end
 
 
@@ -84,34 +84,34 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 debug(coord,1) = k1*err(coord);
                 debug(coord,2) = k2*err_vel(coord);
 
-                if myFun == SpotGnc.ctrlPd_vel_ilc
-
-                    if phase == SpotPhase.Phase3_1
-
-                        cmdStore( idxRW(coord) , coord ) = F(coord);
-                        errStore( idxRW(coord) , coord ) = err(coord);
-                        
-                        idxRW(coord) = idxRW(coord) + 1;
-               
-                    elseif (phase == SpotPhase.Phase3_2) || (phase == SpotPhase.Phase3_3) || (phase == SpotPhase.Phase3_4)
-
-                        if ~initFlag(phase,coord)
-                            fwdStore = learning_control.initPtypeLearning(coord,errStore,cmdStore,fwdStore);
-                            idxRW(coord) = 1;
-                            initFlag(phase,coord) = 1;
-                        end
-
-                        cmdStore( idxRW(coord) , coord ) = F(coord);
-                        errStore( idxRW(coord) , coord ) = err(coord);
-
-                        F(coord) = F(coord) + fwdStore( idxRW(coord) , coord );
-                        debug(coord,3)      = fwdStore( idxRW(coord) , coord );
-
-                        idxRW(coord) = idxRW(coord) + 1;
-
-                    end  % if phase
-                
-                end  % if myFun
+                % if myFun == SpotGnc.ctrlPd_vel_ilc
+                % 
+                %     if phase == SpotPhase.Phase3_1
+                % 
+                %         cmdStore( idxRW(coord) , coord ) = F(coord);
+                %         errStore( idxRW(coord) , coord ) = err(coord);
+                % 
+                %         idxRW(coord) = idxRW(coord) + 1;
+                % 
+                %     elseif (phase == SpotPhase.Phase3_2) || (phase == SpotPhase.Phase3_3) || (phase == SpotPhase.Phase3_4)
+                % 
+                %         if ~initFlag(phase,coord)
+                %             fwdStore = learning_control.initPtypeLearning(coord,errStore,cmdStore,fwdStore);
+                %             idxRW(coord) = 1;
+                %             initFlag(phase,coord) = 1;
+                %         end
+                % 
+                %         cmdStore( idxRW(coord) , coord ) = F(coord);
+                %         errStore( idxRW(coord) , coord ) = err(coord);
+                % 
+                %         F(coord) = F(coord) + fwdStore( idxRW(coord) , coord );
+                %         debug(coord,3)      = fwdStore( idxRW(coord) , coord );
+                % 
+                %         idxRW(coord) = idxRW(coord) + 1;
+                % 
+                %     end  % if phase
+                % 
+                % end  % if myFun
     
 
             case SpotGnc.ctrlPdFwd
