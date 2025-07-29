@@ -51,7 +51,7 @@ rms1 = (rms(Err(timerange(seconds( 60),seconds( 80)),:).thetaRed) + rms(Err(time
 rms2 = (rms(Err(timerange(seconds(180),seconds(200)),:).thetaRed) + rms(Err(timerange(seconds(230),seconds(250)),:).thetaRed) ) / 2;
 rms3 = (rms(Err(timerange(seconds(300),seconds(320)),:).thetaRed) + rms(Err(timerange(seconds(350),seconds(370)),:).thetaRed) ) / 2;
 rms4 = (rms(Err(timerange(seconds(420),seconds(440)),:).thetaRed) + rms(Err(timerange(seconds(470),seconds(490)),:).thetaRed) ) / 2;
-thetaRms = [rms1 rms2 rms3 rms4]
+thetaRms = rad2deg([rms1 rms2 rms3 rms4])
 
 figure;
 plot(ErrVel.Time, [RefVel.thetaRed EstVel.thetaRed ErrVel.thetaRed])
@@ -93,11 +93,11 @@ title('*.xRed');
 figure;
 plot(Err.Time, Err.xRed);
 hold on
-plot(Err.Time-seconds(60),  Err.xRed);
-plot(Err.Time-seconds(120), Err.xRed);
-plot(Err.Time-seconds(180), Err.xRed);
-plot([seconds(30) seconds(90)],[0 0], 'k');
-xlim([seconds(30) seconds(90)]);
+plot(Err.Time-seconds(120),  Err.xRed);
+plot(Err.Time-seconds(240), Err.xRed);
+plot(Err.Time-seconds(360), Err.xRed);
+plot([seconds(30) seconds(150)],[0 0], 'k');
+xlim([seconds(30) seconds(150)]);
 legend('first','second','third','fourth')
 title('Err.xRed');
 
@@ -116,10 +116,10 @@ title('*.xRed');
 figure;
 plot(CtrlKp.Time, CtrlKp.xRed+CtrlKd.xRed);
 hold on
-plot(CtrlKp.Time-seconds(60),  CtrlKp.xRed+CtrlKd.xRed+CtrlFwd.xRed);
-plot(CtrlKp.Time-seconds(120), CtrlKp.xRed+CtrlKd.xRed+CtrlFwd.xRed);
-plot(CtrlKp.Time-seconds(180), CtrlKp.xRed+CtrlKd.xRed+CtrlFwd.xRed);
-xlim([seconds(30) seconds(90)]);
+plot(CtrlKp.Time-seconds(120),  CtrlKp.xRed+CtrlKd.xRed+CtrlFwd.xRed);
+plot(CtrlKp.Time-seconds(240), CtrlKp.xRed+CtrlKd.xRed+CtrlFwd.xRed);
+plot(CtrlKp.Time-seconds(360), CtrlKp.xRed+CtrlKd.xRed+CtrlFwd.xRed);
+xlim([seconds(30) seconds(150)]);
 legend('first','second','third','fourth')
 title('Ctrl*.xRed');
 
@@ -141,11 +141,11 @@ title('*.yRed');
 figure;
 plot(Err.Time, Err.yRed);
 hold on
-plot(Err.Time-seconds(60),  Err.yRed);
-plot(Err.Time-seconds(120), Err.yRed);
-plot(Err.Time-seconds(180), Err.yRed);
-plot([seconds(30) seconds(90)],[0 0], 'k');
-xlim([seconds(30) seconds(90)]);
+plot(Err.Time-seconds(120),  Err.yRed);
+plot(Err.Time-seconds(240), Err.yRed);
+plot(Err.Time-seconds(360), Err.yRed);
+plot([seconds(30) seconds(150)],[0 0], 'k');
+xlim([seconds(30) seconds(150)]);
 legend('first','second','third','fourth')
 title('Err.yRed');
 
@@ -164,10 +164,10 @@ title('*.yRed');
 figure;
 plot(CtrlKp.Time, CtrlKp.yRed+CtrlKd.yRed);
 hold on
-plot(CtrlKp.Time-seconds(60),  CtrlKp.yRed+CtrlKd.yRed+CtrlFwd.yRed);
-plot(CtrlKp.Time-seconds(120), CtrlKp.yRed+CtrlKd.yRed+CtrlFwd.yRed);
-plot(CtrlKp.Time-seconds(180), CtrlKp.yRed+CtrlKd.yRed+CtrlFwd.yRed);
-xlim([seconds(30) seconds(90)]);
+plot(CtrlKp.Time-seconds(120),  CtrlKp.yRed+CtrlKd.yRed+CtrlFwd.yRed);
+plot(CtrlKp.Time-seconds(240), CtrlKp.yRed+CtrlKd.yRed+CtrlFwd.yRed);
+plot(CtrlKp.Time-seconds(360), CtrlKp.yRed+CtrlKd.yRed+CtrlFwd.yRed);
+xlim([seconds(30) seconds(150)]);
 legend('first','second','third','fourth')
 title('Ctrl*.yRed');
 
