@@ -7,6 +7,8 @@ set(groot,'DefaultAxesFontSize', 12);
 set(groot,'defaultAxesXGrid','on');
 set(groot,'defaultAxesYGrid','on');
 
+set(groot,'defaultAxesFontName','Times New Roman')
+
 
 %% DATA
 
@@ -60,17 +62,19 @@ plot(dataClass_rt.RED_RzD_radpers);
 legend('RefVel','EstVel','ErrVel','RED\_RzD');
 title('*.thetaRed');
 
+IRED = 0.1982;
+
 figure;
-plot(CtrlKp.Time, [CtrlKp.thetaRed CtrlKd.thetaRed CtrlFwd.thetaRed]);
+plot(CtrlKp.Time, rad2deg([CtrlKp.thetaRed CtrlKd.thetaRed CtrlFwd.thetaRed])/IRED);
 legend('CtrlKp','CtrlKd','CtrlFwd')
 title('*.thetaRed');
 
 figure;
-plot(CtrlKp.Time, CtrlKp.thetaRed+CtrlKd.thetaRed);
+plot(CtrlKp.Time, rad2deg(CtrlKp.thetaRed+CtrlKd.thetaRed)/IRED);
 hold on
-plot(CtrlKp.Time-seconds(120),  CtrlKp.thetaRed+CtrlKd.thetaRed+CtrlFwd.thetaRed);
-plot(CtrlKp.Time-seconds(240), CtrlKp.thetaRed+CtrlKd.thetaRed+CtrlFwd.thetaRed);
-plot(CtrlKp.Time-seconds(360), CtrlKp.thetaRed+CtrlKd.thetaRed+CtrlFwd.thetaRed);
+plot(CtrlKp.Time-seconds(120), rad2deg(CtrlKp.thetaRed+CtrlKd.thetaRed+CtrlFwd.thetaRed)/IRED);
+plot(CtrlKp.Time-seconds(240), rad2deg(CtrlKp.thetaRed+CtrlKd.thetaRed+CtrlFwd.thetaRed)/IRED);
+plot(CtrlKp.Time-seconds(360), rad2deg(CtrlKp.thetaRed+CtrlKd.thetaRed+CtrlFwd.thetaRed)/IRED);
 xlim([seconds(30) seconds(150)]);
 legend('first','second','third','fourth')
 title('Ctrl*.thetaRed');
