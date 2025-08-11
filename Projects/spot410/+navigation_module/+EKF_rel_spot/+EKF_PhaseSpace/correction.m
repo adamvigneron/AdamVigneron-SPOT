@@ -27,32 +27,53 @@ theta_priori        = input_priori(3);
 x_dot_priori        = input_priori(4);
 y_dot_priori        = input_priori(5);
 theta_dot_priori    = input_priori(6);
+omega_priori        = input_priori(7);
 
 state_priori =  [ x_priori; y_priori; theta_priori; ...
-                  x_dot_priori; y_dot_priori; theta_dot_priori ];
+                  x_dot_priori; y_dot_priori; theta_dot_priori; ...
+                  omega_priori ];
 
 % Propagated State Error Covariance (NxN)
-P_priori = reshape( input_priori(7:42), 6, 6 );
+P_priori = reshape( input_priori(8:56), 7, 7 );
 
 % Measurement vector (Mx1)
-x_m     = sensors(SpotSensor.xBlackPhasespace) ...
-          - sensors(SpotSensor.xRedPhasespace);
-y_m     = sensors(SpotSensor.yBlackPhasespace) ...
-          - sensors(SpotSensor.yRedPhasespace);
-theta_m = sensors(SpotSensor.thetaBlackPhasespace) ...
-          - sensors(SpotSensor.thetaRedPhasespace);
+
+% xInertial     = sensors(SpotSensor.xBlackPhasespace)     - sensors(SpotSensor.xRedPhasespace);
+% yInertial     = sensors(SpotSensor.yBlackPhasespace)     - sensors(SpotSensor.yRedPhasespace);
+% thetaInertial = sensors(SpotSensor.thetaBlackPhasespace) - sensors(SpotSensor.thetaRedPhasespace);
+% 
+% thetaRed = sensors(SpotSensor.thetaRedPhasespace);
+% 
+% x_m     = xInertial * cos(thetaRed) + yInertial * sin(thetaRed);
+% y_m     = yInertial * cos(thetaRed) - xInertial * sin(thetaRed);
+% theta_m = thetaInertial;
+
+% x_m     = sensors(SpotSensor.xBlackPhasespace) ...
+%           - sensors(SpotSensor.xRedPhasespace);
+% y_m     = sensors(SpotSensor.yBlackPhasespace) ...
+%           - sensors(SpotSensor.yRedPhasespace);
+% theta_m = sensors(SpotSensor.thetaBlackPhasespace) ...
+%           - sensors(SpotSensor.thetaRedPhasespace);
+
+x_m     = sensors(SpotSensor.xStereo);
+y_m     = sensors(SpotSensor.yStereo);
+theta_m = sensors(SpotSensor.thetaStereo);
+
+omega_m = sensors(SpotSensor.thetaRedImu);
 
 Z_m = [x_m
        y_m
-       theta_m ];
+       theta_m 
+       omega_m];
 
 
 %% Defining the measurement model
 
-% Relative x, y, and theta (MxN)
-H = [ 1 0 0 0 0 0
-      0 1 0 0 0 0
-      0 0 1 0 0 0 ];
+% Relative x, y, and theta (MxN); inertial omega
+H = [ 1 0 0 0 0 0 0
+      0 1 0 0 0 0 0
+      0 0 1 0 0 0 0
+      0 0 0 0 0 0 1 ];
 
 
 %% Calculate the Kalman Gain
@@ -79,7 +100,7 @@ correction  = K*innovations;
 state_post  = state_priori + correction;
 
 %Correct the state error covariance matrix - Joseph's Form (NxN Matrix)
-P_post = (eye(6)-K*H)*P_priori*(eye(6)-K*H)' + K*R*K';
+P_post = (eye(7)-K*H)*P_priori*(eye(7)-K*H)' + K*R*K';
 
 
 %% Converting data into output vector format

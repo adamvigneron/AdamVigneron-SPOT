@@ -6,8 +6,8 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
     numCoord    = length(coords);
     maxEstState = 2;
 
-    maxEkfState = 6;
-    maxEkfMeas  = 3;
+    maxEkfState = 7;
+    maxEkfMeas  = 4;
 
     numDebug = maxEkfState * ( maxEkfState + 1 );
 
@@ -20,6 +20,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
     % persistent variables - definition
     persistent estState;
     persistent prevEst;
+    persistent prevProc;
     persistent measDelay;
 
     persistent ekfOutputPrev;
@@ -31,6 +32,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
     if isempty(estState)
         estState  = zeros(maxEstState,numCoord);
         prevEst   = zeros(3,numCoord);
+        prevProc  = zeros(3,numCoord);
         measDelay = ones(1,numCoord);
 
         ekfOutputPrev = zeros(    numDebug, 1);
@@ -126,7 +128,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
 
                 end
 
-            case SpotGnc.estEkf3dof
+            case { SpotGnc.estEkfRelPhasespace , SpotGnc.estEkfRelStereo , SpotGnc.estEkfRelLidar } 
 
                 % for now, run the filter in open loop
 
@@ -140,80 +142,82 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                 rateSensor = paramEst(phase,coord).rateSensor;
                 est_vel(coord) = proc(rateSensor);
 
-                % if the measurement hasn't changed, don't run the filter
-                if est(coord) == prevEst(1,coord)
-                    
-                    debug(coord,:)   = ekfOutputPrev';
-                    measDelay(coord) = measDelay(coord) + 1;
+                % we only run the filter for SpotCoord.xRed
+                switch coord
 
-                else
+                    case { SpotCoord.yRed , SpotCoord.thetaRed }
 
-                    switch coord
+                        % do nothing
 
-                        case { SpotCoord.yRed , SpotCoord.thetaRed }
+                    case SpotCoord.xRed
 
+                        baseRate = paramEst(phase,coord).k1;
+
+                        switch myFun
+                            case SpotGnc.estEkfRelPhasespace
+                                initializeEkfFun = @navigation_module.EKF_rel_spot.EKF_PhaseSpace.initialize_EKF;
+                                propagateFun     = @navigation_module.EKF_rel_spot.EKF_PhaseSpace.propagation;
+                                correctionFun    = @navigation_module.EKF_rel_spot.EKF_PhaseSpace.correction;
+
+                                % procPose = [
+                                %     proc(SpotSensor.xBlackPhasespace)     - proc(SpotSensor.xRedPhasespace); ...
+                                %     proc(SpotSensor.yBlackPhasespace)     - proc(SpotSensor.yRedPhasespace); ...
+                                %     proc(SpotSensor.thetaBlackPhasespace) - proc(SpotSensor.thetaRedPhasespace)];
+                                
+                                % xInertial     = proc(SpotSensor.xBlackPhasespace)     - proc(SpotSensor.xRedPhasespace);
+                                % yInertial     = proc(SpotSensor.yBlackPhasespace)     - proc(SpotSensor.yRedPhasespace);
+                                % thetaInertial = proc(SpotSensor.thetaBlackPhasespace) - proc(SpotSensor.thetaRedPhasespace);
+                                % 
+                                % thetaRed = proc(SpotSensor.thetaRedPhasespace);
+                                % procPose = [ xInertial * cos(thetaRed) + yInertial * sin(thetaRed);
+                                %              yInertial * cos(thetaRed) - xInertial * sin(thetaRed);
+                                %              thetaInertial];
+
+                                procPose = [ proc(SpotSensor.xStereo); 
+                                             proc(SpotSensor.yStereo); 
+                                             proc(SpotSensor.thetaStereo) ];
+
+                            otherwise
+                                error('SpotEstimator.m:\n  sensor mode not defined')
+                        end
+
+                        % if needed, load the PQR matrices for the current EKF configuration
+                        if ~any(ekfP0)
+                            [ekfP0,ekfQ0,ekfR0] = initializeEkfFun( baseRate );
+                        end
+
+                        % if needed, initialize the EKF
+                        if ~any(ekfOutputPrev)
+                            ekfOutputPrev = [ procPose;  % initPos 
+                                              [0; 0; 0];   % initVel
+                                              proc(SpotSensor.xRedImu);
+                                              reshape(ekfP0,[],1) ];
+                        end
+
+                        % propagate state estimates from previous time step to a-priori estimates
+                        ekfOutput = propagateFun( ekfOutputPrev, cmd, baseRate, ekfQ0 );
+
+                        % if measurements are available, correct to a-posteriori estimates
+                        if isequal( procPose , prevProc(:,coord) )
                             % do nothing
+                        else
+                            ekfOutput = correctionFun( ekfOutput, proc, ekfR0 );
+                        end
 
-                        case SpotCoord.xRed
+                        % save filter output
+                        ekfOutputPrev  = ekfOutput;
+                        debug(coord,:) = ekfOutput';
 
-                            k1 = paramEst(phase,coord).k1;  % baseRate
+                        % update previous pose measurement
+                        prevProc(:,coord) = procPose;
 
-                            % time since last measurement
-                            dtEkf = k1 * measDelay(coord);
+                    otherwise
 
-                            % determine which sensors are available for processing
-                            navigationSubmodule = 'navigation_module.EKF_rel_spot';
-                            sensorModeStr       = [ navigationSubmodule '.select_sensor_mode'];
-                            sensorModeFun       = str2func(sensorModeStr);
-                            sensorMode          = sensorModeFun(proc);
+                        error('SpotEstimator.m:\n  function SpotGnc.estEkf3dof not defined for SpotCoord(%d).\n\n', int32(coord))
 
-                            switch sensorMode
-                                case 'EKF_PhaseSpace'
-                                    navigationSubmoduleMeas = [ navigationSubmodule '.EKF_PhaseSpace' ];
-                                otherwise
-                                    error('SpotEstimator.m:\n  sensor mode not defined')
-                            end
+                end % switch coord
 
-                            % if needed, load the PQR matrices for the current EKF configuration
-                            if ~any(ekfP0)
-                                initializeEkfStr    = [ navigationSubmoduleMeas '.initialize_EKF' ];
-                                initializeEkfFun    = str2func(initializeEkfStr);
-                                [ekfP0,ekfQ0,ekfR0] = initializeEkfFun();
-                            end
-
-                            % if needed, initialize the EKF
-                            if ~any(ekfOutputPrev)
-                                initPos = [
-                                    proc(SpotSensor.xBlackPhasespace)     - proc(SpotSensor.xRedPhasespace); ...
-                                    proc(SpotSensor.yBlackPhasespace)     - proc(SpotSensor.yRedPhasespace); ...
-                                    proc(SpotSensor.thetaBlackPhasespace) - proc(SpotSensor.thetaRedPhasespace)];
-                                initVel = [ 0; 0; 0];
-                                ekfOutputPrev = [
-                                    initPos; ...
-                                    initVel; ...
-                                    reshape(ekfP0,[],1) ];
-                            end
-
-                            % query the EKF for a state estimate
-                            queryEkfStr = [ navigationSubmodule '.query_ekf' ];
-                            queryEkfFun = str2func(queryEkfStr);
-                            ekfOutput   = queryEkfFun( sensorMode, ekfOutputPrev, proc, cmd, dtEkf, ekfQ0, ekfR0 );
-
-                            % save filter output
-                            ekfOutputPrev    = ekfOutput;
-                            debug(coord,:)   = ekfOutput';
-
-                            % update previous estimate and reset measurement delay
-                            prevEst(1,coord) = est(coord);
-                            measDelay(coord) = 1;
-
-                        otherwise
-
-                            error('SpotEstimator.m:\n  function SpotGnc.estEkf3dof not defined for SpotCoord(%d).\n\n', int32(coord))
-
-                    end % switch coord
-
-                end % if changed meas
+                % end % if changed meas
                 
 
             otherwise
