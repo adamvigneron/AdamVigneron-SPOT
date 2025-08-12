@@ -1,4 +1,4 @@
-function [P0,Q0,R0] = initialize_EKF( time_step )
+function [P0,Q0,R0] = initialize_EKF( time_step, relMeas )
 %% Initialize EKF =========================================================
 % Description: This script defines and loads all data needed for the space-
 % craft on-board software.
@@ -41,14 +41,11 @@ q2_xRel     = ( (1/3) * 1e-1 / 11.2970 )^2; % thrusters at 100 mN (3-sigma)
 q2_yRel     = ( (1/3) * 1e-1 / 11.2970 )^2; % thrusters at 100 mN (3-sigma)
 q2_thetaRel = ( (1/3) * 1e-2 /  0.1982 )^2; % thrusters at 10 mNm (3-sigma)
 
-% % Assemble Q matrix (continuous time, for reference)
-% Q0 = diag([0 0 0 q2_xRel q2_yRel q2_thetaRel]);
+% single-axis double integrator, input matrix, zero-order hold
+Gamma = [ time_step^2 / 2 ; time_step ];
 
-% Assemble Q matrix (discrete time, zero-order hold)
-Gamma  = [ time_step^2 / 2 ; time_step ];  % single-axis
-
+% Assemble Q matrix (discrete time)
 Q0 = zeros(7,7);
-
 Q0([1 4],[1 4]) = Gamma * Gamma' * q2_xRel;
 Q0([2 5],[2 5]) = Gamma * Gamma' * q2_yRel;
 Q0([3 6],[3 6]) = Gamma * Gamma' * q2_thetaRel;
@@ -57,17 +54,22 @@ Q0(    7,    7) = time_step^2    * q2_thetaRel;  % this is a bit too noisy
 
 %% Initial R Matrix (Covariance of the measurement noise)
 
-% r2_xRel     = ( (1/3) * 1e-4 )^2; % PhaseSpace at 0.1 mm (3-sigma)
-% r2_yRel     = ( (1/3) * 1e-4 )^2; % PhaseSpace at 0.1 mm (3-sigma)
-% r2_thetaRel = ( (1/3) * 1e-4 )^2; % PhaseSpace at 0.1 mrad (3-sigma)
+switch relMeas
 
-% r2_xRel     = ( (1/3) * 5e-2 )^2; % stereo at 5 cm (3-sigma)
-% r2_yRel     = ( (1/3) * 5e-2 )^2; % stereo at 5 cm (3-sigma)
-% r2_thetaRel = ( (1/3) * 1e-1 )^2; % stereo at 0.1 rad (3-sigma)
+    case SpotGnc.estEkfRelStereo
+        r2_xRel     = ( (1/3) * 1e-1 )^2; % stereo at 10 cm (3-sigma)
+        r2_yRel     = ( (1/3) * 1e-1 )^2; % stereo at 10 cm (3-sigma)
+        r2_thetaRel = ( (1/3) * 2e-1 )^2; % stereo at 0.2 rad (3-sigma)
 
-r2_xRel     = ( (1/3) * 1e-1 )^2; % lidar at 10 cm (3-sigma)
-r2_yRel     = ( (1/3) * 1e-1 )^2; % lidar at 10 cm (3-sigma)
-r2_thetaRel = ( (1/3) * 1e-0 )^2; % lidar at 1 rad (3-sigma)
+    case SpotGnc.estEkfRelLidar
+        r2_xRel     = ( (1/3) * 1e-1 )^2; % lidar at 10 cm (3-sigma)
+        r2_yRel     = ( (1/3) * 1e-1 )^2; % lidar at 10 cm (3-sigma)
+        r2_thetaRel = ( (1/3) * 1e-0 )^2; % lidar at 1 rad (3-sigma)
+
+    otherwise
+        error('initailize_EKF.m:\n  sensor not defined for relative EKF')
+
+end
 
 r2_omega = ( (1/3) * 1e-3 )^2;  % IMU at 1 mrad/s2 (3-sigma)
 

@@ -33,7 +33,6 @@ end
 
 x     = state(1);
 y     = state(2);
-
 omega = state(7);
 
 %% Derivatives of the state variables

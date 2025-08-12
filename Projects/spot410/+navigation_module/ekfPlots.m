@@ -153,7 +153,7 @@ plot(EkfDebug.Time, ProcRel.thetaInertial - ProcRel.thetaInertial(1) - EkfDebug.
 plot(EkfDebug.Time,  3*sqrt(EkfDebug.Data(:,24)),'Color','#e91c24','LineStyle','--');
 plot(EkfDebug.Time, -3*sqrt(EkfDebug.Data(:,24)),'Color','#e91c24','LineStyle','--');
 xlabel('time, s');
-ylabel('error theta, m');
+ylabel('error theta, rad');
 legend('truth','meas','filter');
 ylim([-2 2]);
 

@@ -51,7 +51,7 @@ sensor = SpotSensor.thetaRedImu;
 tau = 3;  % sec
 
 for phase = allPhases
-    paramMeasProc(phase,sensor).fun = SpotGnc.procSensorBias;
+    paramMeasProc(phase,sensor).fun = SpotGnc.procImuBias;
     paramMeasProc(phase,sensor).k1  = tau;
     paramMeasProc(phase,sensor).k2  = baseRate;
 end

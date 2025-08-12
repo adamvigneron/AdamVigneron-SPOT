@@ -45,7 +45,7 @@ du = u_1 - u_0;
 state_priori = utilities.rkm_54_integration(@navigation_module.EKF_rel_spot.dynamics.spot_dot, state_pre, du, time_step);
 
 % Discrete-time state transition matrix (7x7 Matrix)
-phi = navigation_module.EKF_rel_spot.EKF_PhaseSpace.discrete_STM(state_pre, du, time_step);
+phi = navigation_module.EKF_rel_spot.EKF_PhaseSpace.discrete_STM(state_pre, time_step);
 
 % propagate the covariance
 P_priori = phi*P_pre*phi' + Q;

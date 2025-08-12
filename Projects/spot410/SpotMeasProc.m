@@ -11,7 +11,7 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
     persistent sensorBias;
 
     if isempty(prevProc)
-        prevProc = zeros(numSensor,1);
+        prevProc   = zeros(numSensor,1);
         sensorBias = zeros(numSensor,1);
     end
     
@@ -50,21 +50,25 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
 
                 prevProc(sensor) = proc(sensor);
 
-            case SpotGnc.procSensorBias
+            case SpotGnc.procImuBias
                 
+                % in Phase0, we aren't moving and can estimate the IMU bias
                 if phase == SpotPhase.Phase0
 
                     k1 = paramMeasProc(phase,sensor).k1;  % tau
                     k2 = paramMeasProc(phase,sensor).k2;  % baseRate
 
+                    % exponential moving average in discrete time
                     alpha = 1 - exp(-k1/k2);
 
-                    sensorBias(sensor) = alpha*meas(sensor) + (1-alpha)*sensorBias(sensor);
+                    % update the stored sensor bias
+                    sensorBias(sensor) = alpha * meas(sensor) + (1-alpha) * sensorBias(sensor);
 
+                    % output the uncorrected measurement
                     proc(sensor) = meas(sensor);
-
+                 
+                % otherwise, we correct the IMU using the estimated bias
                 else
-
                     proc(sensor) = meas(sensor) - sensorBias(sensor);
 
                 end

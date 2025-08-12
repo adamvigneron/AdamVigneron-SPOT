@@ -1,4 +1,4 @@
-function [Phi, F] = discrete_STM(state_pre, du, dT)
+function [Phi, F] = discrete_STM(state_pre, dT)
 % FFNAV State Transition Matrix ===========================================
 % Description: This function calculates the linearized state matrix
 % (Jacobian) and the discrete-time state transition matrix, given the
@@ -65,11 +65,11 @@ F51 = [0 0 0];
 F52 = [0 0 0];
 F53 = 0;
 
-F = [   F11 F12 F13
-        F21 F22 F23
-        F31 F32 F33
-        F41 F42 F43
-        F51 F52 F53];
+F = [ F11 F12 F13
+      F21 F22 F23
+      F31 F32 F33
+      F41 F42 F43
+      F51 F52 F53 ];
 
 %% Calculate the approximate state transition matrix, Phi = expm(F*dT)
 

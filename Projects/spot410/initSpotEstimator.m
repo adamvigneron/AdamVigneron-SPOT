@@ -37,7 +37,7 @@ end
 coord = SpotCoord.xRed;
 
 for phase = phases3_1to3_4
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelPhasespace;
+    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
     paramEst(phase,coord).k1  = baseRate;
     % paramEst(phase,coord).sensor is set to phasespace by default
     % paramEst(phase,coord).rateSensor is set to phasespace by default
@@ -49,7 +49,7 @@ end
 coord = SpotCoord.yRed;
 
 for phase = phases3_1to3_4
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelPhasespace;
+    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
     paramEst(phase,coord).k1  = baseRate;
     % paramEst(phase,coord).sensor is set to phasespace by default
     % paramEst(phase,coord).rateSensor is set to phasespace by default
@@ -61,7 +61,7 @@ end
 coord = SpotCoord.thetaRed;
 
 for phase = phases3_1to3_4
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelPhasespace;
+    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
     paramEst(phase,coord).k1  = baseRate;
     % paramEst(phase,coord).sensor is set to phasespace by default
     % paramEst(phase,coord).rateSensor is set to phasespace by default
