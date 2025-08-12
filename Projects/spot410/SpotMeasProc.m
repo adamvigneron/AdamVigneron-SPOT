@@ -8,9 +8,11 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
     proc = zeros(numSensor,1);
 
     persistent prevProc;
+    persistent sensorBias;
 
     if isempty(prevProc)
         prevProc = zeros(numSensor,1);
+        sensorBias = zeros(numSensor,1);
     end
     
     
@@ -37,6 +39,36 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
 
                 prevProc(sensor) = proc(sensor);
 
+            case SpotGnc.procAngleQuadrant
+
+                % wrap to pi/4
+                fourIn    = 4 * ( meas(sensor) - prevProc(sensor) );
+                fourOut   = wrapToPi(fourIn);
+                measDelta = fourOut / 4;
+
+                proc(sensor) = prevProc(sensor) + measDelta;
+
+                prevProc(sensor) = proc(sensor);
+
+            case SpotGnc.procSensorBias
+                
+                if phase == SpotPhase.Phase0
+
+                    k1 = paramMeasProc(phase,sensor).k1;  % tau
+                    k2 = paramMeasProc(phase,sensor).k2;  % baseRate
+
+                    alpha = 1 - exp(-k1/k2);
+
+                    sensorBias(sensor) = alpha*meas(sensor) + (1-alpha)*sensorBias(sensor);
+
+                    proc(sensor) = meas(sensor);
+
+                else
+
+                    proc(sensor) = meas(sensor) - sensorBias(sensor);
+
+                end
+            
             otherwise
                 error('SpotMeasProc.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotSensor(%d).\n\n', int32(myFun), int32(phase), int32(sensor))
     

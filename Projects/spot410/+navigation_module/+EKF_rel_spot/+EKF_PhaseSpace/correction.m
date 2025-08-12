@@ -55,9 +55,13 @@ P_priori = reshape( input_priori(8:56), 7, 7 );
 % theta_m = sensors(SpotSensor.thetaBlackPhasespace) ...
 %           - sensors(SpotSensor.thetaRedPhasespace);
 
-x_m     = sensors(SpotSensor.xStereo);
-y_m     = sensors(SpotSensor.yStereo);
-theta_m = sensors(SpotSensor.thetaStereo);
+% x_m     = sensors(SpotSensor.xStereo);
+% y_m     = sensors(SpotSensor.yStereo);
+% theta_m = sensors(SpotSensor.thetaStereo);
+
+x_m     = sensors(SpotSensor.xLidar);
+y_m     = sensors(SpotSensor.yLidar);
+theta_m = sensors(SpotSensor.thetaLidar);
 
 omega_m = sensors(SpotSensor.thetaRedImu);
 

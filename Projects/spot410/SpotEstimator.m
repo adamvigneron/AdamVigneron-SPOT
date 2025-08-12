@@ -173,9 +173,13 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                                 %              yInertial * cos(thetaRed) - xInertial * sin(thetaRed);
                                 %              thetaInertial];
 
-                                procPose = [ proc(SpotSensor.xStereo); 
-                                             proc(SpotSensor.yStereo); 
-                                             proc(SpotSensor.thetaStereo) ];
+                                % procPose = [ proc(SpotSensor.xStereo); 
+                                %              proc(SpotSensor.yStereo); 
+                                %              proc(SpotSensor.thetaStereo) ];
+
+                                procPose = [ proc(SpotSensor.xLidar);
+                                             proc(SpotSensor.yLidar); 
+                                             proc(SpotSensor.thetaLidar) ];
 
                             otherwise
                                 error('SpotEstimator.m:\n  sensor mode not defined')
@@ -190,7 +194,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                         if ~any(ekfOutputPrev)
                             ekfOutputPrev = [ procPose;  % initPos 
                                               [0; 0; 0];   % initVel
-                                              proc(SpotSensor.xRedImu);
+                                              proc(SpotSensor.thetaRedImu);
                                               reshape(ekfP0,[],1) ];
                         end
 

@@ -28,6 +28,8 @@ classdef SpotGnc < Simulink.IntEnumType
 %
         procNone(501)
         procAngle(502)
+        procAngleQuadrant(503)
+        procSensorBias(504)
     end
 end
 

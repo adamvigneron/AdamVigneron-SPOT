@@ -25,7 +25,8 @@ y     = state_pre(2);
 x_dot = state_pre(4);
 y_dot = state_pre(5);
 omega = state_pre(7);
-alpha = du(3);
+% alpha = du(3);  % this is a bit too noisy
+alpha = 0;
 
 %Derivatives of x-acceleration equation
 dxddot_dx          = omega^2;
