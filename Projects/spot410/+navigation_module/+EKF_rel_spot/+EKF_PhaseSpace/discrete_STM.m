@@ -22,29 +22,25 @@ function [Phi, F] = discrete_STM(state_pre, du, dT)
 
 x     = state_pre(1);
 y     = state_pre(2);
-x_dot = state_pre(4);
-y_dot = state_pre(5);
 omega = state_pre(7);
-% alpha = du(3);  % this is a bit too noisy
-alpha = 0;
 
 %Derivatives of x-acceleration equation
 dxddot_dx          = omega^2;
-dxddot_dy          = alpha;
+dxddot_dy          = 0;  % + omega_dot;
 dxddot_dtheta      = 0;
 dxddot_dx_dot      = 0;
-dxddot_dy_dot      = 2*omega;
+dxddot_dy_dot      = 0;  % + 2*omega;
 dxddot_dtheta_dot  = 0;
-dxddot_domega      = 2*y_dot + 2*omega*x;
+dxddot_domega      = 2*omega*x;  % + 2*y_dot
 
 %Derivatives of y-acceleration equation
-dyddot_dx          = -alpha;
+dyddot_dx          = 0;  % - omega_dot;
 dyddot_dy          = omega^2;
 dyddot_dtheta      = 0;
-dyddot_dx_dot      = -2*omega;
+dyddot_dx_dot      = 0;  % - 2*omega;
 dyddot_dy_dot      = 0;
 dyddot_dtheta_dot  = 0;
-dyddot_domega      = -2*x_dot + 2*omega*y;
+dyddot_domega      = 2*omega*y;  % - 2*x_dot 
 
 
 %% Assembling the Jacobian (7x7 Matrix)

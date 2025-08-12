@@ -35,7 +35,6 @@ x     = state(1);
 y     = state(2);
 
 omega = state(7);
-% alpha = utheta;  % this is a bit too noisy
 
 %% Derivatives of the state variables
 
@@ -43,11 +42,11 @@ x_dot      = state(4);
 y_dot      = state(5);
 theta_dot  = state(6);
 
-x_ddot     = ux + 2*omega*y_dot + omega^2*x;  % + alpha*y;
-y_ddot     = uy - 2*omega*x_dot + omega^2*y;  % - alpha*x;
+% we cheat slightly because [x_dot y_dot omega_dot] are all zero-mean 
+x_ddot     = ux + omega^2*x;  % + 2*omega*y_dot + omega_dot*y;
+y_ddot     = uy + omega^2*y;  % - 2*omega*x_dot - omega_dot*x;
 theta_ddot = utheta;
 
-% omega_dot  = utheta;  % this is a bit too noisy
 omega_dot = 0;
 
 

@@ -159,11 +159,6 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                                 propagateFun     = @navigation_module.EKF_rel_spot.EKF_PhaseSpace.propagation;
                                 correctionFun    = @navigation_module.EKF_rel_spot.EKF_PhaseSpace.correction;
 
-                                % procPose = [
-                                %     proc(SpotSensor.xBlackPhasespace)     - proc(SpotSensor.xRedPhasespace); ...
-                                %     proc(SpotSensor.yBlackPhasespace)     - proc(SpotSensor.yRedPhasespace); ...
-                                %     proc(SpotSensor.thetaBlackPhasespace) - proc(SpotSensor.thetaRedPhasespace)];
-                                
                                 % xInertial     = proc(SpotSensor.xBlackPhasespace)     - proc(SpotSensor.xRedPhasespace);
                                 % yInertial     = proc(SpotSensor.yBlackPhasespace)     - proc(SpotSensor.yRedPhasespace);
                                 % thetaInertial = proc(SpotSensor.thetaBlackPhasespace) - proc(SpotSensor.thetaRedPhasespace);
@@ -202,7 +197,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                         ekfOutput = propagateFun( ekfOutputPrev, cmd, baseRate, ekfQ0 );
 
                         % if measurements are available, correct to a-posteriori estimates
-                        if isequal( procPose , prevProc(:,coord) )
+                        if norm( procPose - prevProc(:,coord) ) < 1e-10
                             % do nothing
                         else
                             ekfOutput = correctionFun( ekfOutput, proc, ekfR0 );

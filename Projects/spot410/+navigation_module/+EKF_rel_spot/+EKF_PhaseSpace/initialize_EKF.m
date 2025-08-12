@@ -37,9 +37,9 @@ P0 = diag([sig2_xRel    sig2_yRel    sig2_thetaRel ...
 %% Initial Q Matrix (Covariance of the process noise)
 
 % Quaternion and angular rate noise components
-q2_xRel     = ( (1/3) * 1e-2 )^2; % thrusters at 10 mN (3-sigma)
-q2_yRel     = ( (1/3) * 1e-2 )^2; % thrusters at 10 mN (3-sigma)
-q2_thetaRel = ( (1/3) * 1e-3 )^2; % thrusters at 1 mNm (3-sigma)
+q2_xRel     = ( (1/3) * 1e-1 / 11.2970 )^2; % thrusters at 100 mN (3-sigma)
+q2_yRel     = ( (1/3) * 1e-1 / 11.2970 )^2; % thrusters at 100 mN (3-sigma)
+q2_thetaRel = ( (1/3) * 1e-2 /  0.1982 )^2; % thrusters at 10 mNm (3-sigma)
 
 % % Assemble Q matrix (continuous time, for reference)
 % Q0 = diag([0 0 0 q2_xRel q2_yRel q2_thetaRel]);
@@ -65,12 +65,11 @@ Q0(    7,    7) = time_step^2    * q2_thetaRel;  % this is a bit too noisy
 % r2_yRel     = ( (1/3) * 5e-2 )^2; % stereo at 5 cm (3-sigma)
 % r2_thetaRel = ( (1/3) * 1e-1 )^2; % stereo at 0.1 rad (3-sigma)
 
-r2_xRel     = ( (1/3) * 2e-1 )^2; % lidar at 20 cm (3-sigma)
-r2_yRel     = ( (1/3) * 2e-1 )^2; % lidar at 20 cm (3-sigma)
+r2_xRel     = ( (1/3) * 1e-1 )^2; % lidar at 10 cm (3-sigma)
+r2_yRel     = ( (1/3) * 1e-1 )^2; % lidar at 10 cm (3-sigma)
 r2_thetaRel = ( (1/3) * 1e-0 )^2; % lidar at 1 rad (3-sigma)
 
-% r2_omega = ( (1/3) * 1e-3 )^2;  % IMU at 1 mrad/s2 (3-sigma)
-r2_omega = 0;  % assume perfect IMU measurements
+r2_omega = ( (1/3) * 1e-3 )^2;  % IMU at 1 mrad/s2 (3-sigma)
 
 % Assemble R matrix
 R0 = diag([r2_xRel r2_yRel r2_thetaRel r2_omega]);
