@@ -155,7 +155,8 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
 
                         % if needed, load the PQR matrices for the current EKF configuration
                         if ~any(ekfP0)
-                            [ekfP0,ekfQ0,ekfR0] = navigation_module.EKF_rel_spot.EKF_PhaseSpace.initialize_EKF( baseRate, myFun );
+                            [ekfP0,ekfQ0,ekfR0] = navigation_module.EKF_rel_spot.initialize_EKF( ...
+                                baseRate, myFun );
                         end
 
                         % assemble the current pose measurement
@@ -181,14 +182,16 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                         end
 
                         % propagate state estimates from previous time step to a-priori estimates
-                        ekfOutput = navigation_module.EKF_rel_spot.EKF_PhaseSpace.propagation( ekfOutputPrev, cmd, baseRate, ekfQ0 );
+                        ekfOutput = navigation_module.EKF_rel_spot.propagation( ...
+                            ekfOutputPrev, cmd, baseRate, ekfQ0 );
 
                         % if measurements are available, correct to a-posteriori estimates
                         if norm( procPose - prevPose(:,coord) ) < 1e-10
                             % do nothing
                         else
                             measVec   = [procPose; proc(SpotSensor.thetaRedImu)];
-                            ekfOutput = navigation_module.EKF_rel_spot.EKF_PhaseSpace.correction( ekfOutput, measVec, ekfR0 );
+                            ekfOutput = navigation_module.EKF_rel_spot.correction( ...
+                                ekfOutput, measVec, ekfR0 );
                         end
 
                         % save filter output

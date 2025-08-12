@@ -42,10 +42,12 @@ du = u_1 - u_0;
 %% EKF Propagation Step
 
 % Runge-Kutta-Merson integration to propagate state vector (7x1 Matrix)
-state_priori = utilities.rkm_54_integration(@navigation_module.EKF_rel_spot.dynamics.spot_dot, state_pre, du, time_step);
+state_priori = utilities.rkm_54_integration( ...
+    @navigation_module.EKF_rel_spot.spot_dot, state_pre, du, time_step);
 
 % Discrete-time state transition matrix (7x7 Matrix)
-phi = navigation_module.EKF_rel_spot.EKF_PhaseSpace.discrete_STM(state_pre, time_step);
+phi = navigation_module.EKF_rel_spot.discrete_STM( ...
+    state_pre, time_step);
 
 % propagate the covariance
 P_priori = phi*P_pre*phi' + Q;
