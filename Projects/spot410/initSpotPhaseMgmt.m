@@ -12,8 +12,8 @@ paramPhaseMgmt(SpotPhase.Phase0).phaseEnd = 10 ;
 paramPhaseMgmt(SpotPhase.Phase1).phaseEnd =  5 + paramPhaseMgmt(SpotPhase.Phase0).phaseEnd;
 paramPhaseMgmt(SpotPhase.Phase2).phaseEnd = 40 + paramPhaseMgmt(SpotPhase.Phase1).phaseEnd;
 
-paramPhaseMgmt(SpotPhase.Phase3_1).phaseEnd =  10 + paramPhaseMgmt(SpotPhase.Phase2).phaseEnd;
-paramPhaseMgmt(SpotPhase.Phase3_2).phaseEnd =  10 + paramPhaseMgmt(SpotPhase.Phase3_1).phaseEnd;
+paramPhaseMgmt(SpotPhase.Phase3_1).phaseEnd =  15 + paramPhaseMgmt(SpotPhase.Phase2).phaseEnd;
+paramPhaseMgmt(SpotPhase.Phase3_2).phaseEnd =  15 + paramPhaseMgmt(SpotPhase.Phase3_1).phaseEnd;
 paramPhaseMgmt(SpotPhase.Phase3_3).phaseEnd =  30 + paramPhaseMgmt(SpotPhase.Phase3_2).phaseEnd;
 paramPhaseMgmt(SpotPhase.Phase3_4).phaseEnd = 120 + paramPhaseMgmt(SpotPhase.Phase3_3).phaseEnd;
 

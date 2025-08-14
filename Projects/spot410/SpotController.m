@@ -51,11 +51,12 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 F(coord) = 0;
     
 
-            case SpotGnc.ctrlPd
+            case {SpotGnc.ctrlPd, SpotGnc.ctrlPdFwd}
 
                 k1 = paramCtrl(phase,coord).k1;  % Kp
                 k2 = paramCtrl(phase,coord).k2;  % Kd
                 k3 = paramCtrl(phase,coord).k3;  % baseRate
+                k4 = paramCtrl(phase,coord).k4;  % beta
     
                 eDelta = err(coord) - errOld(coord);
     
@@ -68,21 +69,36 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
 
                 debug(coord,1) = k1*err(coord);
                 debug(coord,2) = k2*eDelta/k3;
+
+                if myFun == SpotGnc.ctrlPdFwd
+                    % F = Kp*e + Kd*(de/dt) + beta*uOld
+                    F(coord) = F(coord) + k4*feedFwd(coord);
+
+                    debug(coord,3) = k4*feedFwd(coord);
+                end
                 
                 errOld(coord) = err(coord);
                 errDeltaOld(coord) = eDelta;
     
 
-            case { SpotGnc.ctrlPd_vel , SpotGnc.ctrlPd_vel_ilc }
+            case { SpotGnc.ctrlPd_vel , SpotGnc.ctrlPdFwd_vel, SpotGnc.ctrlPd_vel_ilc }
 
                 k1 = paramCtrl(phase,coord).k1;  % Kp
                 k2 = paramCtrl(phase,coord).k2;  % Kd
-    
+                k4 = paramCtrl(phase,coord).k4;  % beta
+
                 % F = Kp*e + Kd*(de/dt)
                 F(coord) = k1*err(coord) + k2*err_vel(coord);
                 
                 debug(coord,1) = k1*err(coord);
                 debug(coord,2) = k2*err_vel(coord);
+
+                if myFun == SpotGnc.ctrlPdFwd_vel
+                    % F = Kp*e + Kd*(de/dt) + beta*uOld
+                    F(coord) = F(coord) + k4*feedFwd(coord);
+
+                    debug(coord,3) = k4*feedFwd(coord);
+                end
 
                 % if myFun == SpotGnc.ctrlPd_vel_ilc
                 % 
@@ -112,42 +128,6 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 %     end  % if phase
                 % 
                 % end  % if myFun
-    
-
-            case SpotGnc.ctrlPdFwd
-                k1 = paramCtrl(phase,coord).k1;  % Kp
-                k2 = paramCtrl(phase,coord).k2;  % Kd
-                k3 = paramCtrl(phase,coord).k3;  % baseRate
-                k4 = paramCtrl(phase,coord).k4;  % beta
-    
-                eDelta = err(coord) - errOld(coord);
-    
-                if eDelta == 0
-                    eDelta = errDeltaOld(coord);
-                end
-    
-                % F = Kp*e + Kd*(de/dt) + beta*uOld
-                F(coord) = k1*err(coord) + k2*eDelta/k3 + k4*feedFwd(coord);
-    
-                debug(coord,1) = k1*err(coord);
-                debug(coord,2) = k2*eDelta/k3;
-                debug(coord,3) = k4*feedFwd(coord);
-    
-                errOld(coord) = err(coord);
-                errDeltaOld(coord) = eDelta;
-    
-
-            case SpotGnc.ctrlPdFwd_vel
-                k1 = paramCtrl(phase,coord).k1;  % Kp
-                k2 = paramCtrl(phase,coord).k2;  % Kd
-                k4 = paramCtrl(phase,coord).k4;  % beta
-    
-                % F = Kp*e + Kd*(de/dt) + beta*uOld
-                F(coord) = k1*err(coord) + k2*err_vel(coord) + k4*feedFwd(coord);
-    
-                debug(coord,1) = k1*err(coord);
-                debug(coord,2) = k2*err_vel(coord);
-                debug(coord,3) = k4*feedFwd(coord);
     
 
             case SpotGnc.ctrlArmSetpoint

@@ -50,6 +50,7 @@ for phase = allPhases
     paramCtrlErr(phase,coord).fun = SpotGnc.errMinusWrap;
 end
 
+
 %% SpotCoord.xBlue - default
 
 % paramCtrlErr.fun is set to errMinus by default

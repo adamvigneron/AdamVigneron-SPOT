@@ -7,6 +7,7 @@ classdef SpotGnc < Simulink.IntEnumType
         refHalfCosine(105)
         refDeployStow(106)
         refCircularInspection(107)
+        refConstantRate(108)
 %        
         ctrlNone(201)
         ctrlPd(202)
