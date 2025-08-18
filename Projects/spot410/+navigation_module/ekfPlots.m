@@ -119,45 +119,6 @@ plot(ProcRel.Time, ProcRel.thetaInertial - ProcRel.thetaInertial(1) - pi/2,':k')
 plot(ProcRel.Time, ProcRel.thetaInertial - ProcRel.thetaInertial(1) + pi/2,':k');
 
 
-%% PLOT ERRORS
-
-figure;
-plot(ProcRel.Time, 0*ProcRel.xBody,'k');
-hold on;
-plot(Proc.Time, ProcRel.xBody - Proc.xLidar,'Color','#808080');
-plot(EkfDebug.Time, ProcRel.xBody - EkfDebug.Data(:,1),'Color','#e91c24');
-plot(EkfDebug.Time,  3*sqrt(EkfDebug.Data(:,8)),'Color','#e91c24','LineStyle','--');
-plot(EkfDebug.Time, -3*sqrt(EkfDebug.Data(:,8)),'Color','#e91c24','LineStyle','--');
-xlabel('time, s');
-ylabel('error x, m');
-legend('truth','meas','filter');
-ylim([-0.3 0.3]);
-
-figure;
-plot(ProcRel.Time, 0*ProcRel.yBody,'k');
-hold on;
-plot(Proc.Time, ProcRel.yBody - Proc.yLidar,'Color','#808080');
-plot(EkfDebug.Time, ProcRel.yBody - EkfDebug.Data(:,2),'Color','#e91c24');
-plot(EkfDebug.Time,  3*sqrt(EkfDebug.Data(:,16)),'Color','#e91c24','LineStyle','--');
-plot(EkfDebug.Time, -3*sqrt(EkfDebug.Data(:,16)),'Color','#e91c24','LineStyle','--');
-xlabel('time, s');
-ylabel('error y, m');
-legend('truth','meas','filter');
-ylim([-0.3 0.3]);
-
-figure;
-plot(ProcRel.Time, 0*ProcRel.thetaInertial,'k');
-hold on;
-plot(Proc.Time, ProcRel.thetaInertial - ProcRel.thetaInertial(1) - Proc.thetaLidar,'Color','#808080');
-plot(EkfDebug.Time, ProcRel.thetaInertial - ProcRel.thetaInertial(1) - EkfDebug.Data(:,3),'Color','#e91c24');
-plot(EkfDebug.Time,  3*sqrt(EkfDebug.Data(:,24)),'Color','#e91c24','LineStyle','--');
-plot(EkfDebug.Time, -3*sqrt(EkfDebug.Data(:,24)),'Color','#e91c24','LineStyle','--');
-xlabel('time, s');
-ylabel('error theta, rad');
-legend('truth','meas','filter');
-ylim([-2 2]);
-
-
 %% PLOT VELOCITIES
 
 figure;
