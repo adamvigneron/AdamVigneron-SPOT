@@ -14,6 +14,9 @@ allPhases = allPhases(:).';  % converts to a row vector
 allCoords = enumeration('SpotCoord');
 allCoords = allCoords(:).';  % converts to a row vector
 
+phases3_1to3_4 = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
+                  SpotPhase.Phase3_3, SpotPhase.Phase3_4];
+
 
 %% by default, every coordinate uses its Phasespace/Encoder measurement and rate
 
@@ -29,19 +32,54 @@ for phase = allPhases
 end
 
 
-%% SpotCoord.xRed - default
+%% SpotCoord.*Red - default
 
-% paramEst.fun is set to estNone by default
+for phase = allPhases
+    % paramEst.fun is already set to estNone
+    paramEst(phase,SpotCoord.xRed).sensor     = SpotSensor.xStereo;
+    paramEst(phase,SpotCoord.yRed).sensor     = SpotSensor.yStereo;
+    paramEst(phase,SpotCoord.thetaRed).sensor = SpotSensor.thetaStereo;
+
+    % paramEst(phase,SpotCoord.xRed).rateSensor is not used
+    % paramEst(phase,SpotCoord.yRed).rateSensor is not used
+    paramEst(phase,SpotCoord.thetaRed).rateSensor = SpotSensor.thetaRedImu;
+end
 
 
-%% SpotCoord.yRed - default
+%% SpotCoord.xRed - SpotPhase.Phase3_*
 
-% paramEst.fun is set to estNone by default
+% coord = SpotCoord.xRed;
+% 
+% for phase = phases3_1to3_4
+%     paramEst(phase,coord).fun = SpotGnc.estEkfRelStereo;
+%     paramEst(phase,coord).k1  = baseRate;
+%     % paramEst(phase,coord).sensor is set to phasespace by default
+%     % paramEst(phase,coord).rateSensor is set to phasespace by default
+% end
 
 
-%% SpotCoord.thetaRed - default
+%% SpotCoord.yRed - SpotPhase.Phase3_*
 
-% paramEst.fun is set to estNone by default
+% coord = SpotCoord.yRed;
+% 
+% for phase = phases3_1to3_4
+%     paramEst(phase,coord).fun = SpotGnc.estEkfRelStereo;
+%     paramEst(phase,coord).k1  = baseRate;
+%     % paramEst(phase,coord).sensor is set to phasespace by default
+%     % paramEst(phase,coord).rateSensor is set to phasespace by default
+% end
+
+
+%% SpotCoord.thetaRed - SpotPhase.Phase3_*
+
+% coord = SpotCoord.thetaRed;
+% 
+% for phase = phases3_1to3_4
+%     paramEst(phase,coord).fun = SpotGnc.estEkfRelStereo;
+%     paramEst(phase,coord).k1  = baseRate;
+%     % paramEst(phase,coord).sensor is set to phasespace by default
+%     % paramEst(phase,coord).rateSensor is set to phasespace by default
+% end
 
 
 %% SpotCoord.xBlack - default
@@ -67,6 +105,7 @@ end
 %% SpotCoord.yBlue - default
 
 % paramEst.fun is set to estNone by default
+
 
 %% SpotCoord.thetaBlue - default
 

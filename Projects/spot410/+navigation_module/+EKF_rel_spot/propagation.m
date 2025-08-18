@@ -21,11 +21,11 @@ function [output] = propagation(ekf_pre, input_pre, time_step, Q)
 
 %% Initialize and assign data
 
-% Previous State Vector (6x1 Matrix)
-state_pre =  ekf_pre(1:6);
+% Previous State Vector (7x1 Matrix)
+state_pre =  ekf_pre(1:7);
 
-% Previous State Error Covariance (6x6 Matrix)
-P_pre = reshape( ekf_pre(7:42), 6, 6);
+% Previous State Error Covariance (7x7 Matrix)
+P_pre = reshape( ekf_pre(8:56), 7, 7);
 
 % servicer control
 u_0 = input_pre( [SpotCoord.xRed; ...
@@ -41,11 +41,13 @@ du = u_1 - u_0;
 
 %% EKF Propagation Step
 
-% Runge-Kutta-Merson integration to propagate state vector (6x1 Matrix)
-state_priori = utilities.rkm_54_integration(@navigation_module.EKF_rel_spot.dynamics.spot_dot, state_pre, du, time_step);
+% Runge-Kutta-Merson integration to propagate state vector (7x1 Matrix)
+state_priori = utilities.rkm_54_integration( ...
+    @navigation_module.EKF_rel_spot.spot_dot, state_pre, du, time_step);
 
-% Discrete-time state transition matrix (6x6 Matrix)
-phi = navigation_module.EKF_rel_spot.EKF_PhaseSpace.discrete_STM(ekf_pre, time_step);
+% Discrete-time state transition matrix (7x7 Matrix)
+phi = navigation_module.EKF_rel_spot.discrete_STM( ...
+    state_pre, time_step);
 
 % propagate the covariance
 P_priori = phi*P_pre*phi' + Q;

@@ -42,6 +42,15 @@ function [ref,ref_vel] = SpotRefGen(phase, t, proc, paramRefGen)
                 ref_vel(coord) = 0;
 
 
+            case SpotGnc.refConstantRate
+
+                k1 = paramRefGen(phase,coord).k1;  % initial offset
+                k2 = paramRefGen(phase,coord).k2;  % constant rate
+
+                ref(coord)     = k1 + k2 * t;
+                ref_vel(coord) = k2;
+
+
             case SpotGnc.refCosine
 
                 k1 = paramRefGen(phase,coord).k1;  % amplitude

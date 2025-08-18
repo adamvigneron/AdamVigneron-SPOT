@@ -31,20 +31,27 @@ else
     utheta = 0;
 end
 
+x     = state(1);
+y     = state(2);
+omega = state(7);
 
 %% Derivatives of the state variables
 
 x_dot      = state(4);
 y_dot      = state(5);
 theta_dot  = state(6);
-x_ddot     = ux;
-y_ddot     = uy;
+
+% we cheat slightly because [x_dot y_dot omega_dot] are all zero-mean 
+x_ddot     = ux + omega^2*x;  % + 2*omega*y_dot + omega_dot*y;
+y_ddot     = uy + omega^2*y;  % - 2*omega*x_dot - omega_dot*x;
 theta_ddot = utheta;
+
+omega_dot = 0;
 
 
 %% Assembling the derivative of the state vector
 
-f = [ x_dot; y_dot; theta_dot; x_ddot; y_ddot; theta_ddot ];
+f = [ x_dot; y_dot; theta_dot; x_ddot; y_ddot; theta_ddot; omega_dot ];
 
 
 end
