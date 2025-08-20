@@ -38,8 +38,8 @@ coord = SpotCoord.xRed;
 
 for phase = phases2to5
     paramCtrl(phase,coord).fun = SpotGnc.ctrlPd;
-    paramCtrl(phase,coord).k1  =      2  * K_RED(1,1) / mRED;
-    paramCtrl(phase,coord).k2  = sqrt(2) * K_RED(1,4) / mRED;
+    paramCtrl(phase,coord).k1  =      0.5  * K_RED(1,1) / mRED;
+    paramCtrl(phase,coord).k2  = sqrt(0.5) * K_RED(1,4) / mRED;
     paramCtrl(phase,coord).k3  = baseRate;
 end
 
@@ -50,8 +50,8 @@ coord = SpotCoord.yRed;
 
 for phase = phases2to5
     paramCtrl(phase,coord).fun = SpotGnc.ctrlPd;
-    paramCtrl(phase,coord).k1  =      2  * K_RED(2,2) / mRED;
-    paramCtrl(phase,coord).k2  = sqrt(2) * K_RED(2,5) / mRED;
+    paramCtrl(phase,coord).k1  =      0.5  * K_RED(2,2) / mRED;
+    paramCtrl(phase,coord).k2  = sqrt(0.5) * K_RED(2,5) / mRED;
     paramCtrl(phase,coord).k3  = baseRate;
 end
 
@@ -68,20 +68,37 @@ for phase = phases2to5
 end
 
 
-%% SpotCoord.thetaRed - SpotPhase.Phase3_*
+%% SpotCoord.xBlack - default
 
-coord = SpotCoord.thetaRed;
+coord = SpotCoord.xBlack;
 
-for phase = phases3_1to3_4
+for phase = phases2to5
     paramCtrl(phase,coord).fun = SpotGnc.ctrlPd_vel;
-    paramCtrl(phase,coord).k1  = 0;
-    paramCtrl(phase,coord).k2  = K_RED(3,6) / IRED;
+    paramCtrl(phase,coord).k1  = K_BLACK(1,1) / mBLACK;
+    paramCtrl(phase,coord).k2  = K_BLACK(1,4) / mBLACK;
 end
 
 
-%% SpotCoord.xBlack - default
+%% SpotCoord.yBlack - default
 
-% paramCtrl(phase,coord).fun is already set to ctrlNone
+coord = SpotCoord.yBlack;
+
+for phase = phases2to5
+    paramCtrl(phase,coord).fun = SpotGnc.ctrlPd_vel;
+    paramCtrl(phase,coord).k1  = K_BLACK(2,2) / mBLACK;
+    paramCtrl(phase,coord).k2  = K_BLACK(2,5) / mBLACK;
+end
+
+
+%% SpotCoord.thetaBlack - default
+
+coord = SpotCoord.thetaBlack;
+
+for phase = phases2to5
+    paramCtrl(phase,coord).fun = SpotGnc.ctrlPd_vel;
+    paramCtrl(phase,coord).k1  = K_BLACK(3,3) / IBLACK;
+    paramCtrl(phase,coord).k2  = K_BLACK(3,6) / IBLACK;
+end
 
 
 %% SpotCoord.yBlack - default

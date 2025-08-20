@@ -48,16 +48,6 @@ for phase = phases2to5
 end
 
 
-%% SpotCoord.thetaRed -- SpotPhase.Phase2 | SpotPhase.Phase4 | SpotPhase.Phase5
-
-coord = SpotCoord.thetaRed;
-
-for phase = [ SpotPhase.Phase2, SpotPhase.Phase4, SpotPhase.Phase5]
-    paramDcpl(phase,coord).fun = SpotGnc.dcplSingleAxisInvert;
-    % paramDcpl(phase,coord).k1 already set to IRED
-end
-
-
 %% SpotCoord.*Arm -- default
 
 for phase = allPhases

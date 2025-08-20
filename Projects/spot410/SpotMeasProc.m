@@ -31,6 +31,7 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
 
                 proc(sensor) = meas(sensor);
 
+
             case SpotGnc.procAngle
 
                 measDelta = wrapToPi( meas(sensor) - prevProc(sensor) );
@@ -38,6 +39,7 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
                 proc(sensor) = prevProc(sensor) + measDelta;
 
                 prevProc(sensor) = proc(sensor);
+
 
             case SpotGnc.procAngleQuadrant
 
@@ -49,6 +51,7 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
                 proc(sensor) = prevProc(sensor) + measDelta;
 
                 prevProc(sensor) = proc(sensor);
+
 
             case SpotGnc.procImuBias
                 
@@ -72,7 +75,14 @@ function [proc] = SpotMeasProc(phase, meas, paramMeasProc)
                     proc(sensor) = meas(sensor) - sensorBias(sensor);
 
                 end
-            
+ 
+
+            case SpotGnc.procImuPhasespace
+
+                % substitute the phasespace rate for the IMU rate
+                proc(sensor) = meas( int32(sensor) - 12);
+
+
             otherwise
                 error('SpotMeasProc.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotSensor(%d).\n\n', int32(myFun), int32(phase), int32(sensor))
     

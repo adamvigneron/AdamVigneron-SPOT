@@ -73,6 +73,17 @@ for phase = phases3_1to3_4
 end
 
 
+%% SpotCoord.*Black - default
+
+% paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
+
+for phase = allPhases
+    paramRefGen(phase,SpotCoord.xBlack    ).k1 = init_states_BLACK(1);
+    paramRefGen(phase,SpotCoord.yBlack    ).k1 = init_states_BLACK(2);
+    paramRefGen(phase,SpotCoord.thetaBlack).k1 = init_states_BLACK(3);
+end
+
+
 %% SpotCoord.shoulderArm | SpotCoord.elbowArm | SpotCoord.wristArm - default
 
 % paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant

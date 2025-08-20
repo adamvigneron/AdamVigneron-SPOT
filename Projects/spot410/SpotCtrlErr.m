@@ -9,11 +9,13 @@ function [err,err_vel] = SpotCtrlErr(phase, ref, ref_vel, est, est_vel, paramCtr
     err_vel = zeros(numCoord,1);
 
     persistent prevEst;
+    persistent prevEstVel;
     persistent prevErr;
     persistent prevErrVel;
 
     if isempty(prevEst)
         prevEst    = zeros(numCoord,1);
+        prevEstVel = zeros(numCoord,1);
         prevErr    = zeros(numCoord,1);
         prevErrVel = zeros(numCoord,1);
     end
@@ -33,7 +35,7 @@ function [err,err_vel] = SpotCtrlErr(phase, ref, ref_vel, est, est_vel, paramCtr
             case SpotGnc.errMinus
 
                 % check whether the input is constant
-                if est(coord) == prevEst(coord)
+                if ( est(coord) == prevEst(coord) ) && ( est_vel(coord) == prevEstVel(coord) )
 
                     % if it is, keep the output constant
                     err(coord)     = prevErr(coord);
@@ -47,6 +49,7 @@ function [err,err_vel] = SpotCtrlErr(phase, ref, ref_vel, est, est_vel, paramCtr
 
                     % and update the persistent variables as well
                     prevEst(coord)    = est(coord);
+                    prevEstVel(coord) = est_vel(coord);
                     prevErr(coord)    = err(coord);
                     prevErrVel(coord) = err_vel(coord);
 
@@ -55,7 +58,7 @@ function [err,err_vel] = SpotCtrlErr(phase, ref, ref_vel, est, est_vel, paramCtr
             case SpotGnc.errMinusWrap
     
                 % check whether the input is constant
-                if est(coord) == prevEst(coord)
+                if ( est(coord) == prevEst(coord) ) && ( est_vel(coord) == prevEstVel(coord) )
 
                     % if it is, keep the output constant
                     err(coord)     = prevErr(coord);
@@ -76,6 +79,7 @@ function [err,err_vel] = SpotCtrlErr(phase, ref, ref_vel, est, est_vel, paramCtr
 
                     % and update the persistent variables as well
                     prevEst(coord)    = est(coord);
+                    prevEstVel(coord) = est_vel(coord);
                     prevErr(coord)    = err(coord);
                     prevErrVel(coord) = err_vel(coord);
 
