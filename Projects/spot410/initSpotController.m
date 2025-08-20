@@ -61,10 +61,9 @@ end
 coord = SpotCoord.thetaRed;
 
 for phase = phases2to5
-    paramCtrl(phase,coord).fun = SpotGnc.ctrlPd;
+    paramCtrl(phase,coord).fun = SpotGnc.ctrlPd_vel;
     paramCtrl(phase,coord).k1  = K_RED(3,3) / IRED;
     paramCtrl(phase,coord).k2  = K_RED(3,6) / IRED;
-    paramCtrl(phase,coord).k3  = baseRate;
 end
 
 
