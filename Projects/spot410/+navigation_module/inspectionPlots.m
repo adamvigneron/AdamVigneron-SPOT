@@ -1,5 +1,7 @@
 %% PRE-SETUP
 
+% clear SpotEstimator
+% 
 % for i = 2:length(dataClass_rt.Time_s.Time)
 %     [~,~,~,debugOut] = SpotEstimator( dataClass_rt.SpotGnc_Phase.Data(i,:), ...
 %                                       dataClass_rt.SpotGnc_Proc.Data(i,:), ...
@@ -112,38 +114,29 @@ Ekf.yRedRate     = dataClass_rt.SpotGnc_EkfDebug.Data(:,5);
 Ekf.thetaRedRate = dataClass_rt.SpotGnc_EkfDebug.Data(:,6);
 Ekf.omega        = dataClass_rt.SpotGnc_EkfDebug.Data(:,7);
 
+Ekf.range = sqrt( Ekf.xRed.^2 + Ekf.yRed.^2 );
+
 
 %% SENSOR PLOTS
 
 figure;
-plot(Proc.Time,[ProcRel.xBody Proc.xLidar Proc.xStereo Ekf.xRed])
+plot(Proc.Time,[ProcRel.xBody Ekf.xRed Proc.xStereo Proc.xLidar])
 xlabel('time, s');
 ylabel('x-position, m')
-title('body frame');
-legend('phasespace', 'lidar', 'stereo','ekf');
+legend('phasespace','ekf','stereo','lidar');
 
 figure;
-plot(Proc.Time,[ProcRel.yBody Proc.yLidar Proc.yStereo Ekf.yRed])
+plot(Proc.Time,[ProcRel.yBody Ekf.yRed Proc.yStereo Proc.yLidar])
 xlabel('time, s');
 ylabel('y-position, m')
-title('body frame');
-legend('phasespace', 'lidar', 'stereo','ekf');
+legend('phasespace','ekf','stereo','lidar');
 ylim([-0.7 0.7])
 
 figure;
-plot(Proc.Time,rad2deg([ProcRel.thetaInertial Proc.thetaLidar Proc.thetaStereo Ekf.thetaRed]))
+plot(Proc.Time,rad2deg([ProcRel.thetaInertial Ekf.thetaRed Proc.thetaStereo Proc.thetaLidar]))
 xlabel('time, s');
 ylabel('theta-rotation, degrees')
-title('body frame');
-legend('phasespace', 'lidar', 'stereo','ekf');
-
-figure;
-plot(ProcRel.Time,[ProcRel.range ProcRel.rangeLidar ProcRel.rangeStereo], ProcRel.Time, ProcRel.rangeLrf, '.')
-xlabel('time, s');
-ylabel('range, m')
-title('body frame');
-legend('phasespace', 'lidar', 'stereo', 'rangefinder');
-ylim([0 2])
+legend('phasespace','ekf','stereo','lidar');
 
 figure;
 plot(ProcRel.Time, [ProcRel.xRateBody Ekf.xRedRate]);
@@ -158,10 +151,24 @@ ylabel('SpotCoord.yRed, m/s');
 legend('phasespace','ekf');
 
 figure;
-plot(Proc.Time, rad2deg([Proc.thetaRedRatePhasespace ProcRel.thetaRateInertial dataClass_rt.RED_IMU_Gz_radpers.Data, Ekf.thetaRedRate, Ekf.omega]))
+plot(Proc.Time, rad2deg([ProcRel.thetaRateInertial Ekf.thetaRedRate dataClass_rt.RED_IMU_Gz_radpers.Data]))
 xlabel('time, s');
-ylabel('rotation rate, degree/s')
-legend('phasespaceInertial','phasespaceRelative','imu','ekfThetaRate','ekfOmega');
+ylabel('SpotCoord.thetaRed, degree/s')
+legend('phasespace','ekf','imu');
+
+figure;
+plot(Proc.Time, rad2deg([Proc.thetaRedRatePhasespace Ekf.omega dataClass_rt.RED_IMU_Gz_radpers.Data]))
+xlabel('time, s');
+ylabel('inertial rotation, degree/s')
+legend('phasespace','ekf','imu');
+
+figure;
+plot(ProcRel.Time,[ProcRel.range Ekf.range ProcRel.rangeStereo ProcRel.rangeLidar], ProcRel.Time, ProcRel.rangeLrf, '.')
+xlabel('time, s');
+ylabel('range, m')
+title('body frame');
+legend('phasespace', 'ekf', 'stereo', 'lidar', 'rangefinder');
+ylim([0 2])
 
 
 %% CONTROL PLOTS

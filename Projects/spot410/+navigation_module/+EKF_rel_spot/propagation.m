@@ -27,16 +27,10 @@ state_pre =  ekf_pre(1:7);
 % Previous State Error Covariance (7x7 Matrix)
 P_pre = reshape( ekf_pre(8:56), 7, 7);
 
-% servicer control
-u_0 = input_pre( [SpotCoord.xRed; ...
-                  SpotCoord.yRed; ...
-                  SpotCoord.thetaRed] );
-
-% client control
-u_1 = [0; 0; 0];
-
-% differential control
-du = u_1 - u_0;
+% relative control
+du = input_pre( [SpotCoord.xRed; ...
+                 SpotCoord.yRed; ...
+                 SpotCoord.thetaRed] );
 
 
 %% EKF Propagation Step
