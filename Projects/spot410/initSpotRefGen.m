@@ -80,7 +80,7 @@ end
 for phase = allPhases
     paramRefGen(phase,SpotCoord.xBlack    ).k1 = init_states_BLACK(1);
     paramRefGen(phase,SpotCoord.yBlack    ).k1 = init_states_BLACK(2);
-    paramRefGen(phase,SpotCoord.thetaBlack).k1 = init_states_BLACK(3);
+    paramRefGen(phase,SpotCoord.thetaBlack).k1 = init_states_BLACK(3) - pi/2;
 end
 
 

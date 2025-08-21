@@ -114,6 +114,14 @@ Ekf.yRedRate     = dataClass_rt.SpotGnc_EkfDebug.Data(:,5);
 Ekf.thetaRedRate = dataClass_rt.SpotGnc_EkfDebug.Data(:,6);
 Ekf.omega        = dataClass_rt.SpotGnc_EkfDebug.Data(:,7);
 
+Ekf.xRed3sig         = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,8));
+Ekf.yRed3sig         = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,16));
+Ekf.thetaRed3sig     = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,24));
+Ekf.xRedRate3sig     = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,32));
+Ekf.yRedRate3sig     = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,40));
+Ekf.thetaRedRate3sig = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,48));
+Ekf.omega3sig        = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,56));
+
 Ekf.range = sqrt( Ekf.xRed.^2 + Ekf.yRed.^2 );
 
 
@@ -121,12 +129,16 @@ Ekf.range = sqrt( Ekf.xRed.^2 + Ekf.yRed.^2 );
 
 figure;
 plot(Proc.Time,[ProcRel.xBody Ekf.xRed Proc.xStereo Proc.xLidar])
+hold on;
+plot(Proc.Time,[Ekf.xRed+Ekf.xRed3sig Ekf.xRed-Ekf.xRed3sig],'r:')
 xlabel('time, s');
 ylabel('x-position, m')
 legend('phasespace','ekf','stereo','lidar');
 
 figure;
 plot(Proc.Time,[ProcRel.yBody Ekf.yRed Proc.yStereo Proc.yLidar])
+hold on;
+plot(Proc.Time,[Ekf.yRed+Ekf.yRed3sig Ekf.yRed-Ekf.yRed3sig],'r:')
 xlabel('time, s');
 ylabel('y-position, m')
 legend('phasespace','ekf','stereo','lidar');
@@ -140,12 +152,16 @@ legend('phasespace','ekf','stereo','lidar');
 
 figure;
 plot(ProcRel.Time, [ProcRel.xRateBody Ekf.xRedRate]);
+hold on;
+plot(Proc.Time,[Ekf.xRedRate+Ekf.xRedRate3sig Ekf.xRedRate-Ekf.xRedRate3sig],'r:')
 xlabel('time, s');
 ylabel('SpotCoord.xRed, m/s');
 legend('phasespace','ekf');
 
 figure;
 plot(ProcRel.Time, [ProcRel.yRateBody Ekf.yRedRate]);
+hold on;
+plot(Proc.Time,[Ekf.yRedRate+Ekf.yRedRate3sig Ekf.yRedRate-Ekf.yRedRate3sig],'r:')
 xlabel('time, s');
 ylabel('SpotCoord.yRed, m/s');
 legend('phasespace','ekf');

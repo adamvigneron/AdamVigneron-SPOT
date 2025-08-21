@@ -130,13 +130,13 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
 
             case { SpotGnc.estEkfRelStereo , SpotGnc.estEkfRelLidar }
 
-                % for now, run the filter open-loop
-                sensor = paramEst(phase,coord).sensor;
-                est(coord) = proc(sensor);
-
-                rateSensor = paramEst(phase,coord).rateSensor;
-                est_vel(coord) = proc(rateSensor);
-                % % bias estimates remain at zero
+                % % for now, run the filter open-loop
+                % sensor = paramEst(phase,coord).sensor;
+                % est(coord) = proc(sensor);
+                % 
+                % rateSensor = paramEst(phase,coord).rateSensor;
+                % est_vel(coord) = proc(rateSensor);
+                % % % bias estimates remain at zero
 
                 % we only run the filter for SpotCoord.xRed
                 switch coord
@@ -197,15 +197,21 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                         % update previous pose measurement
                         prevPose(:,coord) = procPose;
 
-                        % % output position and velocity estimates
-                        % est(SpotCoord.xRed)         = ekfOutput(1);
-                        % est(SpotCoord.yRed)         = ekfOutput(2);
-                        % est(SpotCoord.thetaRed)     = ekfOutput(3);
-                        % est_vel(SpotCoord.xRed)     = ekfOutput(4);
-                        % est_vel(SpotCoord.yRed)     = ekfOutput(5);
-                        % est_vel(SpotCoord.thetaRed) = ekfOutput(6);
-                        % % bias estimates remain at zero
+                        % output estimates for xRed and yRed
+                        est(SpotCoord.xRed)         = ekfOutput(1);
+                        est(SpotCoord.yRed)         = ekfOutput(2);
+                        est_vel(SpotCoord.xRed)     = ekfOutput(4);
+                        est_vel(SpotCoord.yRed)     = ekfOutput(5);
 
+                        % theta estimates remain inertial
+                        est(SpotCoord.thetaRed) = proc( ...
+                            paramEst(phase,SpotCoord.thetaRed).sensor);
+                        est_vel(SpotCoord.thetaRed) = proc( ...
+                            paramEst(phase,SpotCoord.thetaRed).rateSensor);
+                        
+                        % bias estimates remain at zero
+
+                        
                     otherwise
                         error('SpotEstimator.m:\n  function SpotGnc.estEkf3dof not defined for SpotCoord(%d).\n\n', int32(coord))
 

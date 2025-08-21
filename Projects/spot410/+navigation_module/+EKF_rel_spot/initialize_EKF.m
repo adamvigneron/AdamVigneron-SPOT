@@ -57,14 +57,14 @@ Q0(    7,    7) = time_step^2    * q2_thetaRel;  % this is a bit too noisy
 switch relMeas
 
     case SpotGnc.estEkfRelStereo
-        r2_xRel     = ( (1/3) * 1e-1 )^2; % stereo at 10 cm (3-sigma)
-        r2_yRel     = ( (1/3) * 1e-1 )^2; % stereo at 10 cm (3-sigma)
+        r2_xRel     = ( (1/3) * 5e-2 )^2; % stereo at 5 cm (3-sigma)
+        r2_yRel     = ( (1/3) * 5e-2 )^2; % stereo at 5 cm (3-sigma)
         r2_thetaRel = ( (1/3) * 2e-1 )^2; % stereo at 0.2 rad (3-sigma)
 
     case SpotGnc.estEkfRelLidar
-        r2_xRel     = ( (1/3) * 1e-1 )^2; % lidar at 10 cm (3-sigma)
-        r2_yRel     = ( (1/3) * 1e-1 )^2; % lidar at 10 cm (3-sigma)
-        r2_thetaRel = ( (1/3) * 1e-0 )^2; % lidar at 1 rad (3-sigma)
+        r2_xRel     = ( (1/3) * 5e-2 )^2; % lidar at 5 cm (3-sigma)
+        r2_yRel     = ( (1/3) * 5e-2 )^2; % lidar at 5 cm (3-sigma)
+        r2_thetaRel = ( (1/3) * 2e-1 )^2; % lidar at 0.2 rad (3-sigma)
 
     otherwise
         error('initailize_EKF.m:\n  sensor not defined for relative EKF')

@@ -14,8 +14,7 @@ allPhases = allPhases(:).';  % converts to a row vector
 allCoords = enumeration('SpotCoord');
 allCoords = allCoords(:).';  % converts to a row vector
 
-phases3_1to3_4 = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
-                  SpotPhase.Phase3_3, SpotPhase.Phase3_4];
+phases1to6 = allPhases( (allPhases ~= SpotPhase.Phase0) );
 
 
 %% by default, every coordinate uses its Phasespace/Encoder measurement and rate
@@ -50,8 +49,8 @@ end
 
 coord = SpotCoord.xRed;
 
-for phase = phases3_1to3_4
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelStereo;
+for phase = phases1to6
+    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
     paramEst(phase,coord).k1  = baseRate;
     % paramEst(phase,coord).sensor has already been set
     % paramEst(phase,coord).rateSensor has already been set
@@ -62,8 +61,8 @@ end
 
 coord = SpotCoord.yRed;
 
-for phase = phases3_1to3_4
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelStereo;
+for phase = phases1to6
+    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
     paramEst(phase,coord).k1  = baseRate;
     % paramEst(phase,coord).sensor has already been set
     % paramEst(phase,coord).rateSensor has already been set
@@ -74,8 +73,8 @@ end
 
 coord = SpotCoord.thetaRed;
 
-for phase = phases3_1to3_4
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelStereo;
+for phase = phases1to6
+    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
     paramEst(phase,coord).k1  = baseRate;
     % paramEst(phase,coord).sensor has already been set
     % paramEst(phase,coord).rateSensor has already been set
