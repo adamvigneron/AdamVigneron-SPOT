@@ -6,8 +6,7 @@ classdef SpotGnc < Simulink.IntEnumType
         refPolyWrap(104)
         refHalfCosine(105)
         refDeployStow(106)
-        refCircularInspection(107)
-        refConstantRate(108)
+        refConstantRate(107)
 %        
         ctrlNone(201)
         ctrlPd(202)
@@ -33,9 +32,8 @@ classdef SpotGnc < Simulink.IntEnumType
         procImuPhasespace(505)
 %
         dcplSingleAxis(601)
-        dcplSingleAxisInvert(602)
-        dcplSingleAxisInvertRotate(603)
-        dcplArmSetpoint(604)
+        dcplRedBodyForce(602)
+        dcplArmSetpoint(603)
     end
 end
 

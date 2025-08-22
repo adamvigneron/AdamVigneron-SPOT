@@ -3,7 +3,14 @@
 numPhase = length( enumeration( SpotPhase(1) ) );
 numCoord = length( enumeration( SpotCoord(1) ) );
 
-paramRefGen = repmat(struct, numPhase, numCoord);
+structRefGen.fun = SpotGnc.refConstant;
+structRefGen.k1  = 0;
+structRefGen.k2  = 0;
+structRefGen.k3  = 0;
+structRefGen.k4  = 0;
+structRefGen.k5  = 0;
+
+paramRefGen = repmat(structRefGen, numPhase, numCoord);
 
 
 %% convenience variables
@@ -11,26 +18,8 @@ paramRefGen = repmat(struct, numPhase, numCoord);
 allPhases = enumeration('SpotPhase');
 allPhases = allPhases(:).';  % converts to a row vector
 
-allCoords = enumeration('SpotCoord');
-allCoords = allCoords(:).';  % converts to a row vector
-
 phases3_1to3_4 = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
                   SpotPhase.Phase3_3, SpotPhase.Phase3_4];
-
-
-%% by default, every coordinate uses its Phasespace measurement
-
-for phase = allPhases
-    for coord = allCoords
-        paramRefGen(phase,coord).fun    = SpotGnc.refConstant;
-        paramRefGen(phase,coord).sensor = SpotSensor(coord.real);
-        paramRefGen(phase,coord).k1     = 0;
-        paramRefGen(phase,coord).k2     = 0;
-        paramRefGen(phase,coord).k3     = 0;
-        paramRefGen(phase,coord).k4     = 0;
-        paramRefGen(phase,coord).k5     = 0;
-    end
-end
 
 
 %% reference orbit
@@ -42,23 +31,14 @@ omgRef = 0.03490659;  % angular frequency, rad/s
 startPhase = omgRef * Phase2_End;
 
 
-%% SpotCoord.xRed | spotCoord.yRed - default
+%% SpotCoord.*Red - default
 
 % paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
 
 for phase = allPhases
-    paramRefGen(phase,SpotCoord.xRed).k1 = rRef;
-    paramRefGen(phase,SpotCoord.yRed).k1 = 0;
-end
-
-
-%% SpotCoord.thetaRed - default
-
-coord = SpotCoord.thetaRed;
-
-for phase = allPhases
-    paramRefGen(phase,coord).fun = SpotGnc.refConstant;
-    paramRefGen(phase,coord).k1  = 0;
+    paramRefGen(phase,SpotCoord.xRed    ).k1 = rRef;
+    paramRefGen(phase,SpotCoord.yRed    ).k1 = 0;
+    paramRefGen(phase,SpotCoord.thetaRed).k1 = 0;
 end
 
 
@@ -84,7 +64,7 @@ for phase = allPhases
 end
 
 
-%% SpotCoord.shoulderArm | SpotCoord.elbowArm | SpotCoord.wristArm - default
+%% SpotCoord.*Arm - default
 
 % paramRefGen(phase,coord).fun has already been set to SpotGnc.refConstant
 

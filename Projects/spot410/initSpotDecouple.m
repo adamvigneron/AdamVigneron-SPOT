@@ -18,14 +18,12 @@ phases2to5 = allPhases( (allPhases ~= SpotPhase.Phase0) & ...
                         (allPhases ~= SpotPhase.Phase1) & ...
                         (allPhases ~= SpotPhase.Phase6) );
 
-phases3_1to3_4 = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
-                  SpotPhase.Phase3_3, SpotPhase.Phase3_4];
 
+%% Platforms - default
 
-%% Platforms -- default
+% structDcpl(phase,coord).fun already set to SpotGnc.dcplSingleAxis
 
 for phase = allPhases
-    % structDcpl(phase,coord).fun already set to SpotGnc.dcplSingleAxis
     paramDcpl(phase,SpotCoord.xRed       ).k1 = mRED;
     paramDcpl(phase,SpotCoord.yRed       ).k1 = mRED;
     paramDcpl(phase,SpotCoord.thetaRed   ).k1 = IRED;
@@ -38,17 +36,17 @@ for phase = allPhases
 end
 
 
-%% SpotCoord.xRed | SpotCoord.yRed -- SpotPhase.Phase2 to SpotPhase.Phase5
+%% SpotCoord.xRed | SpotCoord.yRed - SpotPhase.Phase2 to SpotPhase.Phase5
 
 for phase = phases2to5
     for coord = [ SpotCoord.xRed, SpotCoord.yRed]
-        paramDcpl(phase,coord).fun = SpotGnc.dcplSingleAxisInvertRotate;
+        paramDcpl(phase,coord).fun = SpotGnc.dcplRedBodyForce;
         % paramDcpl(phase,coord).k1 already set to mRED
     end
 end
 
 
-%% SpotCoord.*Arm -- default
+%% SpotCoord.*Arm - default
 
 for phase = allPhases
     for coord = [ SpotCoord.shoulderArm , SpotCoord.elbowArm, SpotCoord.wristArm ]

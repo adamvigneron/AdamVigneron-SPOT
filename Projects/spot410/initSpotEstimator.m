@@ -31,97 +31,14 @@ for phase = allPhases
 end
 
 
-%% SpotCoord.*Red* - default
-
-for phase = allPhases
-    % paramEst.fun is already set to estNone
-    paramEst(phase,SpotCoord.xRed).sensor     = SpotSensor.xStereo;
-    paramEst(phase,SpotCoord.yRed).sensor     = SpotSensor.yStereo;
-    % paramEst(phase,SpotCoord.thetaRed).sensor is already set to phasespace
-
-    % paramEst(phase,SpotCoord.xRed).rateSensor is not used
-    % paramEst(phase,SpotCoord.yRed).rateSensor is not used
-    paramEst(phase,SpotCoord.thetaRed).rateSensor = SpotSensor.thetaRedImu;
-end
-
-
-%% SpotCoord.xRed - SpotPhase.Phase3_*
-
-coord = SpotCoord.xRed;
+%% SpotCoord.*Red - default
 
 for phase = phases1to6
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
-    paramEst(phase,coord).k1  = baseRate;
-    % paramEst(phase,coord).sensor has already been set
-    % paramEst(phase,coord).rateSensor has already been set
+    for coord = [ SpotCoord.xRed, SpotCoord.yRed, SpotCoord.thetaRed ]
+        paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
+        paramEst(phase,coord).k1  = baseRate;
+        % paramEst(phase,coord).sensor has already been set
+        % paramEst(phase,coord).rateSensor has already been set
+    end
 end
-
-
-%% SpotCoord.yRed - SpotPhase.Phase3_*
-
-coord = SpotCoord.yRed;
-
-for phase = phases1to6
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
-    paramEst(phase,coord).k1  = baseRate;
-    % paramEst(phase,coord).sensor has already been set
-    % paramEst(phase,coord).rateSensor has already been set
-end
-
-
-%% SpotCoord.thetaRed - SpotPhase.Phase3_*
-
-coord = SpotCoord.thetaRed;
-
-for phase = phases1to6
-    paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
-    paramEst(phase,coord).k1  = baseRate;
-    % paramEst(phase,coord).sensor has already been set
-    % paramEst(phase,coord).rateSensor has already been set
-end
-
-
-%% SpotCoord.xBlack - default
-
-% paramEst.fun is set to estNone by default
-
-
-%% SpotCoord.yBlack - default
-
-% paramEst.fun is set to estNone by default
-
-
-%% SpotCoord.thetaBlack - default
-
-% paramEst.fun is set to estNone by default
-
-
-%% SpotCoord.xBlue - default
-
-% paramEst.fun is set to estNone by default
-
-
-%% SpotCoord.yBlue - default
-
-% paramEst.fun is set to estNone by default
-
-
-%% SpotCoord.thetaBlue - default
-
-% paramEst.fun is set to estNone by default
-
-
-%% SpotCoord.shoulderArm - default
-
-% paramEst.fun is set to estNone by default
-
-
-%% SpotCoord.elbowArm - default
-
-% paramEst.fun is set to estNone by default
-
-
-%% SpotCoord.wristArm - default
-
-% paramEst.fun is set to estNone by default
 

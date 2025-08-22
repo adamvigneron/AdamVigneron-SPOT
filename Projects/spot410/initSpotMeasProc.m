@@ -16,30 +16,12 @@ allPhases = enumeration('SpotPhase');
 allPhases = allPhases(:).';  % converts to a row vector
 
 
-%% SpotSensor.thetaRedPhasespace - default
-
-sensor = SpotSensor.thetaRedPhasespace;
+%% SpotSensor.theta*Phasespace - default
 
 for phase = allPhases
-    paramMeasProc(phase,sensor).fun = SpotGnc.procAngle;
-end
-
-
-%% SpotCoord.thetaBlackPhasespace - default
-
-sensor = SpotSensor.thetaBlackPhasespace;
-
-for phase = allPhases
-    paramMeasProc(phase,sensor).fun = SpotGnc.procAngle;
-end
-
-
-%% SpotCoord.thetaBluePhasespace - default
-
-sensor = SpotSensor.thetaBluePhasespace;
-
-for phase = allPhases
-    paramMeasProc(phase,sensor).fun = SpotGnc.procAngle;
+    paramMeasProc(phase,SpotSensor.thetaRedPhasespace  ).fun = SpotGnc.procAngle;
+    paramMeasProc(phase,SpotSensor.thetaBlackPhasespace).fun = SpotGnc.procAngle;
+    paramMeasProc(phase,SpotSensor.thetaBluePhasespace ).fun = SpotGnc.procAngle;
 end
 
 
@@ -61,19 +43,10 @@ end
 % end
 
 
-%% SpotCoord.thetaStereo - default
-
-sensor = SpotSensor.thetaStereo;
+%% SpotCoord.thetaStereo | SpotCoord.thetaLidar - default
 
 for phase = allPhases
-    paramMeasProc(phase,sensor).fun = SpotGnc.procAngleQuadrant;
+    paramMeasProc(phase,SpotSensor.thetaStereo).fun = SpotGnc.procAngleQuadrant;
+    paramMeasProc(phase,SpotSensor.thetaLidar ).fun = SpotGnc.procAngleQuadrant;
 end
 
-
-%% SpotCoord.thetaLidar - default
-
-sensor = SpotSensor.thetaLidar;
-
-for phase = allPhases
-    paramMeasProc(phase,sensor).fun = SpotGnc.procAngleQuadrant;
-end

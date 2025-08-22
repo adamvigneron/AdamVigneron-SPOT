@@ -4,7 +4,7 @@ numPhase = length(meta.class.fromName('SpotPhase').EnumerationMemberList);
 structFlag.armState  = 0;
 structFlag.puckState = 0;
 
-paramFlag = repmat(structFlag,1,numPhase);
+paramFlag = repmat(structFlag,numPhase,1);
 
 
 %% convenience variables
@@ -19,16 +19,16 @@ phases2to5 = allPhases( (allPhases ~= SpotPhase.Phase0) & ...
                         (allPhases ~= SpotPhase.Phase1) & ...
                         (allPhases ~= SpotPhase.Phase6) );
 
-%% paramFlag.armState
-
-for phase = phases2to5
-    paramFlag(phase).armState = 1;
-end
-
-
-%% paramFlag.puckState
+%% paramFlag(*).puckState
 
 for phase = phases1to5
     paramFlag(phase).puckState = 1;
+end
+
+
+%% paramFlag(*).armState
+
+for phase = phases2to5
+    paramFlag(phase).armState = 1;
 end
 

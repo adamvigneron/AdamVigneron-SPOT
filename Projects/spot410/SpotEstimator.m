@@ -130,14 +130,6 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
 
             case { SpotGnc.estEkfRelStereo , SpotGnc.estEkfRelLidar }
 
-                % % for now, run the filter open-loop
-                % sensor = paramEst(phase,coord).sensor;
-                % est(coord) = proc(sensor);
-                % 
-                % rateSensor = paramEst(phase,coord).rateSensor;
-                % est_vel(coord) = proc(rateSensor);
-                % % % bias estimates remain at zero
-
                 % we only run the filter for SpotCoord.xRed
                 switch coord
 

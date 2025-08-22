@@ -21,6 +21,8 @@ set(groot,'DefaultAxesFontSize', 12);
 set(groot,'defaultAxesXGrid','on');
 set(groot,'defaultAxesYGrid','on');
 
+colorMap = orderedcolors('gem');
+
 
 %% DATA
 
@@ -130,7 +132,8 @@ Ekf.range = sqrt( Ekf.xRed.^2 + Ekf.yRed.^2 );
 figure;
 plot(Proc.Time,[ProcRel.xBody Ekf.xRed Proc.xStereo Proc.xLidar])
 hold on;
-plot(Proc.Time,[Ekf.xRed+Ekf.xRed3sig Ekf.xRed-Ekf.xRed3sig],'r:')
+plot(Proc.Time,Ekf.xRed+Ekf.xRed3sig,'Color',colorMap(2,:),'LineStyle',':')
+plot(Proc.Time,Ekf.xRed-Ekf.xRed3sig,'Color',colorMap(2,:),'LineStyle',':')
 xlabel('time, s');
 ylabel('x-position, m')
 legend('phasespace','ekf','stereo','lidar');
@@ -138,14 +141,15 @@ legend('phasespace','ekf','stereo','lidar');
 figure;
 plot(Proc.Time,[ProcRel.yBody Ekf.yRed Proc.yStereo Proc.yLidar])
 hold on;
-plot(Proc.Time,[Ekf.yRed+Ekf.yRed3sig Ekf.yRed-Ekf.yRed3sig],'r:')
+plot(Proc.Time,Ekf.yRed+Ekf.yRed3sig,'Color',colorMap(2,:),'LineStyle',':')
+plot(Proc.Time,Ekf.yRed-Ekf.yRed3sig,'Color',colorMap(2,:),'LineStyle',':')
 xlabel('time, s');
 ylabel('y-position, m')
 legend('phasespace','ekf','stereo','lidar');
 ylim([-0.7 0.7])
 
 figure;
-plot(Proc.Time,rad2deg([ProcRel.thetaInertial Ekf.thetaRed Proc.thetaStereo Proc.thetaLidar]))
+plot(Proc.Time,rad2deg([ProcRel.thetaInertial+pi/2 Ekf.thetaRed Proc.thetaStereo Proc.thetaLidar]))
 xlabel('time, s');
 ylabel('theta-rotation, degrees')
 legend('phasespace','ekf','stereo','lidar');
@@ -153,7 +157,8 @@ legend('phasespace','ekf','stereo','lidar');
 figure;
 plot(ProcRel.Time, [ProcRel.xRateBody Ekf.xRedRate]);
 hold on;
-plot(Proc.Time,[Ekf.xRedRate+Ekf.xRedRate3sig Ekf.xRedRate-Ekf.xRedRate3sig],'r:')
+plot(Proc.Time,Ekf.xRedRate+Ekf.xRedRate3sig,'Color',colorMap(2,:),'LineStyle',':')
+plot(Proc.Time,Ekf.xRedRate-Ekf.xRedRate3sig,'Color',colorMap(2,:),'LineStyle',':')
 xlabel('time, s');
 ylabel('SpotCoord.xRed, m/s');
 legend('phasespace','ekf');
@@ -161,7 +166,8 @@ legend('phasespace','ekf');
 figure;
 plot(ProcRel.Time, [ProcRel.yRateBody Ekf.yRedRate]);
 hold on;
-plot(Proc.Time,[Ekf.yRedRate+Ekf.yRedRate3sig Ekf.yRedRate-Ekf.yRedRate3sig],'r:')
+plot(Proc.Time,Ekf.yRedRate+Ekf.yRedRate3sig,'Color',colorMap(2,:),'LineStyle',':')
+plot(Proc.Time,Ekf.yRedRate-Ekf.yRedRate3sig,'Color',colorMap(2,:),'LineStyle',':')
 xlabel('time, s');
 ylabel('SpotCoord.yRed, m/s');
 legend('phasespace','ekf');

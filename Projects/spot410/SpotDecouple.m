@@ -19,18 +19,19 @@ function [FTcmd] = SpotDecouple(phase, thetaRed, cmd, paramDcpl)
         
         switch myFun
     
-            case { SpotGnc.dcplSingleAxis , SpotGnc.dcplSingleAxisInvert }
+            case SpotGnc.dcplSingleAxis
 
                 k1 = paramDcpl(phase,coord).k1;  % mass / inertia 
 
                 FTcmd(coord) = k1 * cmd(coord);
 
-                if myFun == SpotGnc.dcplSingleAxisInvert
-                    FTcmd(coord) = -1 * FTcmd(coord);
-                end
+
+            case SpotGnc.dcplArmSetpoint
+
+                FTcmd(coord) = cmd(coord);
 
 
-            case SpotGnc.dcplSingleAxisInvertRotate
+            case SpotGnc.dcplRedBodyForce
 
                 switch coord
 
@@ -56,11 +57,6 @@ function [FTcmd] = SpotDecouple(phase, thetaRed, cmd, paramDcpl)
                         error('SpotDecouple.m:\n  function dcplSingleAxisInvertRotate only defined for xRed and yRed');
 
                 end  % switch coord
-
-
-            case SpotGnc.dcplArmSetpoint
-
-                FTcmd(coord) = cmd(coord);
 
 
             otherwise

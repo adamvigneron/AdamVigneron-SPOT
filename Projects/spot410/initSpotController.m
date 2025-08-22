@@ -28,9 +28,6 @@ phases2to5 = allPhases( (allPhases ~= SpotPhase.Phase0) & ...
                         (allPhases ~= SpotPhase.Phase1) & ...
                         (allPhases ~= SpotPhase.Phase6) );
 
-phases3_1to3_4 = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
-                  SpotPhase.Phase3_3, SpotPhase.Phase3_4];
-
 
 %% SpotCoord.xRed - default
 
@@ -96,44 +93,4 @@ for phase = phases2to5
     paramCtrl(phase,coord).k1  = K_BLACK(3,3) / IBLACK;
     paramCtrl(phase,coord).k2  = K_BLACK(3,6) / IBLACK;
 end
-
-
-%% SpotCoord.yBlack - default
-
-% paramCtrl(phase,coord).fun is already set to ctrlNone
-
-
-%% SpotCoord.thetaBlack - default
-
-% paramCtrl(phase,coord).fun is already set to ctrlNone
-
-
-%% SpotCoord.xBlue - default
-
-% paramCtrl(phase,coord).fun is already set to ctrlNone
-
-
-%% SpotCoord.yBlue - default
-
-% paramCtrl(phase,coord).fun is already set to ctrlNone
-
-
-%% SpotCoord.thetaBlue - default
-
-% paramCtrl(phase,coord).fun is already set to ctrlNone
-
-
-%% SpotCoord.shoulderArm - default
-
-% paramCtrl(phase,coord).fun is already set to ctrlNone
-
-
-%% SpotCoord.elbowArm - default
-
-% paramCtrl(phase,coord).fun is already set to ctrlNone
-
-
-%% SpotCoord.wristArm - default
-
-% paramCtrl(phase,coord).fun is already set to ctrlNone
 
