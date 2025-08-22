@@ -162,6 +162,7 @@ plot(Proc.Time,Ekf.xRedRate-Ekf.xRedRate3sig,'Color',colorMap(2,:),'LineStyle','
 xlabel('time, s');
 ylabel('SpotCoord.xRed, m/s');
 legend('phasespace','ekf');
+ylim([-0.05 0.05]);
 
 figure;
 plot(ProcRel.Time, [ProcRel.yRateBody Ekf.yRedRate]);
@@ -171,6 +172,7 @@ plot(Proc.Time,Ekf.yRedRate-Ekf.yRedRate3sig,'Color',colorMap(2,:),'LineStyle','
 xlabel('time, s');
 ylabel('SpotCoord.yRed, m/s');
 legend('phasespace','ekf');
+ylim([-0.05 0.05]);
 
 figure;
 plot(Proc.Time, rad2deg([ProcRel.thetaRateInertial Ekf.thetaRedRate dataClass_rt.RED_IMU_Gz_radpers.Data]))

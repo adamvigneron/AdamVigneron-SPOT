@@ -36,10 +36,10 @@ P0 = diag([sig2_xRel    sig2_yRel    sig2_thetaRel ...
 
 %% Initial Q Matrix (Covariance of the process noise)
 
-% Quaternion and angular rate noise components
-q2_xRel     = ( (1/3) * 1e-1 / 11.2970 )^2; % thrusters at 100 mN (3-sigma)
-q2_yRel     = ( (1/3) * 1e-1 / 11.2970 )^2; % thrusters at 100 mN (3-sigma)
-q2_thetaRel = ( (1/3) * 1e-2 /  0.1982 )^2; % thrusters at 10 mNm (3-sigma)
+% Quaternion and angular rate noise components (doubled for relative frame)
+q2_xRel     = ( (1/3) * 2e-1 / 11.2970 )^2; % thrusters at 2*100 mN (3-sigma)
+q2_yRel     = ( (1/3) * 2e-1 / 11.2970 )^2; % thrusters at 2*100 mN (3-sigma)
+q2_thetaRel = ( (1/3) * 2e-2 /  0.1982 )^2; % thrusters at 2*10 mNm (3-sigma)
 
 % single-axis double integrator, input matrix, zero-order hold
 Gamma = [ time_step^2 / 2 ; time_step ];
