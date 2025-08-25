@@ -56,12 +56,12 @@ Q0(    7,    7) = time_step^2    * q2_thetaRel;  % this is a bit too noisy
 
 switch relMeas
 
-    case SpotGnc.estEkfRelStereo
+    case { SpotGnc.estEkfStereo , SpotGnc.estEkfPolarStereo }
         r2_xRel     = ( (1/3) * 5e-2 )^2; % stereo at 5 cm (3-sigma)
         r2_yRel     = ( (1/3) * 5e-2 )^2; % stereo at 5 cm (3-sigma)
         r2_thetaRel = ( (1/3) * 2e-1 )^2; % stereo at 0.2 rad (3-sigma)
 
-    case SpotGnc.estEkfRelLidar
+    case { SpotGnc.estEkfLidar , SpotGnc.estEkfPolarLidar }
         r2_xRel     = ( (1/3) * 5e-2 )^2; % lidar at 5 cm (3-sigma)
         r2_yRel     = ( (1/3) * 5e-2 )^2; % lidar at 5 cm (3-sigma)
         r2_thetaRel = ( (1/3) * 2e-1 )^2; % lidar at 0.2 rad (3-sigma)

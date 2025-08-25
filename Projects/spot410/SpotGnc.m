@@ -22,10 +22,12 @@ classdef SpotGnc < Simulink.IntEnumType
 %
         estNone(401)
         estVelBias(402)
-        estEkfRelStereo(403)
-        estEkfRelLidar(404)
+        estEkfStereo(403)
+        estEkfLidar(404)
         estPolarStereo(405)
         estPolarLidar(406)
+        estEkfPolarStereo(407)
+        estEkfPolarLidar(408)
 %
         procNone(501)
         procAngle(502)

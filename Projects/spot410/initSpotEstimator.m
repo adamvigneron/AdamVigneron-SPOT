@@ -40,7 +40,7 @@ end
 
 for phase = phases1to6
     for coord = [ SpotCoord.xRed, SpotCoord.yRed, SpotCoord.thetaRed ]
-        paramEst(phase,coord).fun = SpotGnc.estPolarStereo;
+        paramEst(phase,coord).fun = SpotGnc.estEkfPolarStereo;
         paramEst(phase,coord).k1  = rRef;
         % paramEst(phase,coord).sensor has already been set
         % paramEst(phase,coord).rateSensor has already been set
