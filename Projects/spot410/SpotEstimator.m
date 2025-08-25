@@ -203,14 +203,48 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                         
                         % bias estimates remain at zero
 
-                        
                     otherwise
                         error('SpotEstimator.m:\n  function SpotGnc.estEkf3dof not defined for SpotCoord(%d).\n\n', int32(coord))
 
                 end % switch coord
 
-                % end % if changed meas
-                
+
+            case { SpotGnc.estPolarStereo, SpotGnc.estPolarLidar }
+
+                % we only assign measurements for SpotCoord.xRed
+                switch coord
+
+                    case { SpotCoord.yRed , SpotCoord.thetaRed }
+
+                        % do nothing
+
+                    case SpotCoord.xRed
+
+                        rRef = paramEst(phase,coord).k1;
+
+                        switch myFun
+                            case SpotGnc.estPolarStereo
+                                xBody = proc(SpotSensor.xStereo);
+                                yBody = proc(SpotSensor.yStereo);
+                            case SpotGnc.estPolarLidar
+                                xBody = proc(SpotSensor.xLidar);
+                                yBody = proc(SpotSensor.yLidar);
+                            otherwise
+                                error('SpotEstimator.m:\n  sensor not defined for range and bearing control')
+                        end
+
+                        rBody    = sqrt( xBody^2 + yBody^2 );
+                        phiBody  = atan2( yBody, xBody );
+                        thetaRed = proc(SpotCoord.thetaRed);
+
+                        est(SpotCoord.xRed)     = rBody;
+                        est(SpotCoord.yRed)     = rRef * thetaRed;
+                        est(SpotCoord.thetaRed) = phiBody;
+
+                    otherwise
+                        error('SpotEstimator.m:\n  function SpotGnc.estPolar not defined for SpotCoord(%d).\n\n', int32(coord))
+                end
+
 
             otherwise
                 error('SpotEstimator.m:\n  function SpotGnc(%d) not defined for SpotPhase(%d) and SpotCoord(%d).\n\n', int32(myFun), int32(phase), int32(coord))

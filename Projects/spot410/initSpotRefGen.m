@@ -37,19 +37,23 @@ startPhase = omgRef * Phase2_End;
 
 for phase = allPhases
     paramRefGen(phase,SpotCoord.xRed    ).k1 = rRef;
-    paramRefGen(phase,SpotCoord.yRed    ).k1 = 0;
+    paramRefGen(phase,SpotCoord.yRed    ).k1 = rRef * -1 * pi;
     paramRefGen(phase,SpotCoord.thetaRed).k1 = 0;
 end
 
 
-%% SpotCoord.thetaRed - SpotPhase.Phase3_*
+%% SpotCoord.yRed - SpotPhase.Phase3_*
 
-coord = SpotCoord.thetaRed;
+coord = SpotCoord.yRed;
 
 for phase = phases3_1to3_4
     paramRefGen(phase,coord).fun = SpotGnc.refConstantRate;
-    paramRefGen(phase,coord).k1  = -1 * startPhase;
-    paramRefGen(phase,coord).k2  = omgRef;
+    paramRefGen(phase,coord).k1  = (-1 * startPhase - pi)*rRef;
+    paramRefGen(phase,coord).k2  = omgRef * rRef;
+end
+
+for phase = [ SpotPhase.Phase4 SpotPhase.Phase5 SpotPhase.Phase6 ]
+    paramRefGen(phase,coord).k1 = rRef * pi;
 end
 
 

@@ -19,11 +19,15 @@ function [FTcmd] = SpotDecouple(phase, thetaRed, cmd, paramDcpl)
         
         switch myFun
     
-            case SpotGnc.dcplSingleAxis
+            case { SpotGnc.dcplSingleAxis , SpotGnc.dcplSingleAxisInvert }
 
                 k1 = paramDcpl(phase,coord).k1;  % mass / inertia 
 
                 FTcmd(coord) = k1 * cmd(coord);
+
+                if myFun == SpotGnc.dcplSingleAxisInvert
+                    FTcmd(coord) = -1 * FTcmd(coord);
+                end
 
 
             case SpotGnc.dcplArmSetpoint

@@ -17,6 +17,11 @@ allCoords = allCoords(:).';  % converts to a row vector
 phases1to6 = allPhases( (allPhases ~= SpotPhase.Phase0) );
 
 
+%% reference orbit
+
+rRef   = 0.85;  % radius, metres
+
+
 %% by default, every coordinate uses its Phasespace/Encoder measurement and rate
 
 for phase = allPhases
@@ -35,8 +40,8 @@ end
 
 for phase = phases1to6
     for coord = [ SpotCoord.xRed, SpotCoord.yRed, SpotCoord.thetaRed ]
-        paramEst(phase,coord).fun = SpotGnc.estEkfRelLidar;
-        paramEst(phase,coord).k1  = baseRate;
+        paramEst(phase,coord).fun = SpotGnc.estPolarStereo;
+        paramEst(phase,coord).k1  = rRef;
         % paramEst(phase,coord).sensor has already been set
         % paramEst(phase,coord).rateSensor has already been set
     end

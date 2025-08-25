@@ -8,7 +8,7 @@ open(appHandle.AvailableDiagramsDropDown.Value);
 % Edit active platforms
 appHandle.REDCheckBox.Value    = 1;
 appHandle.BLACKCheckBox.Value  = 1;
-appHandle.BLUECheckBox.Value   = 1;
+appHandle.BLUECheckBox.Value   = 0;
 appHandle.ARMCheckBox.Value    = 0;
 appHandle.ConfirmSettings();
 
