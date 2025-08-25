@@ -36,7 +36,19 @@ for phase = allPhases
 end
 
 
-%% SpotCoord.*Red - default
+%% SpotCoord.*Red - SpotPhase.Phase0
+
+phase = SpotPhase.Phase0;
+
+for coord = [ SpotCoord.xRed, SpotCoord.yRed, SpotCoord.thetaRed ]
+    paramEst(phase,coord).fun = SpotGnc.estPolarStereo;
+    paramEst(phase,coord).k1  = rRef;
+    % paramEst(phase,coord).sensor has already been set
+    % paramEst(phase,coord).rateSensor has already been set
+end
+
+
+%% SpotCoord.*Red - SpotPhase.Phase1 through Phase6
 
 for phase = phases1to6
     for coord = [ SpotCoord.xRed, SpotCoord.yRed, SpotCoord.thetaRed ]
