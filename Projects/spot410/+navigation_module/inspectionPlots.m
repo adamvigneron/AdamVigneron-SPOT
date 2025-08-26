@@ -1,5 +1,7 @@
 %% PRE-SETUP
 
+% dataClass_rt = dataClass;
+
 % clear SpotEstimator
 % 
 % for i = 2:length(dataClass_rt.Time_s.Time)
@@ -146,7 +148,7 @@ plot(Proc.Time,Ekf.yRed-Ekf.yRed3sig,'Color',colorMap(2,:),'LineStyle',':')
 xlabel('time, s');
 ylabel('y-position, m')
 legend('phasespace','ekf','stereo','lidar');
-ylim([-0.7 0.7])
+% ylim([-0.7 0.7])
 
 figure;
 plot(Proc.Time,rad2deg([ProcRel.thetaInertial+pi/2 Ekf.thetaRed Proc.thetaStereo Proc.thetaLidar]))
@@ -162,7 +164,7 @@ plot(Proc.Time,Ekf.xRedRate-Ekf.xRedRate3sig,'Color',colorMap(2,:),'LineStyle','
 xlabel('time, s');
 ylabel('SpotCoord.xRed, m/s');
 legend('phasespace','ekf');
-ylim([-0.05 0.05]);
+% ylim([-0.05 0.05]);
 
 figure;
 plot(ProcRel.Time, [ProcRel.yRateBody Ekf.yRedRate]);
@@ -172,16 +174,16 @@ plot(Proc.Time,Ekf.yRedRate-Ekf.yRedRate3sig,'Color',colorMap(2,:),'LineStyle','
 xlabel('time, s');
 ylabel('SpotCoord.yRed, m/s');
 legend('phasespace','ekf');
-ylim([-0.05 0.05]);
+% ylim([-0.05 0.05]);
 
 figure;
-plot(Proc.Time, rad2deg([ProcRel.thetaRateInertial Ekf.thetaRedRate dataClass_rt.RED_IMU_Gz_radpers.Data]))
+plot(Proc.Time, rad2deg([ProcRel.thetaRateInertial Ekf.thetaRedRate Proc.thetaRedImu]))
 xlabel('time, s');
 ylabel('SpotCoord.thetaRed, degree/s')
 legend('phasespace','ekf','imu');
 
 figure;
-plot(Proc.Time, rad2deg([Proc.thetaRedRatePhasespace Ekf.omega dataClass_rt.RED_IMU_Gz_radpers.Data]))
+plot(Proc.Time, rad2deg([Proc.thetaRedRatePhasespace Ekf.omega Proc.thetaRedImu]))
 xlabel('time, s');
 ylabel('inertial rotation, degree/s')
 legend('phasespace','ekf','imu');
@@ -192,7 +194,7 @@ xlabel('time, s');
 ylabel('range, m')
 title('body frame');
 legend('phasespace', 'ekf', 'stereo', 'lidar', 'rangefinder');
-ylim([0 2])
+% ylim([0 2])
 
 
 %% CONTROL PLOTS
@@ -202,14 +204,14 @@ plot(Est.Time, [Est.xRed Ref.xRed Err.xRed]);
 xlabel('time, s');
 ylabel('SpotCoord.xRed, m');
 legend('est','ref','err');
-ylim([-0.2 1.2]);
+% ylim([-0.2 1.2]);
 
 figure;
 plot(Est.Time, [Est.yRed Ref.yRed Err.yRed]);
 xlabel('time, s');
 ylabel('SpotCoord.yRed, m');
 legend('est','ref','err');
-ylim([-0.7 0.7]);
+% ylim([-0.7 0.7]);
 
 figure;
 plot(Est.Time, rad2deg([Est.thetaRed Ref.thetaRed Err.thetaRed]));

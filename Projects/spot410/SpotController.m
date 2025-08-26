@@ -58,7 +58,11 @@ function [cmd,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                 k3 = paramCtrl(phase,coord).k3;  % baseRate
                 k4 = paramCtrl(phase,coord).k4;  % beta
     
-                eDelta = err(coord) - errOld(coord);
+                if errOld(coord)
+                    eDelta = err(coord) - errOld(coord);
+                else
+                    eDelta = 0;
+                end
     
                 if eDelta == 0
                     eDelta = errDeltaOld(coord);
