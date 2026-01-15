@@ -226,12 +226,27 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
 
                         else
 
-                            % output estimates for xRed and yRed
-                            est(SpotCoord.xRed)         = ekfOutput(1);
-                            est(SpotCoord.yRed)         = ekfOutput(2);
-                            est_vel(SpotCoord.xRed)     = ekfOutput(4);
-                            est_vel(SpotCoord.yRed)     = ekfOutput(5);
-    
+                            % % output estimates for xRed and yRed
+                            % est(SpotCoord.xRed)         = ekfOutput(1);
+                            % est(SpotCoord.yRed)         = ekfOutput(2);
+                            % est_vel(SpotCoord.xRed)     = ekfOutput(4);
+                            % est_vel(SpotCoord.yRed)     = ekfOutput(5);
+
+                            % build the relative measurements from phasespace
+                            thetaRed = proc(SpotSensor.thetaRedPhasespace);
+
+                            xBlackRed = proc(SpotSensor.xBlackPhasespace) - proc(SpotSensor.xRedPhasespace);
+                            yBlackRed = proc(SpotSensor.yBlackPhasespace) - proc(SpotSensor.yRedPhasespace);
+
+                            xBlackRedRate = proc(SpotSensor.xBlackRatePhasespace) - proc(SpotSensor.xRedRatePhasespace);
+                            yBlackRedRate = proc(SpotSensor.yBlackRatePhasespace) - proc(SpotSensor.yRedRatePhasespace);
+
+                            est(SpotCoord.xRed) = xBlackRed * cos(thetaRed) + yBlackRed * sin(thetaRed);
+                            est(SpotCoord.yRed) = yBlackRed * cos(thetaRed) - xBlackRed * sin(thetaRed);
+
+                            est_vel(SpotCoord.xRed) = xBlackRedRate * cos(thetaRed) + yBlackRedRate * sin(thetaRed);
+                            est_vel(SpotCoord.yRed) = yBlackRedRate * cos(thetaRed) - xBlackRedRate * sin(thetaRed);
+
                             % theta estimates remain inertial
                             est(SpotCoord.thetaRed) = proc( ...
                                 paramEst(phase,SpotCoord.thetaRed).sensor);

@@ -45,16 +45,16 @@ for phase = phases2to5
     end
 end
 
-
-%% SpotCoord.thetaRed - SpotPhase.Phase2 to SpotPhase.Phase5
-
-coord = SpotCoord.thetaRed;
-
-for phase = phases2to5
-    paramDcpl(phase,coord).fun = SpotGnc.dcplSingleAxisInvert;
-    % paramDcpl(phase,coord).k1 already set to IRED
-end
-
+% 
+% %% SpotCoord.thetaRed - SpotPhase.Phase2 to SpotPhase.Phase5
+% 
+% coord = SpotCoord.thetaRed;
+% 
+% for phase = phases2to5
+%     paramDcpl(phase,coord).fun = SpotGnc.dcplSingleAxisInvert;
+%     % paramDcpl(phase,coord).k1 already set to IRED
+% end
+% 
 
 %% SpotCoord.*Arm - default
 

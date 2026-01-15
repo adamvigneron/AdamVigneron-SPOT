@@ -54,23 +54,19 @@ init_states_BLACK    = drop_states_BLACK;
 
 for phase = allPhases
     paramRefGen(phase,SpotCoord.xRed    ).k1 = rRef;
-    paramRefGen(phase,SpotCoord.yRed    ).k1 = rRef * thetaRedInit;
+    paramRefGen(phase,SpotCoord.yRed    ).k1 = 0;
     paramRefGen(phase,SpotCoord.thetaRed).k1 = 0;
 end
 
 
-%% SpotCoord.yRed - SpotPhase.Phase3_*
+%% SpotCoord.thetaRed - SpotPhase.Phase3_*
 
-coord = SpotCoord.yRed;
+coord = SpotCoord.thetaRed;
 
 for phase = phases3_1to3_4
     paramRefGen(phase,coord).fun = SpotGnc.refConstantRate;
-    paramRefGen(phase,coord).k1  = rRef * ( thetaRedInit - startPhase );
-    paramRefGen(phase,coord).k2  = rRef * omgRef;
-end
-
-for phase = [ SpotPhase.Phase4 SpotPhase.Phase5 SpotPhase.Phase6 ]
-    paramRefGen(phase,coord).k1 = rRef * 2*pi;
+    paramRefGen(phase,coord).k1  = thetaRedInit - startPhase;
+    paramRefGen(phase,coord).k2  = omgRef;
 end
 
 
