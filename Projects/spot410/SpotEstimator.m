@@ -247,6 +247,11 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                             est_vel(SpotCoord.xRed) = xBlackRedRate * cos(thetaRed) + yBlackRedRate * sin(thetaRed);
                             est_vel(SpotCoord.yRed) = yBlackRedRate * cos(thetaRed) - xBlackRedRate * sin(thetaRed);
 
+                            % omega \cross r correction for the rotating reference frame
+                            if ismember( int32(phase), [4 5 6 7] )
+                                est_vel(SpotCoord.yRed) = est_vel(SpotCoord.yRed) - 0.85*0.03490659;
+                            end
+
                             % theta estimates remain inertial
                             est(SpotCoord.thetaRed) = proc( ...
                                 paramEst(phase,SpotCoord.thetaRed).sensor);

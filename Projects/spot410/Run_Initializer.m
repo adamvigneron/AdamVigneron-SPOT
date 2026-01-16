@@ -43,9 +43,6 @@ initSpotDecouple;
 % initialize the GNC unit handling status flags
 initSpotFlag;
 
-% load the BLACK-with-cone inspection data
-load('correctedData_2xRedThetaImu.mat')
-
 
 %% For those who want to run simulations without using the GUI:
 
