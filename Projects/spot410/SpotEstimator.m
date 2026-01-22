@@ -226,29 +226,35 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
 
                         else
 
-                            % % output estimates for xRed and yRed
-                            % est(SpotCoord.xRed)         = ekfOutput(1);
-                            % est(SpotCoord.yRed)         = ekfOutput(2);
-                            % est_vel(SpotCoord.xRed)     = ekfOutput(4);
-                            % est_vel(SpotCoord.yRed)     = ekfOutput(5);
+                            if int32(phase) == 7
 
-                            % build the relative measurements from phasespace
-                            thetaRed = proc(SpotSensor.thetaRedPhasespace);
+                                % output estimates for xRed and yRed
+                                est(SpotCoord.xRed)         = ekfOutput(1);
+                                est(SpotCoord.yRed)         = ekfOutput(2);
+                                est_vel(SpotCoord.xRed)     = ekfOutput(4);
+                                est_vel(SpotCoord.yRed)     = ekfOutput(5);
 
-                            xBlackRed = proc(SpotSensor.xBlackPhasespace) - proc(SpotSensor.xRedPhasespace);
-                            yBlackRed = proc(SpotSensor.yBlackPhasespace) - proc(SpotSensor.yRedPhasespace);
+                            else
 
-                            xBlackRedRate = proc(SpotSensor.xBlackRatePhasespace) - proc(SpotSensor.xRedRatePhasespace);
-                            yBlackRedRate = proc(SpotSensor.yBlackRatePhasespace) - proc(SpotSensor.yRedRatePhasespace);
+                                % build the relative measurements from phasespace
+                                thetaRed = proc(SpotSensor.thetaRedPhasespace);
+    
+                                xBlackRed = proc(SpotSensor.xBlackPhasespace) - proc(SpotSensor.xRedPhasespace);
+                                yBlackRed = proc(SpotSensor.yBlackPhasespace) - proc(SpotSensor.yRedPhasespace);
+    
+                                xBlackRedRate = proc(SpotSensor.xBlackRatePhasespace) - proc(SpotSensor.xRedRatePhasespace);
+                                yBlackRedRate = proc(SpotSensor.yBlackRatePhasespace) - proc(SpotSensor.yRedRatePhasespace);
+    
+                                est(SpotCoord.xRed) = xBlackRed * cos(thetaRed) + yBlackRed * sin(thetaRed);
+                                est(SpotCoord.yRed) = yBlackRed * cos(thetaRed) - xBlackRed * sin(thetaRed);
+    
+                                est_vel(SpotCoord.xRed) = xBlackRedRate * cos(thetaRed) + yBlackRedRate * sin(thetaRed);
+                                est_vel(SpotCoord.yRed) = yBlackRedRate * cos(thetaRed) - xBlackRedRate * sin(thetaRed);
 
-                            est(SpotCoord.xRed) = xBlackRed * cos(thetaRed) + yBlackRed * sin(thetaRed);
-                            est(SpotCoord.yRed) = yBlackRed * cos(thetaRed) - xBlackRed * sin(thetaRed);
-
-                            est_vel(SpotCoord.xRed) = xBlackRedRate * cos(thetaRed) + yBlackRedRate * sin(thetaRed);
-                            est_vel(SpotCoord.yRed) = yBlackRedRate * cos(thetaRed) - xBlackRedRate * sin(thetaRed);
+                            end
 
                             % omega \cross r correction for the rotating reference frame
-                            if ismember( int32(phase), [4 5 6 7] )
+                            if ismember( int32(phase), [4 5 6] )
                                 est_vel(SpotCoord.yRed) = est_vel(SpotCoord.yRed) - 0.85*0.03490659;
                             end
 
