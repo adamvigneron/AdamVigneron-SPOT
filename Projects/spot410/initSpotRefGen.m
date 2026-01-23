@@ -43,7 +43,7 @@ init_states_RED = drop_states_RED;
 thetaRedInit = init_states_RED(3);
 
 % BLACK states
-drop_states_BLACK(3) = drop_states_BLACK(3) - pi/2;
+drop_states_BLACK(3) = drop_states_BLACK(3) + pi/2;
 
 init_states_BLACK    = drop_states_BLACK;
 

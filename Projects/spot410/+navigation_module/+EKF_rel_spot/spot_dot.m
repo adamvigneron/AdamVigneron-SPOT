@@ -41,9 +41,9 @@ x_dot      = state(4);
 y_dot      = state(5);
 theta_dot  = state(6);
 
-% we cheat slightly because omega_dot is zero-mean 
-x_ddot     = ux + omega^2*x + 2*omega*y_dot;  % + omega_dot*y;
-y_ddot     = uy + omega^2*y - 2*omega*x_dot;  % - omega_dot*x;
+% we cheat slightly because x_dot, y_dot, and omega_dot are all zero-mean 
+x_ddot     = ux + omega^2*x;  % + 2*omega*y_dot;  % + omega_dot*y;
+y_ddot     = uy + omega^2*y;  % - 2*omega*x_dot;  % - omega_dot*x;
 theta_ddot = utheta;
 
 omega_dot = 0;

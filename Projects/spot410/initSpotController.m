@@ -13,8 +13,11 @@ paramCtrl = repmat(structCtrl,numPhase,numCoord);
 
 %% predeclare for simulink model
 
+rRef   = 0.85;  % radius, metres
+omgRef = 2*0.03490659;  % angular frequency, rad/s
+
 myTime = 0:baseRate:tsim;
-myData = zeros(length(myTime),numCoord);
+myData = -1 * omgRef^2 * rRef * ones(length(myTime),numCoord);
 
 feedForward = timeseries(myData,myTime);
 
@@ -37,6 +40,12 @@ for phase = phases2to5
     paramCtrl(phase,coord).fun = SpotGnc.ctrlPd_vel;
     paramCtrl(phase,coord).k1  = K_RED(1,1) / mRED;
     paramCtrl(phase,coord).k2  = K_RED(1,4) / mRED;
+end
+
+for phase = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
+             SpotPhase.Phase3_3, SpotPhase.Phase3_4]
+    paramCtrl(phase,coord).fun = SpotGnc.ctrlPdFwd_vel;
+    paramCtrl(phase,coord).k4  = 1;
 end
 
 

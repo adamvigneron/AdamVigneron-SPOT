@@ -29,18 +29,14 @@ end
 
 sensor = SpotSensor.thetaRedImu;
 
-for phase = allPhases
-    paramMeasProc(phase,sensor).fun = SpotGnc.procImuPhasespace;
-end
+% time constant of the exponential moving average
+tau = 3;  % sec
 
-% % time constant of the exponential moving average
-% tau = 3;  % sec
-% 
-% for phase = allPhases
-%     paramMeasProc(phase,sensor).fun = SpotGnc.procImuBias;
-%     paramMeasProc(phase,sensor).k1  = tau;
-%     paramMeasProc(phase,sensor).k2  = baseRate;
-% end
+for phase = allPhases
+    paramMeasProc(phase,sensor).fun = SpotGnc.procImuBias;
+    paramMeasProc(phase,sensor).k1  = tau;
+    paramMeasProc(phase,sensor).k2  = baseRate;
+end
 
 
 %% SpotCoord.thetaStereo | SpotCoord.thetaLidar - default
