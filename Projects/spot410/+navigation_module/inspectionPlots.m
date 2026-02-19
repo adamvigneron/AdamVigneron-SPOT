@@ -13,15 +13,19 @@
 %     dataClass_rt.SpotGnc_EkfDebug.Data(i,:) = debugOut(1,:);
 % end
 
+load('/Users/adamvigneron/carleton/git/GetStarted/PlottingFunctions/Examples/Example Saved Data/ExperimentData_RED_2026_1_22_14_2_35_1079/ExperimentData_RED_2026_1_22_14_2_35_1079_1.mat')
+load('/Users/adamvigneron/carleton/git/GetStarted/PlottingFunctions/Examples/Example Saved Data/noStops_poseWithReconstructedModel.mat')
+
 
 %% SETUP
 
 % change default figure style
 set(groot,'DefaultFigureWindowStyle','docked');
-set(groot,'DefaultLineLineWidth', 2);
+set(groot,'DefaultLineLineWidth', 1.5);
 set(groot,'DefaultAxesFontSize', 12);
 set(groot,'defaultAxesXGrid','on');
 set(groot,'defaultAxesYGrid','on');
+set(groot,'defaultAxesFontName','Times')
 
 colorMap = orderedcolors('gem');
 
@@ -129,32 +133,92 @@ Ekf.omega3sig        = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,56));
 Ekf.range = sqrt( Ekf.xRed.^2 + Ekf.yRed.^2 );
 
 
+%% REPROCESSING
+
+xRepro     = icp.VarName1;
+yRepro     = icp.VarName2;
+thetaRepro = icp.VarName3 * pi / 180 - 7*pi/2;
+    
+tLidar = dataClass_rt.SpotGnc_Proc.Time(diff(dataClass_rt.SpotGnc_Proc.Data(:,37)) ~= 0);
+    
+xLidar2     = interp1(tLidar,xRepro(1:286),     seconds(Proc.Time));
+yLidar2     = interp1(tLidar,yRepro(1:286),     seconds(Proc.Time));
+thetaLidar2 = interp1(tLidar,thetaRepro(1:286), seconds(Proc.Time));
+
+
 %% SENSOR PLOTS
 
-figure;
-plot(Proc.Time,[ProcRel.xBody Ekf.xRed Proc.xStereo Proc.xLidar])
-hold on;
-plot(Proc.Time,Ekf.xRed+Ekf.xRed3sig,'Color',colorMap(2,:),'LineStyle',':')
-plot(Proc.Time,Ekf.xRed-Ekf.xRed3sig,'Color',colorMap(2,:),'LineStyle',':')
-xlabel('time, s');
-ylabel('x-position, m')
-legend('phasespace','ekf','stereo','lidar');
+cuRed = '#e91c24';
 
 figure;
-plot(Proc.Time,[ProcRel.yBody Ekf.yRed Proc.yStereo Proc.yLidar])
+plot(seconds(Proc.Time), ProcRel.xBody, 'k');
 hold on;
-plot(Proc.Time,Ekf.yRed+Ekf.yRed3sig,'Color',colorMap(2,:),'LineStyle',':')
-plot(Proc.Time,Ekf.yRed-Ekf.yRed3sig,'Color',colorMap(2,:),'LineStyle',':')
+plot(seconds(Proc.Time), Proc.xLidar, 'Color', cuRed);
+plot(seconds(Proc.Time), xLidar2, 'k--');
+plot(seconds(Proc.Time), 0*Proc.xLidar + 0.85, 'Color', '#808080', 'LineStyle', '--')
+% plot(Proc.Time, Ekf.xRed, 'Color', cuRed);
+% plot(Proc.Time, Ekf.xRed+Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
+% plot(Proc.Time, Ekf.xRed-Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
 xlabel('time, s');
-ylabel('y-position, m')
-legend('phasespace','ekf','stereo','lidar');
-% ylim([-0.7 0.7])
+ylabel('relative x-axis, m')
+legend('ground truth','real-time estimate','post-processed estimate','desired value','Location','southwest');
+xlim([145 325]);
+ylim([0.65 1.1]);
+
+mysize = [20 10]; set(gcf, 'PaperUnits', 'centimeters', 'PaperSize', mysize, 'PaperPosition', [0 0 mysize]);
+print('xBody','-dpdf','-r200')
 
 figure;
-plot(Proc.Time,rad2deg([ProcRel.thetaInertial+pi/2 Ekf.thetaRed Proc.thetaStereo Proc.thetaLidar]))
+plot(seconds(Proc.Time), ProcRel.yBody, 'k');
+hold on;
+plot(seconds(Proc.Time), Proc.yLidar, 'Color', cuRed);
+plot(seconds(Proc.Time), yLidar2, 'k--');
+plot(seconds(Proc.Time), 0*Proc.yLidar, 'Color', '#808080', 'LineStyle', '--')
+% plot(Proc.Time, Ekf.xRed, 'Color', cuRed);
+% plot(Proc.Time, Ekf.xRed+Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
+% plot(Proc.Time, Ekf.xRed-Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
 xlabel('time, s');
-ylabel('theta-rotation, degrees')
-legend('phasespace','ekf','stereo','lidar');
+ylabel('relative y-axis, m')
+legend('ground truth','real-time estimate','post-processed estimate','desired value','Location','northwest');
+xlim([145 325]);
+ylim([-0.2 0.25]);
+
+mysize = [20 10]; set(gcf, 'PaperUnits', 'centimeters', 'PaperSize', mysize, 'PaperPosition', [0 0 mysize]);
+print('yBody','-dpdf','-r200')
+
+idxLidar = ( diff( Proc.xLidar ) ~= 0 );
+idxLidar = [ false; idxLidar(1:end-1) ];
+
+figure;
+plot(Proc.Time, Proc.thetaBlackPhasespace-pi/2, 'k');
+hold on;
+stairs(Proc.Time(idxLidar), rad2deg(Proc.thetaLidar(idxLidar) + Proc.thetaRedPhasespace(idxLidar) ), 'Color', cuRed, 'LineWidth', 2);
+stairs(Proc.Time(idxLidar), wrapTo180(rad2deg( thetaLidar2(idxLidar) + Proc.thetaRedPhasespace(idxLidar) )), 'Color', '#000000', 'LineWidth', 2, 'LineStyle', '--');
+% plot(Proc.Time, Ekf.xRed, 'Color', cuRed);
+% plot(Proc.Time, Ekf.xRed+Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
+% plot(Proc.Time, Ekf.xRed-Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
+xlabel('time, s');
+ylabel('thetaBlack, degrees')
+legend('ground truth','real-time estimate','post-processed estimate','Location','southeast');
+xlim([seconds(145) seconds(325)]);
+
+figure;
+plot(Proc.Time, rad2deg(Proc.thetaRedPhasespace - Ref.thetaRed), 'k');
+hold on;
+stairs(Proc.Time(idxLidar), rad2deg(Proc.thetaLidar(idxLidar) + Ref.thetaRed(idxLidar) ), 'Color', cuRed, 'LineWidth', 1.5);
+% stairs(Proc.Time(idxLidar), wrapTo180(rad2deg( thetaLidar2(idxLidar) + Ref.thetaRed(idxLidar) )), 'Color', '#000000', 'LineWidth', 2, 'LineStyle', '--');
+plot(Proc.Time, rad2deg( Proc.thetaBlackPhasespace-pi/2 ) , 'Color', '#808080', 'LineStyle', '--');
+% plot(Proc.Time, Ekf.xRed, 'Color', cuRed);
+% plot(Proc.Time, Ekf.xRed+Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
+% plot(Proc.Time, Ekf.xRed-Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
+xlabel('time, s');
+ylabel('inertial client attitude, degrees')
+legend('ground truth','real-time estimate','desired value','Location','southwest');
+xlim([seconds(145) seconds(324)]);
+ylim([-8 10]);
+
+mysize = [20 10]; set(gcf, 'PaperUnits', 'centimeters', 'PaperSize', mysize, 'PaperPosition', [0 0 mysize]);
+print('thetaBlack','-dpdf','-r200')
 
 figure;
 plot(ProcRel.Time, [ProcRel.xRateBody Ekf.xRedRate]);
@@ -293,13 +357,12 @@ axis square;
 xlim([0 3]);
 ylim([0 3]);
 
+plotTimes = timerange(seconds(145),seconds(325));
 
+xLidarRms = rms(ProcRel(plotTimes,:).xBody - Proc(plotTimes,:).xLidar);
+yLidarRms = rms(ProcRel(plotTimes,:).yBody - Proc(plotTimes,:).yLidar);
 
-
-xLidarRms = rms(ProcRel(timerange(seconds(55),seconds(225)),:).xBody - Proc(timerange(seconds(55),seconds(225)),:).xLidar);
-yLidarRms = rms(ProcRel(timerange(seconds(55),seconds(225)),:).yBody - Proc(timerange(seconds(55),seconds(225)),:).yLidar);
-
-xStereoRms = rms(ProcRel(timerange(seconds(55),seconds(225)),:).xBody - Proc(timerange(seconds(55),seconds(225)),:).xStereo);
-yStereoRms = rms(ProcRel(timerange(seconds(55),seconds(225)),:).yBody - Proc(timerange(seconds(55),seconds(225)),:).yStereo);
+xStereoRms = rms(ProcRel(plotTimes,:).xBody - Proc(plotTimes,:).xStereo);
+yStereoRms = rms(ProcRel(plotTimes,:).yBody - Proc(plotTimes,:).yStereo);
 
 [xLidarRms yLidarRms; xStereoRms yStereoRms]
