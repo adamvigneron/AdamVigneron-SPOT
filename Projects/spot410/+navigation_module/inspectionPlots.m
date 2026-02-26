@@ -148,14 +148,14 @@ thetaLidar2 = interp1(tLidar,thetaRepro(1:286), seconds(Proc.Time));
 
 %% SENSOR PLOTS
 
-cuRed = '#e91c24';
+cuRed = '#D0103A';
 
 figure;
-plot(seconds(Proc.Time), ProcRel.xBody, 'k');
+plot(seconds(Proc.Time), ProcRel.xBody, 'Color', '#FDC82F');
 hold on;
 plot(seconds(Proc.Time), Proc.xLidar, 'Color', cuRed);
-plot(seconds(Proc.Time), xLidar2, 'k--');
-plot(seconds(Proc.Time), 0*Proc.xLidar + 0.85, 'Color', '#808080', 'LineStyle', '--')
+plot(seconds(Proc.Time), xLidar2, 'Color', '#0098DB', 'LineStyle', '--');
+plot(seconds(Proc.Time), 0*Proc.xLidar + 0.85, 'Color', '#008542', 'LineStyle', '--')
 % plot(Proc.Time, Ekf.xRed, 'Color', cuRed);
 % plot(Proc.Time, Ekf.xRed+Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
 % plot(Proc.Time, Ekf.xRed-Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
@@ -169,11 +169,11 @@ mysize = [20 10]; set(gcf, 'PaperUnits', 'centimeters', 'PaperSize', mysize, 'Pa
 print('xBody','-dpdf','-r200')
 
 figure;
-plot(seconds(Proc.Time), ProcRel.yBody, 'k');
+plot(seconds(Proc.Time), ProcRel.yBody, 'Color', '#FDC82F');
 hold on;
 plot(seconds(Proc.Time), Proc.yLidar, 'Color', cuRed);
-plot(seconds(Proc.Time), yLidar2, 'k--');
-plot(seconds(Proc.Time), 0*Proc.yLidar, 'Color', '#808080', 'LineStyle', '--')
+plot(seconds(Proc.Time), yLidar2, 'Color', '#0098DB', 'LineStyle', '--');
+plot(seconds(Proc.Time), 0*Proc.yLidar, 'Color', '#008542', 'LineStyle', '--')
 % plot(Proc.Time, Ekf.xRed, 'Color', cuRed);
 % plot(Proc.Time, Ekf.xRed+Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
 % plot(Proc.Time, Ekf.xRed-Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
@@ -190,7 +190,7 @@ idxLidar = ( diff( Proc.xLidar ) ~= 0 );
 idxLidar = [ false; idxLidar(1:end-1) ];
 
 figure;
-plot(Proc.Time, Proc.thetaBlackPhasespace-pi/2, 'k');
+plot(Proc.Time, Proc.thetaBlackPhasespace-pi/2, 'Color', '#FDC82F');
 hold on;
 stairs(Proc.Time(idxLidar), rad2deg(Proc.thetaLidar(idxLidar) + Proc.thetaRedPhasespace(idxLidar) ), 'Color', cuRed, 'LineWidth', 2);
 stairs(Proc.Time(idxLidar), wrapTo180(rad2deg( thetaLidar2(idxLidar) + Proc.thetaRedPhasespace(idxLidar) )), 'Color', '#000000', 'LineWidth', 2, 'LineStyle', '--');
@@ -203,11 +203,11 @@ legend('ground truth','real-time estimate','post-processed estimate','Location',
 xlim([seconds(145) seconds(325)]);
 
 figure;
-plot(Proc.Time, rad2deg(Proc.thetaRedPhasespace - Ref.thetaRed), 'k');
+plot(Proc.Time, rad2deg(Proc.thetaRedPhasespace - Ref.thetaRed), 'Color', '#FDC82F');
 hold on;
 stairs(Proc.Time(idxLidar), rad2deg(Proc.thetaLidar(idxLidar) + Ref.thetaRed(idxLidar) ), 'Color', cuRed, 'LineWidth', 1.5);
 % stairs(Proc.Time(idxLidar), wrapTo180(rad2deg( thetaLidar2(idxLidar) + Ref.thetaRed(idxLidar) )), 'Color', '#000000', 'LineWidth', 2, 'LineStyle', '--');
-plot(Proc.Time, rad2deg( Proc.thetaBlackPhasespace-pi/2 ) , 'Color', '#808080', 'LineStyle', '--');
+plot(Proc.Time, rad2deg( Proc.thetaBlackPhasespace-pi/2 ) , 'Color', '#008542', 'LineStyle', '--');
 % plot(Proc.Time, Ekf.xRed, 'Color', cuRed);
 % plot(Proc.Time, Ekf.xRed+Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
 % plot(Proc.Time, Ekf.xRed-Ekf.xRed3sig,'Color',cuRed,'LineStyle',':')
@@ -349,7 +349,7 @@ legend('RED\_Tz\_Nm','RED\_Tz\_Sat\_Nm');
 figure;
 plot(Proc.xRedPhasespace, Proc.yRedPhasespace,'r');
 hold on;
-plot(Proc.xBlackPhasespace, Proc.yBlackPhasespace, 'k');
+plot(Proc.xBlackPhasespace, Proc.yBlackPhasespace, 'Color', '#FDC82F');
 xlabel('SPOT x-axis');
 ylabel('SPOT y-axis');
 legend('RED','BLACK');
