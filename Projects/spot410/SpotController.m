@@ -21,6 +21,8 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
     persistent fwdStore;
     persistent idxRW;
     persistent initFlag;
+    persistent ilcF;
+    persistent ilcG;
 
     % persistent variables - initialization
     if isempty(errOld)
@@ -31,6 +33,8 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
         fwdStore = zeros(numStore,3);
         idxRW    = zeros(numCoord,1);
         initFlag = zeros(numPhase,numCoord);
+
+        [ilcF,ilcG] = initializeILC;
     end
 
 
@@ -96,7 +100,7 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
                     elseif (phase == SpotPhase.Phase3_2) || (phase == SpotPhase.Phase3_3) || (phase == SpotPhase.Phase3_4)
 
                         if ~initFlag(phase,coord)
-                            fwdStore = learning_control.initPtypeLearning(coord,errStore,cmdStore,fwdStore);
+                            fwdStore = learning_control.initPtypeLearning(coord,errStore,cmdStore,fwdStore,ilcF,ilcG);
                             idxRW(coord) = 1;
                             initFlag(phase,coord) = 1;
                         end
@@ -164,4 +168,56 @@ function [F,debug] = SpotController(phase, err, err_vel, feedFwd, paramCtrl)
     end % loop coords
 
 end % function
+
+
+function [F,G] = initializeILC()
+
+    % PARAMETERS
+    deployLength = 20;      % seconds
+    baseRate     = 0.05;    % seconds
+        
+    % double integrator, continuous time
+    % A = [0 1; 0 0];
+    % B = [0; 1];
+    % C = [1 0];
+    % D = 0;
+    
+    % double integrator, discrete time (zoh)
+    Ad = [1 baseRate; 0 1];
+    Bd = [0.5*baseRate^2; baseRate];
+    Cd = [1 0];
+    % Dd = 0;
+    
+    % dimensions
+    xDim   = size(Bd,1);
+    uDim   = size(Bd,2);
+    % yDim = size(Cd,1);
+    
+    % we only apply ILC during the manoeuvre itself
+    nILC = round(deployLength / baseRate);
+    
+    % F matrix
+    F_store        = zeros( xDim, uDim, nILC);
+    F_store(:,:,2) = Bd;
+    
+    for q = 3:nILC
+        F_store(:,:,q) = Ad * F_store(:,:,q-1);
+    end
+        
+    F = zeros( nILC*xDim, nILC*uDim );
+    
+    for l = 1:nILC
+        rowIdx = (1:xDim) + (l-1)*xDim;
+    
+        for m = 1:l
+            colIdx = (1:uDim) + (m-1)*uDim;
+            F(rowIdx,colIdx) = F_store(:,:,l-m+1);
+        end
+    end
+    
+    % G matrix
+    GCell = repmat({Cd},1,nILC);
+    G     = blkdiag(GCell{:});
+
+end
 
