@@ -49,10 +49,10 @@ xlim([seconds(30) seconds(150)]);
 legend('first','second','third','fourth')
 title('Err.thetaRed');
 
-rms1 = (rms(Err(timerange(seconds( 60),seconds( 80)),:).thetaRed) + rms(Err(timerange(seconds(110),seconds(130)),:).thetaRed) ) / 2;
-rms2 = (rms(Err(timerange(seconds(180),seconds(200)),:).thetaRed) + rms(Err(timerange(seconds(230),seconds(250)),:).thetaRed) ) / 2;
-rms3 = (rms(Err(timerange(seconds(300),seconds(320)),:).thetaRed) + rms(Err(timerange(seconds(350),seconds(370)),:).thetaRed) ) / 2;
-rms4 = (rms(Err(timerange(seconds(420),seconds(440)),:).thetaRed) + rms(Err(timerange(seconds(470),seconds(490)),:).thetaRed) ) / 2;
+rms1 = (rms(Err(timerange(seconds( 65),seconds( 80)),:).thetaRed) + rms(Err(timerange(seconds(115),seconds(130)),:).thetaRed) ) / 2;
+rms2 = (rms(Err(timerange(seconds(185),seconds(200)),:).thetaRed) + rms(Err(timerange(seconds(235),seconds(250)),:).thetaRed) ) / 2;
+rms3 = (rms(Err(timerange(seconds(305),seconds(320)),:).thetaRed) + rms(Err(timerange(seconds(355),seconds(370)),:).thetaRed) ) / 2;
+rms4 = (rms(Err(timerange(seconds(425),seconds(440)),:).thetaRed) + rms(Err(timerange(seconds(475),seconds(490)),:).thetaRed) ) / 2;
 thetaRms = rad2deg([rms1 rms2 rms3 rms4])
 
 figure;
@@ -105,6 +105,12 @@ xlim([seconds(30) seconds(150)]);
 legend('first','second','third','fourth')
 title('Err.xRed');
 
+rms1 = (rms(Err(timerange(seconds( 65),seconds( 80)),:).xRed) + rms(Err(timerange(seconds(115),seconds(130)),:).xRed) ) / 2;
+rms2 = (rms(Err(timerange(seconds(185),seconds(200)),:).xRed) + rms(Err(timerange(seconds(235),seconds(250)),:).xRed) ) / 2;
+rms3 = (rms(Err(timerange(seconds(305),seconds(320)),:).xRed) + rms(Err(timerange(seconds(355),seconds(370)),:).xRed) ) / 2;
+rms4 = (rms(Err(timerange(seconds(425),seconds(440)),:).xRed) + rms(Err(timerange(seconds(475),seconds(490)),:).xRed) ) / 2;
+xRms = rad2deg([rms1 rms2 rms3 rms4])
+
 figure;
 plot(ErrVel.Time, [RefVel.xRed EstVel.xRed ErrVel.xRed])
 hold on;
@@ -152,6 +158,13 @@ plot([seconds(30) seconds(150)],[0 0], 'k');
 xlim([seconds(30) seconds(150)]);
 legend('first','second','third','fourth')
 title('Err.yRed');
+
+rms1 = (rms(Err(timerange(seconds( 65),seconds( 80)),:).yRed) + rms(Err(timerange(seconds(115),seconds(130)),:).yRed) ) / 2;
+rms2 = (rms(Err(timerange(seconds(185),seconds(200)),:).yRed) + rms(Err(timerange(seconds(235),seconds(250)),:).yRed) ) / 2;
+rms3 = (rms(Err(timerange(seconds(305),seconds(320)),:).yRed) + rms(Err(timerange(seconds(355),seconds(370)),:).yRed) ) / 2;
+rms4 = (rms(Err(timerange(seconds(425),seconds(440)),:).yRed) + rms(Err(timerange(seconds(475),seconds(490)),:).yRed) ) / 2;
+yRms = rad2deg([rms1 rms2 rms3 rms4])
+
 
 figure;
 plot(ErrVel.Time, [RefVel.yRed EstVel.yRed ErrVel.yRed])
