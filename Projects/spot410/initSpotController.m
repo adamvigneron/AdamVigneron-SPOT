@@ -14,7 +14,7 @@ paramCtrl = repmat(structCtrl,numPhase,numCoord);
 %% predeclare for simulink model
 
 rRef   = 0.85;  % radius, metres
-omgRef = 2*0.03490659;  % angular frequency, rad/s
+omgRef = 0.03490659;  % angular frequency, rad/s
 
 myTime = 0:baseRate:tsim;
 myData = -1 * omgRef^2 * rRef * ones(length(myTime),numCoord);
