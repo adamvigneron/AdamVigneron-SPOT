@@ -64,8 +64,8 @@ for phase = [SpotPhase.Phase3_1  SpotPhase.Phase3_2 ...
         % paramRefGen(phase,coord).k2 is set for each coordinate individually
         
         paramRefGen(phase,coord).k3 = paramPhaseMgmt(phase-1).phaseEnd;  % phase epoch
-        paramRefGen(phase,coord).k4 = 20;  % deploy interval
-        paramRefGen(phase,coord).k5 = 30;  % pause interval
+        paramRefGen(phase,coord).k4 = 15;  % deploy interval
+        paramRefGen(phase,coord).k5 = 35;  % pause interval
 
     end
 

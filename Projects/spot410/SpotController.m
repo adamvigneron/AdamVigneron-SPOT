@@ -173,7 +173,7 @@ end % function
 function [F,G] = initializeILC()
 
     % PARAMETERS
-    deployLength = 20;      % seconds
+    deployLength = 15;      % seconds
     baseRate     = 0.05;    % seconds
         
     % double integrator, continuous time

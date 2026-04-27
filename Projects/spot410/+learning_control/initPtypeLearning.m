@@ -3,8 +3,8 @@ function fwdStore = initPtypeLearning(coord,errStore,cmdStore,fwdStore,ilcF,ilcG
     % PARAMETERS
     mRED         = 11.297;  % mass for RED, kg
     IRED         = 0.1982;  % MoI for RED, kg.m2
-    deployLength = 20;      % seconds
-    pauseLength  = 30;      % seconds
+    deployLength = 15;      % seconds
+    pauseLength  = 35;      % seconds
     baseRate     = 0.05;    % seconds
     aveWindow    = 1;       % seconds
     cmdFactor    = 0.5;     % unitless on the range 0 to 1 inclusive
