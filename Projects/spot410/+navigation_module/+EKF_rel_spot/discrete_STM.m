@@ -20,61 +20,58 @@ function [Phi, F] = discrete_STM(state_pre, dT)
 
 %% Partial derivatives of the 2 nonlinear equations
 
-x     = state_pre(1);
-y     = state_pre(2);
-omega = state_pre(7);
+xBr         = state_pre(1);
+yBr         = state_pre(2);
+thetaRedDot = state_pre(8);
 
-%Derivatives of x-acceleration equation
-dxddot_dx          = omega^2;
-dxddot_dy          = 0;  % + omega_dot;
-dxddot_dtheta      = 0;
-dxddot_dx_dot      = 0;
-dxddot_dy_dot      = 0;  % + 2*omega;
-dxddot_dtheta_dot  = 0;
-dxddot_domega      = 2*omega*x;  % + 2*y_dot
+% Derivatives of x-acceleration equation
+% xBr_ddot = ux + thetaRed_dot^2*xBr + 2*thetaRed_dot*yBr_dot + thetaRed_ddot*yBr;
 
-%Derivatives of y-acceleration equation
-dyddot_dx          = 0;  % - omega_dot;
-dyddot_dy          = omega^2;
-dyddot_dtheta      = 0;
-dyddot_dx_dot      = 0;  % - 2*omega;
-dyddot_dy_dot      = 0;
-dyddot_dtheta_dot  = 0;
-dyddot_domega      = 2*omega*y;  % - 2*x_dot 
+dxddot_dxBr         = thetaRedDot^2;
+dxddot_dyBr         = 0;  % + thetaRed_ddot;
+dxddot_dthetaBr     = 0;
+dxddot_dthetaRed    = 0;
+dxddot_dxBrDot      = 0;
+dxddot_dyBrDot      = 0;  % + 2*thetaRedDot;
+dxddot_dthetaBrDot  = 0;
+dxddot_dthetaRedDot = 2*thetaRedDot*xBr;  % + 2*yBrDot;
+
+% Derivatives of y-acceleration equation
+% uy + thetaRed_dot^2*yBr - 2*thetaRed_dot*xBr_dot - thetaRed_ddot*xBr;
+
+dyddot_dxBr         = 0;  % - thetaRed_ddot;
+dyddot_dyBr         = thetaRedDot^2;
+dyddot_dthetaBr     = 0;
+dyddot_dthetaRed    = 0;
+dyddot_dxBrDot      = 0;  % - 2*thetaRedDot;
+dyddot_dyBrDot      = 0;
+dyddot_dthetaBrDot  = 0;
+dyddot_dthetaRedDot = 2*thetaRedDot*yBr;  % - 2*xBrDot;
 
 
-%% Assembling the Jacobian (7x7 Matrix)
+%% Assembling the Jacobian (8x8 Matrix)
 
-F11 = zeros(3,3);
-F12 = eye(3,3);
-F13 = zeros(3,1);
+F11 = zeros(4,4);
+F12 = eye(4,4);
 
-F21 = [dxddot_dx dxddot_dy dxddot_dtheta];
-F22 = [dxddot_dx_dot dxddot_dy_dot dxddot_dtheta_dot];
-F23 = dxddot_domega;
+F21 = [dxddot_dxBr    dxddot_dyBr    dxddot_dthetaBr    dxddot_dthetaRed];
+F22 = [dxddot_dxBrDot dxddot_dyBrDot dxddot_dthetaBrDot dxddot_dthetaRedDot];
 
-F31 = [dyddot_dx dyddot_dy dyddot_dtheta];
-F32 = [dyddot_dx_dot dyddot_dy_dot dyddot_dtheta_dot];
-F33 = dyddot_domega;
+F31 = [dyddot_dxBr    dyddot_dyBr    dyddot_dthetaBr    dyddot_dthetaRed];
+F32 = [dyddot_dxBrDot dyddot_dyBrDot dyddot_dthetaBrDot dyddot_dthetaRedDot];
 
-F41 = [0 0 0];
-F42 = [0 0 0];
-F43 = 0;
+F41 = zeros(2,4);
+F42 = zeros(2,4);
 
-F51 = [0 0 0];
-F52 = [0 0 0];
-F53 = 0;
-
-F = [ F11 F12 F13
-      F21 F22 F23
-      F31 F32 F33
-      F41 F42 F43
-      F51 F52 F53 ];
+F = [ F11 F12
+      F21 F22
+      F31 F32
+      F41 F42 ];
 
 %% Calculate the approximate state transition matrix, Phi = expm(F*dT)
 
 Phi = (F*dT) * ( ((F*dT)/2) * ( ((F*dT)/3) * ( ((F*dT)/4) ...
-                 + eye(7,7) )   + eye(7,7) )   + eye(7,7) ) + eye(7,7);
+                 + eye(8,8) )   + eye(8,8) )   + eye(8,8) ) + eye(8,8);
 
 
 end

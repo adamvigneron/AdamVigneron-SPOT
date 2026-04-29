@@ -38,8 +38,8 @@ coord = SpotCoord.xRed;
 
 for phase = phases2to5
     paramCtrl(phase,coord).fun = SpotGnc.ctrlPd_vel;
-    paramCtrl(phase,coord).k1  = K_RED(1,1) / mRED;
-    paramCtrl(phase,coord).k2  = K_RED(1,4) / mRED;
+    paramCtrl(phase,coord).k1  = K_RED(1,1) / mRED / 4;
+    paramCtrl(phase,coord).k2  = K_RED(1,4) / mRED / sqrt(4);
 end
 
 for phase = [SpotPhase.Phase3_1, SpotPhase.Phase3_2, ...
@@ -55,8 +55,8 @@ coord = SpotCoord.yRed;
 
 for phase = phases2to5
     paramCtrl(phase,coord).fun = SpotGnc.ctrlPd_vel;
-    paramCtrl(phase,coord).k1  = K_RED(2,2) / mRED;
-    paramCtrl(phase,coord).k2  = K_RED(2,5) / mRED;
+    paramCtrl(phase,coord).k1  = K_RED(2,2) / mRED / 4;
+    paramCtrl(phase,coord).k2  = K_RED(2,5) / mRED / sqrt(4);
 end
 
 

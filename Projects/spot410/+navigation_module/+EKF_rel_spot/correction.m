@@ -21,10 +21,10 @@ function [output] = correction(input_priori, measVec, R)
 %% Initialize and assign data
 
 % Propagated State Vector (Nx1)
-state_priori = reshape( input_priori(1: 7), 7, 1 );
+state_priori = reshape( input_priori(1: 8), 8, 1 );
 
 % Propagated State Error Covariance (NxN)
-P_priori     = reshape( input_priori(8:56), 7, 7 );
+P_priori     = reshape( input_priori(9:72), 8, 8 );
 
 % Measurement vector (Mx1)
 Z_m = measVec;
@@ -32,11 +32,12 @@ Z_m = measVec;
 
 %% Defining the measurement model
 
-% Relative x, y, and theta plus inertial omega (MxN)
-H = [ 1 0 0 0 0 0 0
-      0 1 0 0 0 0 0
-      0 0 1 0 0 0 0
-      0 0 0 0 0 0 1 ];
+% relative lidar (xBr, yBr, thetaBr), absolute thetaRed and thetaRedDot (MxN)
+H = [ 1 0 0 0 0 0 0 0
+      0 1 0 0 0 0 0 0
+      0 0 1 0 0 0 0 0
+      0 0 0 1 0 0 0 0 
+      0 0 0 0 0 0 0 1 ];
 
 
 %% Calculate the Kalman Gain
@@ -63,7 +64,7 @@ correction  = K*innovations;
 state_post  = state_priori + correction;
 
 % Correct the state error covariance matrix - Joseph's Form (NxN Matrix)
-P_post = (eye(7)-K*H)*P_priori*(eye(7)-K*H)' + K*R*K';
+P_post = (eye(8)-K*H)*P_priori*(eye(8)-K*H)' + K*R*K';
 
 
 %% Converting data into output vector format

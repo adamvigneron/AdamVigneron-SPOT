@@ -50,13 +50,22 @@ end
 
 %% SpotCoord.*Red - SpotPhase.Phase1 through Phase6
 
+% in general, run open-loop
+
 for phase = phases1to6
     for coord = [ SpotCoord.xRed, SpotCoord.yRed, SpotCoord.thetaRed ]
-        paramEst(phase,coord).fun = SpotGnc.estEkfLidar;
-        paramEst(phase,coord).k1  = rRef;
-        paramEst(phase,coord).k2  = baseRate;
+        paramEst(phase,coord).fun = SpotGnc.estEkfLidarOpenLoop;
+        paramEst(phase,coord).k1  = baseRate;
         % paramEst(phase,coord).sensor has already been set
         % paramEst(phase,coord).rateSensor has already been set
     end
+end
+
+% in Phase3_4, run closed-loop
+
+phase = SpotPhase.Phase3_4;
+
+for coord = [ SpotCoord.xRed, SpotCoord.yRed, SpotCoord.thetaRed ]
+    paramEst(phase,coord).fun = SpotGnc.estEkfLidar;
 end
 
