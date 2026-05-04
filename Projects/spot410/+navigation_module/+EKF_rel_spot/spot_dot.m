@@ -49,9 +49,9 @@ xBr_ddot = ux + thetaRed_dot^2*xBr;  % + 2*thetaRed_dot*yBr_dot + thetaRed_ddot*
 yBr_ddot = uy + thetaRed_dot^2*yBr;  % - 2*thetaRed_dot*xBr_dot - thetaRed_ddot*xBr;
 
 % relative theta acceleration is a function of thetaBlack_ddot and thetaRed_ddot
-% thetaBlack_ddot - we don't know anything about this
-% thetaRed_ddot   - this is a function of utheta which is noisy and zero mean
-% since we have great IMU measurements of thetaRedDit, we choose not to propagate
+%   thetaBlack_ddot - we don't know anything about this
+%   thetaRed_ddot   - this is a function of utheta which is noisy and zero-mean
+% since we have great IMU measurements of thetaRedDot, we choose not to propagate
 thetaBr_ddot  = 0;  % -1 * utheta
 thetaRed_ddot = 0;  % utheta
 

@@ -1,25 +1,6 @@
 %% PRE-SETUP
 
-% dataClass_rt = dataClass;
-
 % clear SpotEstimator
-% 
-% % % unpack saturated forces and torques
-% % Fx = dataClass_rt.RED_Fx_Sat_N.Data;
-% % Fy = dataClass_rt.RED_Fy_Sat_N.Data;
-% % Tz = dataClass_rt.RED_Tz_Sat_Nm.Data;
-% % 
-% % % rotate the inertial forces into the body frame
-% % Rz = dataClass_rt.RED_Rz_rad.Data;
-% % FxB = Fx .* cos(Rz) + Fy .* sin(Rz);
-% % FyB = Fy .* cos(Rz) - Fx .* sin(Rz);
-% % 
-% % % update the commands with their saturated counterparts
-% % satCmd = dataClass_rt.SpotGnc_Cmd.Data;
-% % satCmd(:,1) = FxB / 11.2970;
-% % satCmd(:,2) = FyB / 11.2970;
-% % satCmd(:,3) = Tz / 0.1982;
-% % satCmd = -1 * satCmd;
 % 
 % for i = 2:length(dataClass_rt.Time_s.Time)
 %     [~,~,~,debugOut] = SpotEstimator( dataClass_rt.SpotGnc_Phase.Data(i,:), ...
@@ -29,9 +10,6 @@
 % 
 %     dataClass_rt.SpotGnc_EkfDebug.Data(i,:) = debugOut(1,:);
 % end
-
-% load('/Users/adamvigneron/carleton/git/GetStarted/PlottingFunctions/Examples/Example Saved Data/ExperimentData_RED_2026_1_22_14_2_35_1079/ExperimentData_RED_2026_1_22_14_2_35_1079_1.mat')
-% load('/Users/adamvigneron/carleton/git/GetStarted/PlottingFunctions/Examples/Example Saved Data/noStops_poseWithReconstructedModel.mat')
 
 
 %% SETUP
@@ -152,19 +130,6 @@ Ekf.thetaRedRate3sig = 3*sqrt(dataClass_rt.SpotGnc_EkfDebug.Data(:,72));
 Ekf.range = sqrt( Ekf.xBr.^2 + Ekf.yBr.^2 );
 
 
-%% REPROCESSING
-
-% xRepro     = icp.VarName1;
-% yRepro     = icp.VarName2;
-% thetaRepro = icp.VarName3 * pi / 180 - 7*pi/2;
-% 
-% tLidar = dataClass_rt.SpotGnc_Proc.Time(diff(dataClass_rt.SpotGnc_Proc.Data(:,37)) ~= 0);
-% 
-% xLidar2     = interp1(tLidar,xRepro(1:286),     seconds(Proc.Time));
-% yLidar2     = interp1(tLidar,yRepro(1:286),     seconds(Proc.Time));
-% thetaLidar2 = interp1(tLidar,thetaRepro(1:286), seconds(Proc.Time));
-
-
 %% SENSOR PLOTS
 
 cuRed = '#e91c24';
@@ -173,7 +138,6 @@ figure;
 plot(seconds(Proc.Time), ProcRel.xBody, 'k');
 hold on;
 plot(seconds(Proc.Time), Proc.xLidar, 'b');
-% plot(seconds(Proc.Time), xLidar2, 'k--');
 plot(seconds(Proc.Time), 0*Proc.xLidar + 0.85, 'Color', '#808080', 'LineStyle', '--')
 plot(seconds(Proc.Time), Ekf.xBr, 'Color', cuRed);
 plot(seconds(Proc.Time), Ekf.xBr+Ekf.xBr3sig,'Color',cuRed,'LineStyle',':')
@@ -181,7 +145,6 @@ plot(seconds(Proc.Time), Ekf.xBr-Ekf.xBr3sig,'Color',cuRed,'LineStyle',':')
 xlabel('time, s');
 ylabel('relative x-axis, m');
 legend('phasespace','lidar','','filter');
-% legend('ground truth','real-time estimate','post-processed estimate','desired value','Location','southwest');
 xlim([145 325]);
 ylim([0.65 1.1]);
 
@@ -192,7 +155,6 @@ figure;
 plot(seconds(Proc.Time), ProcRel.yBody, 'k');
 hold on;
 plot(seconds(Proc.Time), Proc.yLidar, 'b');
-% plot(seconds(Proc.Time), yLidar2, 'k--');
 plot(seconds(Proc.Time), 0*Proc.yLidar, 'Color', '#808080', 'LineStyle', '--')
 plot(seconds(Proc.Time), Ekf.yBr, 'Color', cuRed);
 plot(seconds(Proc.Time), Ekf.yBr+Ekf.yBr3sig,'Color',cuRed,'LineStyle',':')
@@ -200,7 +162,6 @@ plot(seconds(Proc.Time), Ekf.yBr-Ekf.yBr3sig,'Color',cuRed,'LineStyle',':')
 xlabel('time, s');
 ylabel('relative y-axis, m')
 legend('phasespace','lidar','','filter');
-% legend('ground truth','real-time estimate','post-processed estimate','desired value','Location','northwest');
 xlim([145 325]);
 ylim([-0.2 0.25]);
 
@@ -214,14 +175,12 @@ figure;
 plot(Proc.Time, Proc.thetaBlackPhasespace-pi/2, 'k');
 hold on;
 stairs(Proc.Time(idxLidar), rad2deg(Proc.thetaLidar(idxLidar) + Proc.thetaRedPhasespace(idxLidar) ), 'b', 'LineWidth', 2);
-% stairs(Proc.Time(idxLidar), wrapTo180(rad2deg( thetaLidar2(idxLidar) + Proc.thetaRedPhasespace(idxLidar) )), 'Color', '#000000', 'LineWidth', 2, 'LineStyle', '--');
 plot(seconds(Proc.Time), rad2deg(Ekf.thetaBr + Proc.thetaRedPhasespace), 'Color', cuRed);
 plot(Proc.Time, rad2deg(Ekf.thetaBr + Proc.thetaRedPhasespace+Ekf.thetaBr3sig),'Color',cuRed,'LineStyle',':')
 plot(Proc.Time, rad2deg(Ekf.thetaBr + Proc.thetaRedPhasespace-Ekf.thetaBr3sig),'Color',cuRed,'LineStyle',':')
 xlabel('time, s');
 ylabel('thetaBlack, degrees');
 legend('phasespace','lidar','filter');
-% legend('ground truth','real-time estimate','post-processed estimate','Location','southeast');
 xlim([seconds(145) seconds(325)]);
 
 % mysize = [20 10]; set(gcf, 'PaperUnits', 'centimeters', 'PaperSize', mysize, 'PaperPosition', [0 0 mysize]);
@@ -234,10 +193,8 @@ plot(seconds(Proc.Time), rad2deg(Ekf.thetaRed - Ref.thetaRed));
 plot(Proc.Time, rad2deg(Ekf.thetaRed - Ref.thetaRed+Ekf.thetaRed3sig),'Color',colorMap(2,:),'LineStyle',':')
 plot(Proc.Time, rad2deg(Ekf.thetaRed - Ref.thetaRed-Ekf.thetaRed3sig),'Color',colorMap(2,:),'LineStyle',':')
 xlabel('time, s');
-ylabel('thetaRedErr, degrees');
+ylabel('thetaRed w.r.t. reference, degrees');
 legend('phasespace','filter');
-% legend('ground truth','real-time estimate','post-processed estimate','Location','southeast');
-% xlim([seconds(145) seconds(325)]);
 
 % mysize = [20 10]; set(gcf, 'PaperUnits', 'centimeters', 'PaperSize', mysize, 'PaperPosition', [0 0 mysize]);
 % print('thetaBlack','-dpdf','-r200')

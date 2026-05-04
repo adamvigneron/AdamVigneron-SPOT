@@ -161,10 +161,6 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                                               reshape(ekfP0,[],1) ];
                         end
 
-                        % if phase == 6
-                        %     disp('here');
-                        % end
-
                         % propagate state estimates from previous time step to a-priori estimates
                         ekfOutput = navigation_module.EKF_rel_spot.propagation( ...
                             ekfOutputPrev, cmd, baseRate, ekfQ0 );
@@ -231,7 +227,7 @@ function [est,est_vel,est_bias,debug] = SpotEstimator(phase, proc, cmd, paramEst
                         % bias estimates remain at zero
 
                     otherwise
-                        error('SpotEstimator.m:\n  function SpotGnc.estEkf3dof not defined for SpotCoord(%d).\n\n', int32(coord))
+                        error('SpotEstimator.m:\n  EKF functionality not currently implemented for SpotCoord(%d).\n\n', int32(coord))
 
                 end % switch coord
 

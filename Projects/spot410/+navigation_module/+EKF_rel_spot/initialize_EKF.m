@@ -25,7 +25,7 @@ sig2_thetaBr = ( (1/3) * 1e-4 )^2;  % PhaseSpace at 0.1 mrad (3-sigma)
 sig2_thetaRed = ( (1/3) * 1e-4 )^2;  % PhaseSpace at 0.1 mrad (3-sigma)
 
 sig2_xBrDot     = ( 1e-1 )^2;  % worst-case initial value 0.1 m/s 
-sig2_yBrDot     = ( 1e-1 )^2;  % worst-case initial value 0.1 rad/s
+sig2_yBrDot     = ( 1e-1 )^2;  % worst-case initial value 0.1 m/s
 sig2_thetaBrDot = ( 1e-1 )^2;  % worst-case initial value 0.1 rad/s
 
 sig2_thetaRedDot = ( (1/3) * 1e-3 )^2;  % IMU at 1 mrad/s2 (3-sigma)
@@ -56,9 +56,9 @@ Q0([4 8],[4 8]) = Gamma * Gamma' * q2_thetaRed;
 
 %% Initial R Matrix (Covariance of the measurement noise)
 
-r2_xBr     = ( (1/3) * 5e-3 )^2; % lidar at 5 cm (3-sigma)
-r2_yBr     = ( (1/3) * 5e-3 )^2; % lidar at 5 cm (3-sigma)
-r2_thetaBr = ( (1/3) * 1e-2 )^2; % lidar at 0.1 rad (3-sigma)
+r2_xBr     = ( (1/3) * 5e-3 )^2; % lidar at 5 mm (3-sigma)
+r2_yBr     = ( (1/3) * 5e-3 )^2; % lidar at 5 mm (3-sigma)
+r2_thetaBr = ( (1/3) * 1e-2 )^2; % lidar at 10 mrad (3-sigma)
 
 r2_thetaRed = ( (1/3) * 1e-4 )^2; % PhaseSpace at 0.1 mrad (3-sigma)
 
