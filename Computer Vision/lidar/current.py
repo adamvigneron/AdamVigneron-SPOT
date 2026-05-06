@@ -49,12 +49,21 @@ switch_distance = 1 # [m] If below, switch to short mode
 visualizer_enabled = False # [bool]
 remove_tank = True # from model
 
+
 # Read recording parameters
 sequence = 20
 first_frame = 38
 last_frame = 38
 
 frames = np.linspace(first_frame, last_frame, last_frame-first_frame+1, endpoint = True, dtype=int)
+
+print("-------------------------------------------------------------------------------------------")
+print("Select Orbit: Press 1 for first orbit (using CAD box model), or 2 for second orbit (using reconstructed model)")
+
+orbit = int(input("Enter orbit number: "))
+
+print("-------------------------------------------------------------------------------------------")
+
 ######################################### 3: Functions #######################################################
 def read_specific_frame(seg_num, frame_num):
     try:
@@ -335,6 +344,23 @@ def data_reduction_pcd(pcd):
 
 """Initialization"""
 
+def load_point_cloud_safe(path):
+    data = []
+    with open(path, 'r') as f:
+        for i, line in enumerate(f, 1):
+            line = line.strip()
+            if not line or line.startswith('#'): 
+                continue
+            parts = line.split()
+            if len(parts) != 3:
+                continue
+            try:
+                float_values = [float(p) for p in parts]
+                data.append(float_values)
+            except ValueError:
+                continue
+    return np.array(data)
+
 ######################################### 1: Initialization ######################################################
 # Camera frame to SPOT frame transform
 Identity = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
@@ -364,6 +390,9 @@ distance_threshold_ICP = voxel_size_ICP * 3 # 4
 # Set script states
 read_recording = True if Select_Mode == "Read" else (False)
 
+origin = np.array([0, 0, 0])
+axes = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5, origin=origin)
+
 # UDP Setup
 if send_package_udp:
     sock_send = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -380,31 +409,115 @@ if platform == "Orin":
 
     result_pc_path = "/home/spot-vision/Documents/o3d_icp/pose_estimation/"
 
+    reconstruction_path = "/home/spot-vision/Documents/lidarLegends2026/Reconstructed.txt"
+
 
 elif platform == "Xavier":
     print("Not set for Xavier")
     exit(0)
+################## April 16 - added ####################
 
-# Model Initialization
-try:
-    print("Initializing Model: Start")
+
+##-- added
+if orbit == 2:
+    print("Initializing Reconstruction Model: Start")
+    
+    # use CAD model + RANSAC to move reconstructed model to origin 
+
+    # 1 - Load Box Model
     model_pcd = model_initialization(model_sampling, RotZ180)
-    model_down, model_fpfh = pcd_downsample_fpfh(model_pcd, voxel_size_RANSAC, radius_normal_RANSAC, radius_feature_RANSAC) # Downsample and estimate normals for point cloud
-    model_down.paint_uniform_color([1, 0, 0]) # Red
-    print("Initializing Model: End")
+    cad_down, cad_fpfh = pcd_downsample_fpfh(model_pcd, voxel_size_RANSAC, radius_normal_RANSAC, radius_feature_RANSAC) 
 
-    # print("Loading Neural Net...")
-    # model = load_model(nn_model_path,compile=False)
-    # model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    # print("Net Loaded.")
+    # 2 - Load Reconstructed Model
+    pcd_np = load_point_cloud_safe(reconstruction_path)
+    recon_pcd = o3d.geometry.PointCloud()
+    recon_pcd.points = o3d.utility.Vector3dVector(pcd_np[:, :3])
+    model_down, model_fpfh = pcd_downsample_fpfh(recon_pcd, voxel_size_RANSAC, radius_normal_RANSAC, radius_feature_RANSAC)
 
-except KeyboardInterrupt:
-    print("\nCtrl+C pressed, exiting loop...")
-    exit(0)
-except Exception as e:
-    print(e)
-    print("Could not find Target Model.")
-    exit(0)
+    # o3d.visualization.draw_geometries([model_down, axes],window_name="Reconstructed Point Cloud")
+
+    # RANSAC = registration_RANSAC(cad_down, model_down, cad_fpfh, model_fpfh, distance_threshold_RANSAC, ransac_confidence)
+    # transform_remember = RANSAC.transformation 
+
+    # model_down.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+    # ICP = registration_ICP_point2plane(cad_down, model_down, distance_threshold_ICP, transform_remember)
+
+    ###
+
+    brute_angles_deg = [15, 45, 75, 105, 135, 165]
+    global_start = time.time()
+    # RANSAC
+    # 3 - Transform Reconstructed to Box CAD origin frame
+    try: 
+        transform_temp = registration_RANSAC(cad_down, model_down, cad_fpfh, model_fpfh, distance_threshold_RANSAC, ransac_confidence)        
+        RANSAC_pose = estimate_pose(transform_temp.transformation) # X, Y, Z, Rx, Ry, Rz (millimeters and degrees, relative Chaser-Target)
+
+    # ICP for Global, brute force
+        model_down.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+        best_brute_ICP_fitness = 0
+        best_brute_ICP_transform = None
+        for angle_deg in brute_angles_deg:
+            transform_temp = transform_builder(RANSAC_pose[0], RANSAC_pose[1], np.deg2rad(angle_deg))
+            transform_temp = registration_ICP_point2plane(cad_down, model_down, distance_threshold_ICP, transform_temp)
+            
+            if transform_temp.fitness > best_brute_ICP_fitness:
+                best_brute_ICP_fitness = transform_temp.fitness
+                best_brute_ICP_transform = transform_temp
+
+        best_brute_ICP_pose = estimate_pose(best_brute_ICP_transform.transformation)
+        if -10 < best_brute_ICP_pose[3] < 10 and -10 < best_brute_ICP_pose[4] < 10:
+            # The Global registration output is valid and recorded
+            transform = best_brute_ICP_transform
+            transform_temp = transform # For visualizaer
+            pose = estimate_pose(transform.transformation)
+            fitness = transform.fitness
+            #registration_duration = time.time() - global_start
+
+    except Exception as e:
+        print(e)
+
+    ####
+
+    # inv = np.linalg.inv(RANSAC.transformation)
+    inv = np.linalg.inv(transform.transformation)
+    fly_pose = estimate_pose(inv)
+    transform_fly = transform_builder(fly_pose[0],fly_pose[1], np.deg2rad((fly_pose[5])))
+    fly_pcd = model_down.transform(transform_fly)
+
+    o3d.visualization.draw_geometries([model_down, axes],window_name="RANSAC+ICP Moved Reconstructed Point Cloud")
+
+    print("Initializing Reconstruction Model: End")
+    ##--
+
+else:
+    print("Initializing CAD Model: Start")
+    model_pcd = model_initialization(model_sampling, RotZ180)
+    model_down, model_fpfh = pcd_downsample_fpfh(model_pcd, voxel_size_RANSAC, radius_normal_RANSAC, radius_feature_RANSAC) 
+    #o3d.visualization.draw_geometries([model_down, axes],window_name="CAD Model")
+    model_down.paint_uniform_color([1, 0, 0])
+    print("Initializing CAD Model: End")
+
+################### April 16 - End ########################
+
+# try:
+#     print("Initializing Box Model: Start")
+#     model_pcd = model_initialization(model_sampling, RotZ180)
+#     model_down, model_fpfh = pcd_downsample_fpfh(model_pcd, voxel_size_RANSAC, radius_normal_RANSAC, radius_feature_RANSAC) # Downsample and estimate normals for point cloud
+#     model_down.paint_uniform_color([1, 0, 0]) # Red
+#     print("Initializing Box Model: End")
+
+#     # print("Loading Neural Net...")
+#     # model = load_model(nn_model_path,compile=False)
+#     # model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+#     # print("Net Loaded.")
+
+# except KeyboardInterrupt:
+#     print("\nCtrl+C pressed, exiting loop...")
+#     exit(0)
+# except Exception as e:
+#     print(e)
+#     print("Could not find Target Model.")
+#     exit(0)
 
 # Configure depth stream
 if not read_recording:    
